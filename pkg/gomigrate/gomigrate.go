@@ -2,7 +2,7 @@ package gomigrate
 
 import (
 	"database/sql"
-	"gomigrate/internal/migration"
+	"github.com/tweety53/gomigrate/internal/migration"
 	"runtime"
 )
 
