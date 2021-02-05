@@ -3,7 +3,7 @@ package gomigrate
 import (
 	"database/sql"
 	"fmt"
-	"gomigrate/internal/action"
+	"github.com/tweety53/gomigrate/internal/action"
 )
 
 const (

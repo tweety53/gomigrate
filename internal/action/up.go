@@ -3,9 +3,9 @@ package action
 import (
 	"database/sql"
 	"fmt"
-	errors2 "gomigrate/internal/errors"
-	"gomigrate/internal/log"
-	"gomigrate/internal/migration"
+	errors2 "github.com/tweety53/gomigrate/internal/errors"
+	"github.com/tweety53/gomigrate/internal/log"
+	"github.com/tweety53/gomigrate/internal/migration"
 	"strconv"
 )
 

@@ -2,7 +2,7 @@ package errors
 
 import (
 	"github.com/pkg/errors"
-	"gomigrate/internal/exit_code"
+	"github.com/tweety53/gomigrate/internal/exit_code"
 )
 
 var (

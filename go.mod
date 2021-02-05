@@ -1,4 +1,4 @@
-module "github.com/tweety53/gomigrate"
+module github.com/tweety53/gomigrate
 
 go 1.15
 

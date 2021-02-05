@@ -3,7 +3,7 @@ package migration
 import (
 	"database/sql"
 	"github.com/pkg/errors"
-	"gomigrate/internal/sql_dialect"
+	"github.com/tweety53/gomigrate/internal/sql_dialect"
 	"time"
 )
 

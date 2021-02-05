@@ -3,10 +3,10 @@ package action
 import (
 	"database/sql"
 	"github.com/pkg/errors"
-	errors2 "gomigrate/internal/errors"
-	"gomigrate/internal/log"
-	"gomigrate/internal/migration"
-	"gomigrate/internal/sql_dialect"
+	errors2 "github.com/tweety53/gomigrate/internal/errors"
+	"github.com/tweety53/gomigrate/internal/log"
+	"github.com/tweety53/gomigrate/internal/migration"
+	"github.com/tweety53/gomigrate/internal/sql_dialect"
 	"strconv"
 )
 
