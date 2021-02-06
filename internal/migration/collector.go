@@ -55,7 +55,7 @@ func CollectMigrations(dirpath string, current, target int) (Migrations, error) 
 			return nil, err
 		}
 
-		// Skip migrations already existing migrations registered via goose.AddMigration().
+		// Skip migrations already existing migrations registered via AddMigration().
 		if _, ok := registeredMigrations[v]; ok {
 			continue
 		}

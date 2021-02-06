@@ -9,6 +9,10 @@ type SQLDialect interface {
 	CreateVersionTableSQL() string
 	InsertVersionSQL() string
 	DeleteVersionSQL() string
+	AllTableNamesSQL() string
+	TableForeignKeysSQL() string
+	DropFkSQL(tableName string, fkName string) string
+	DropTableSQL(tableName string) string
 	GetMigrationsHistory(db *sql.DB, limit int) (*sql.Rows, error)
 }
 

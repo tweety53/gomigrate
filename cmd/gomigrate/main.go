@@ -11,6 +11,7 @@ import (
 	"os"
 
 	_ "github.com/lib/pq"
+	_ "github.com/tweety53/gomigrate/migrations"
 )
 
 var (
@@ -81,7 +82,7 @@ func main() {
 		}
 
 		os.Exit(int(exit_code.ExitCodeOK))
-	case "up", "down":
+	case "up", "down", "fresh":
 		if err := gomigrate.Run(action, db, args[1:]); err != nil {
 			log.Printf("gomigrate error: %v\n", err)
 			os.Exit(int(errors.ErrorExitCode(err)))

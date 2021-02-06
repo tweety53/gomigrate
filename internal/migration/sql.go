@@ -18,7 +18,7 @@ import (
 // Run a migration specified in raw SQL.
 //
 // Sections of the script can be annotated with a special comment,
-// starting with "-- +goose" to specify whether the section should
+// starting with "-- +gomigrate" to specify whether the section should
 // be applied during an Up or Down migration
 //
 // All statements following an Up or Down directive are grouped together
@@ -47,13 +47,13 @@ func runSQLMigration(db *sql.DB, statements []string, useTx bool, v string, dire
 			if _, err := tx.Exec(sql_dialect.GetDialect().InsertVersionSQL(), v, int(time.Now().Unix())); err != nil {
 				log.Err("Rollback transaction")
 				tx.Rollback()
-				return errors.Wrap(err, "failed to insert new goose version")
+				return errors.Wrap(err, "failed to insert new gomigrate version")
 			}
 		} else {
 			if _, err := tx.Exec(sql_dialect.GetDialect().DeleteVersionSQL(), v); err != nil {
 				log.Err("Rollback transaction")
 				tx.Rollback()
-				return errors.Wrap(err, "failed to delete goose version")
+				return errors.Wrap(err, "failed to delete gomigrate version")
 			}
 		}
 
@@ -73,7 +73,7 @@ func runSQLMigration(db *sql.DB, statements []string, useTx bool, v string, dire
 		}
 	}
 	if _, err := db.Exec(sql_dialect.GetDialect().InsertVersionSQL(), v, int(time.Now().Unix())); err != nil {
-		return errors.Wrap(err, "failed to insert new goose version")
+		return errors.Wrap(err, "failed to insert new gomigrate version")
 	}
 
 	return nil

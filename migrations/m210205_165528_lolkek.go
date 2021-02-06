@@ -2,7 +2,7 @@ package migrations
 
 import (
 	"database/sql"
-	"gomigrate/pkg/gomigrate"
+	"github.com/tweety53/gomigrate/pkg/gomigrate"
 )
 
 func init() {

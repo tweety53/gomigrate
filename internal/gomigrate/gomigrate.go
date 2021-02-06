@@ -67,7 +67,14 @@ func Run(a string, db *sql.DB, args []string) error {
 			return err
 		}
 	case "fresh":
-		return nil
+		freshAction := action.NewFreshAction(db)
+		params := new(action.FreshActionParams)
+		if err := params.ValidateAndFill(args); err != nil {
+			return err
+		}
+		if err := freshAction.Run(params); err != nil {
+			return err
+		}
 	case "history":
 		return nil
 	case "mark":

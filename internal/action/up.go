@@ -3,9 +3,9 @@ package action
 import (
 	"database/sql"
 	"fmt"
+	"github.com/tweety53/gomigrate/internal/db"
 	errors2 "github.com/tweety53/gomigrate/internal/errors"
 	"github.com/tweety53/gomigrate/internal/log"
-	"github.com/tweety53/gomigrate/internal/migration"
 	"strconv"
 )
 
@@ -43,7 +43,7 @@ func (a *UpAction) Run(params interface{}) error {
 		return errors2.ErrInvalidActionParamsType
 	}
 
-	migrations, err := migration.GetNewMigrations(a.db)
+	migrations, err := db.GetNewMigrations(a.db)
 	if err != nil {
 		return err
 	}
@@ -91,14 +91,15 @@ func (a *UpAction) Run(params interface{}) error {
 	var applied int
 	for i := range migrations {
 		if err = migrations[i].Up(a.db); err != nil {
-			if applied == 1 {
-				logText = "migration was"
-			} else {
-				logText = "migrations were"
-			}
 			log.Errf("\n%d from %d %s applied.\n", applied, n, logText)
-
+			log.Err("\nMigration failed. The rest of the migrations are canceled.\n")
 			return err
+		}
+
+		if applied == 1 {
+			logText = "migration was"
+		} else {
+			logText = "migrations were"
 		}
 
 		applied++
