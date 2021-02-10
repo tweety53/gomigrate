@@ -82,7 +82,7 @@ func main() {
 		}
 
 		os.Exit(int(exit_code.ExitCodeOK))
-	case "up", "down", "fresh":
+	case "up", "down", "fresh", "history", "new", "redo", "to", "mark":
 		if err := gomigrate.Run(action, db, args[1:]); err != nil {
 			log.Printf("gomigrate error: %v\n", err)
 			os.Exit(int(errors.ErrorExitCode(err)))

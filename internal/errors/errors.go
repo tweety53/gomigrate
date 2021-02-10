@@ -8,6 +8,7 @@ import (
 var (
 	ErrNotEnoughArgs           = errors.New("not enough args")
 	ErrInvalidActionParamsType = errors.New("invalid action params type")
+	ErrInvalidVersionFormat    = errors.New("invalid version format")
 )
 
 type Error struct {

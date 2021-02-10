@@ -76,15 +76,50 @@ func Run(a string, db *sql.DB, args []string) error {
 			return err
 		}
 	case "history":
-		return nil
+		historyAction := action.NewHistoryAction(db)
+		params := new(action.HistoryActionParams)
+		if err := params.ValidateAndFill(args); err != nil {
+			return err
+		}
+		if err := historyAction.Run(params); err != nil {
+			return err
+		}
 	case "mark":
-		return nil
+		markAction := action.NewMarkAction(db)
+		params := new(action.MarkActionParams)
+		if err := params.ValidateAndFill(args); err != nil {
+			return err
+		}
+		if err := markAction.Run(params); err != nil {
+			return err
+		}
 	case "new":
-		return nil
+		newAction := action.NewNewAction(db)
+		params := new(action.NewActionParams)
+		if err := params.ValidateAndFill(args); err != nil {
+			return err
+		}
+		if err := newAction.Run(params); err != nil {
+			return err
+		}
 	case "redo":
-		return nil
+		redoAction := action.NewRedoAction(db)
+		params := new(action.RedoActionParams)
+		if err := params.ValidateAndFill(args); err != nil {
+			return err
+		}
+		if err := redoAction.Run(params); err != nil {
+			return err
+		}
 	case "to":
-		return nil
+		toAction := action.NewToAction(db)
+		params := new(action.ToActionParams)
+		if err := params.ValidateAndFill(args); err != nil {
+			return err
+		}
+		if err := toAction.Run(params); err != nil {
+			return err
+		}
 	case "up":
 		upAction := action.NewUpAction(db)
 		params := new(action.UpActionParams)

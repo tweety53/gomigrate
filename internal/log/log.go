@@ -47,3 +47,11 @@ func Warnln(args ...interface{}) {
 func Errln(args ...interface{}) {
 	log.Println(colorRed, args, resetColor)
 }
+
+func Printf(s string, args ...interface{}) {
+	log.Printf(s, args...)
+}
+
+func Println(args ...interface{}) {
+	log.Println(args...)
+}
