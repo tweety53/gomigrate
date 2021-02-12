@@ -3,11 +3,11 @@ package action
 import (
 	"database/sql"
 	"fmt"
+	"github.com/tweety53/gomigrate/internal/db"
 	errors2 "github.com/tweety53/gomigrate/internal/errors"
 	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
-	"github.com/tweety53/gomigrate/internal/sql_dialect"
 	"strconv"
 )
 
@@ -51,7 +51,7 @@ func (a *RedoAction) Run(params interface{}) error {
 		return errors2.ErrInvalidActionParamsType
 	}
 
-	migrationsHistory, err := sql_dialect.GetDialect().GetMigrationsHistory(a.db, p.limit)
+	migrationsHistory, err := db.GetMigrationsHistory(a.db, p.limit)
 	if err != nil {
 		return err
 	}

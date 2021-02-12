@@ -1,13 +1,13 @@
 package sql_dialect
 
 import (
-	"database/sql"
 	"fmt"
-	"strconv"
+	"github.com/tweety53/gomigrate/internal/config"
 )
 
-// PostgresDialect struct.
-type PostgresDialect struct{}
+type PostgresDialect struct {
+	config *config.AppConfig
+}
 
 func (pd PostgresDialect) CreateVersionTableSQL() string {
 	return fmt.Sprintf(`CREATE TABLE %s (
@@ -15,27 +15,11 @@ func (pd PostgresDialect) CreateVersionTableSQL() string {
 				CONSTRAINT migration_pkey
 					PRIMARY KEY,
 			apply_time INTEGER
-            );`, "migration")
+            );`, pd.config.MigrationTable)
 }
 
 func (pd PostgresDialect) InsertVersionSQL() string {
-	return fmt.Sprintf("INSERT INTO %s (version, apply_time) VALUES ($1, $2);", "migration")
-}
-
-func (pd PostgresDialect) GetMigrationsHistory(db *sql.DB, limit int) (*sql.Rows, error) {
-	query := fmt.Sprintf("SELECT version, apply_time FROM %s ORDER BY apply_time DESC, version DESC", "migration")
-	if limit > 0 {
-		query += " LIMIT " + strconv.Itoa(limit)
-	}
-
-	query += ";"
-
-	rows, err := db.Query(query)
-	if err != nil {
-		return nil, err
-	}
-
-	return rows, err
+	return fmt.Sprintf("INSERT INTO %s (version, apply_time) VALUES ($1, $2);", pd.config.MigrationTable)
 }
 
 func (pd PostgresDialect) TableForeignKeysSQL() string {
@@ -80,5 +64,17 @@ DROP TABLE IF EXISTS %s;
 }
 
 func (pd PostgresDialect) DeleteVersionSQL() string {
-	return fmt.Sprintf("DELETE FROM %s WHERE version=$1;", "migration")
+	return fmt.Sprintf("DELETE FROM %s WHERE version=$1;", pd.config.MigrationTable)
+}
+
+func (pd PostgresDialect) InsertUnAppliedVersionSQL() string {
+	return fmt.Sprintf("INSERT INTO %s (version) VALUES ($1);", pd.config.MigrationTable)
+}
+
+func (pd PostgresDialect) UpdateApplyTimeSQL() string {
+	return fmt.Sprintf("UPDATE %s SET apply_time=$1 WHERE version=$2;", pd.config.MigrationTable)
+}
+
+func (pd PostgresDialect) LockVersionSQL() string {
+	return fmt.Sprintf("SELECT * FROM %s WHERE version=$1 FOR UPDATE NOWAIT;", pd.config.MigrationTable)
 }

@@ -2,10 +2,12 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/pkg/errors"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
 	"github.com/tweety53/gomigrate/internal/sql_dialect"
+	"strconv"
 	"time"
 )
 
@@ -14,7 +16,7 @@ func GetNewMigrations(db *sql.DB) (migration.Migrations, error) {
 		return nil, err
 	}
 
-	rows, err := sql_dialect.GetDialect().GetMigrationsHistory(db, 0)
+	rows, err := GetMigrationsHistory(db, 0)
 	if err != nil {
 		return migration.Migrations{}, errors.New("cannot get migrations history from dbogar")
 	}
@@ -28,7 +30,7 @@ func GetNewMigrations(db *sql.DB) (migration.Migrations, error) {
 		}
 
 		// skip base migration
-		if row.Version == "m000000_000000_base" {
+		if row.Version == migration.BaseMigrationVersion {
 			continue
 		}
 
@@ -59,7 +61,7 @@ func GetNewMigrations(db *sql.DB) (migration.Migrations, error) {
 // EnsureDBVersion retrieves the current version for this DB.
 // Create and initialize the DB version table if it doesn't exist.
 func EnsureDBVersion(db *sql.DB) (string, error) {
-	rows, err := sql_dialect.GetDialect().GetMigrationsHistory(db, 1)
+	rows, err := GetMigrationsHistory(db, 1)
 	if err != nil {
 		return "", createVersionTable(db)
 	}
@@ -83,7 +85,7 @@ func createVersionTable(db *sql.DB) error {
 		return err
 	}
 
-	if _, err := txn.Exec(d.InsertVersionSQL(), "m000000_000000_base", int(time.Now().Unix())); err != nil {
+	if _, err := txn.Exec(d.InsertVersionSQL(), migration.BaseMigrationVersion, int(time.Now().Unix())); err != nil {
 		txn.Rollback()
 		return err
 	}
@@ -133,7 +135,7 @@ func TruncateDatabase(db *sql.DB) error {
 				return err
 			}
 
-			log.Infof("Foreign key %s dropped.\n", fkName)
+			log.Infof("Foreign key %s dropped.", fkName)
 		}
 
 		tableNames = append(tableNames, tableName)
@@ -148,7 +150,7 @@ func TruncateDatabase(db *sql.DB) error {
 			return err
 		}
 
-		log.Infof("Table %s dropped.\n", name)
+		log.Infof("Table %s dropped.", name)
 	}
 
 	return nil
@@ -162,4 +164,20 @@ func GetFkRows(db *sql.DB, tableName string) (*sql.Rows, error) {
 	defer fkRows.Close()
 
 	return fkRows, err
+}
+
+func GetMigrationsHistory(db *sql.DB, limit int) (*sql.Rows, error) {
+	query := fmt.Sprintf("SELECT version, apply_time FROM %s ORDER BY apply_time DESC, version DESC", "migration")
+	if limit > 0 {
+		query += " LIMIT " + strconv.Itoa(limit)
+	}
+
+	query += ";"
+
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	return rows, err
 }

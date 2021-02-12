@@ -75,7 +75,7 @@ func (a *MarkAction) Run(params interface{}) error {
 	}
 
 	// try migrate down
-	migrationsHistory, err := sql_dialect.GetDialect().GetMigrationsHistory(a.db, 0)
+	migrationsHistory, err := db.GetMigrationsHistory(a.db, 0)
 	if err != nil {
 		return err
 	}
@@ -107,7 +107,7 @@ func (a *MarkAction) Run(params interface{}) error {
 		}
 	}
 
-	if p.version == "m000000_000000_base" {
+	if p.version == migration.BaseMigrationVersion {
 		resp := helpers.AskForConfirmation(fmt.Sprintf("Set migration history at %s?", p.version), false)
 		if !resp {
 			log.Info("Action was cancelled by user. Nothing has been performed.\n")

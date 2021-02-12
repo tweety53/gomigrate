@@ -4,52 +4,21 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/tweety53/gomigrate/internal/action"
+	"github.com/tweety53/gomigrate/internal/config"
+	"github.com/tweety53/gomigrate/internal/log"
+	"github.com/tweety53/gomigrate/internal/sql_dialect"
 )
 
-const (
-	// The name of the dummy migration that marks the beginning of the whole migration history.
-	BaseMigrationVersion = "m000000_000000_base"
-)
+func Run(a string, db *sql.DB, config *config.AppConfig, args []string) error {
+	err := sql_dialect.InitDialect(config.SQLDialect, config)
+	if err != nil {
+		return err
+	}
+	log.SetVerbose(!config.Compact)
 
-var (
-	// The default action
-	defaultAction = "up"
-
-	// The directory containing the migration classes
-	MigrationsPath string
-
-	// Table name which contains migrations data
-	MigrationTable string
-
-	// "create" action template file path
-	goTemplateFilePath string
-
-	// If this is set to true, the individual commands ran within the migration will not be output to the console.
-	// Default is false, in other words the output is fully verbose by default.
-	Compact bool
-)
-
-func SetMigrationsPath(p string) {
-	MigrationsPath = p
-}
-
-func SetMigrationTable(n string) {
-	MigrationTable = n
-}
-
-func SetGoTemplateFilePath(p string) {
-	goTemplateFilePath = p
-}
-
-func SetCompact(c bool) {
-	Compact = c
-}
-
-// Run runs an action.
-func Run(a string, db *sql.DB, args []string) error {
 	switch a {
 	case "create":
-		createAction := action.NewCreateAction(db, MigrationsPath)
+		createAction := action.NewCreateAction(db, config.MigrationsPath)
 		params := new(action.CreateActionParams)
 		if err := params.ValidateAndFill(args); err != nil {
 			return err

@@ -2,7 +2,6 @@ package action
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/tweety53/gomigrate/internal/db"
 	errors2 "github.com/tweety53/gomigrate/internal/errors"
 	"github.com/tweety53/gomigrate/internal/log"
@@ -61,8 +60,6 @@ func (a *UpAction) Run(params interface{}) error {
 		migrations = migrations[0:p.limit]
 	}
 
-	fmt.Println(migrations)
-
 	var logText string
 
 	n := len(migrations)
@@ -84,9 +81,7 @@ func (a *UpAction) Run(params interface{}) error {
 		log.Warnf("Total %d out of %d new %s to be applied:\n", n, total, logText)
 	}
 
-	for i := range migrations {
-		log.Infof("\t%s\n", migrations[i])
-	}
+	log.Infof("%s", migrations)
 
 	var applied int
 	for i := range migrations {

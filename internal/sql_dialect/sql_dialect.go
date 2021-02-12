@@ -1,33 +1,35 @@
 package sql_dialect
 
 import (
-	"database/sql"
 	"fmt"
+	"github.com/tweety53/gomigrate/internal/config"
 )
 
 type SQLDialect interface {
 	CreateVersionTableSQL() string
 	InsertVersionSQL() string
+	InsertUnAppliedVersionSQL() string
+	UpdateApplyTimeSQL() string
+	LockVersionSQL() string
 	DeleteVersionSQL() string
 	AllTableNamesSQL() string
 	TableForeignKeysSQL() string
 	DropFkSQL(tableName string, fkName string) string
 	DropTableSQL(tableName string) string
-	GetMigrationsHistory(db *sql.DB, limit int) (*sql.Rows, error)
 }
 
-var dialect SQLDialect = &PostgresDialect{}
+var dialect SQLDialect
 
-// GetDialect gets the SQLDialect
 func GetDialect() SQLDialect {
 	return dialect
 }
 
-// SetDialect sets the SQLDialect
-func SetDialect(d string) error {
+func InitDialect(d string, config *config.AppConfig) error {
 	switch d {
 	case "postgres":
-		dialect = &PostgresDialect{}
+		dialect = &PostgresDialect{
+			config: config,
+		}
 	default:
 		return fmt.Errorf("%q: unknown dialect", d)
 	}

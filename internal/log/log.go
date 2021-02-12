@@ -8,9 +8,15 @@ const (
 	colorGreen  = "\033[32m"
 	colorYellow = "\033[33m"
 	colorRed    = "\033[31m"
-	colorGray   = "\033[37m"
+	colorPurple = "\033[35m"
 	resetColor  = "\033[00m"
 )
+
+var verbose bool
+
+func SetVerbose(v bool) {
+	verbose = v
+}
 
 func Info(s string) {
 	log.Print(colorGreen + s + resetColor)
@@ -54,4 +60,10 @@ func Printf(s string, args ...interface{}) {
 
 func Println(args ...interface{}) {
 	log.Println(args...)
+}
+
+func Debugf(s string, args ...interface{}) {
+	if verbose {
+		log.Printf(colorPurple+s+resetColor, args...)
+	}
 }

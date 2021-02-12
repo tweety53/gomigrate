@@ -4,25 +4,25 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/tweety53/gomigrate/internal/log"
-	"github.com/tweety53/gomigrate/internal/sql_dialect"
 	"os"
 	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
-	"time"
+)
+
+const (
+	// The name of the dummy migration that marks the beginning of the whole migration history.
+	BaseMigrationVersion = "m000000_000000_base"
 )
 
 var registeredMigrations = map[string]*Migration{}
 
-// MigrationRecord struct.
 type MigrationRecord struct {
 	Version   string
 	ApplyTime int
 }
 
-// Migration struct.
 type Migration struct {
 	Version    string
 	Next       string // next version, or -1 if none
@@ -33,13 +33,19 @@ type Migration struct {
 	DownFn     func(*sql.Tx) error // Down go migration function
 }
 
+type MigrationDirection string
+
+var (
+	migrationDirectionUp   MigrationDirection = "up"
+	migrationDirectionDown MigrationDirection = "down"
+)
+
 func (m *Migration) String() string {
 	return fmt.Sprintf(m.Version)
 }
 
-// Up runs an up migration.
 func (m *Migration) Up(db *sql.DB) error {
-	if err := m.run(db, true); err != nil {
+	if err := m.run(db, migrationDirectionUp); err != nil {
 		return err
 	}
 	return nil
@@ -47,13 +53,13 @@ func (m *Migration) Up(db *sql.DB) error {
 
 // Down runs a down migration.
 func (m *Migration) Down(db *sql.DB) error {
-	if err := m.run(db, false); err != nil {
+	if err := m.run(db, migrationDirectionDown); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (m *Migration) run(db *sql.DB, direction bool) error {
+func (m *Migration) run(db *sql.DB, direction MigrationDirection) error {
 	switch filepath.Ext(m.Source) {
 	case ".sql":
 		f, err := os.Open(m.Source)
@@ -64,64 +70,27 @@ func (m *Migration) run(db *sql.DB, direction bool) error {
 
 		statements, useTx, err := parseSQLMigration(f, direction)
 		if err != nil {
-			return errors.Wrapf(err, "ERROR %v: failed to parse SQL migration file", filepath.Base(m.Source))
+			return errors.Wrapf(err, "failed to parse SQL migration file: %v", filepath.Base(m.Source))
 		}
 
-		if err := runSQLMigration(db, statements, useTx, m.Version, direction); err != nil {
-			return errors.Wrapf(err, "ERROR %v: failed to run SQL migration", filepath.Base(m.Source))
-		}
-
-		if len(statements) > 0 {
-			log.Infoln("OK   ", filepath.Base(m.Source))
+		if direction == migrationDirectionUp {
+			assembleUpFnFromStatements(statements, useTx, m)
+			return migrateUpGo(db, m)
 		} else {
-			log.Warnln("EMPTY", filepath.Base(m.Source))
+			assembleDownFnFromStatements(statements, useTx, m)
+			return migrateDownGo(db, m)
 		}
 
 	case ".go":
 		if !m.Registered {
 			return errors.Errorf("ERROR %v", m.Source)
 		}
-		tx, err := db.Begin()
-		if err != nil {
-			return errors.Wrap(err, "ERROR failed to begin transaction")
-		}
 
-		fn := m.UpFn
-		if !direction {
-			fn = m.DownFn
-		}
-
-		if fn != nil {
-			// Run Go migration function.
-			if err := fn(tx); err != nil {
-				tx.Rollback()
-				return errors.Wrapf(err, "ERROR %v: failed to run Go migration function %T", filepath.Base(m.Source), fn)
-			}
-		}
-
-		if direction {
-			if _, err := tx.Exec(sql_dialect.GetDialect().InsertVersionSQL(), m.Version, int(time.Now().Unix())); err != nil {
-				tx.Rollback()
-				return errors.Wrap(err, "ERROR failed to execute transaction")
-			}
+		if direction == migrationDirectionUp {
+			return migrateUpGo(db, m)
 		} else {
-			if _, err := tx.Exec(sql_dialect.GetDialect().DeleteVersionSQL(), m.Version); err != nil {
-				tx.Rollback()
-				return errors.Wrap(err, "ERROR failed to execute transaction")
-			}
+			return migrateDownGo(db, m)
 		}
-
-		if err := tx.Commit(); err != nil {
-			return errors.Wrap(err, "ERROR failed to commit transaction")
-		}
-
-		if fn != nil {
-			log.Infoln("OK   ", filepath.Base(m.Source))
-		} else {
-			log.Warnln("EMPTY", filepath.Base(m.Source))
-		}
-
-		return nil
 	}
 
 	return nil
@@ -188,7 +157,6 @@ func (ms Migrations) Reverse() {
 	}
 }
 
-// Current gets the current migration.
 func (ms Migrations) Current(current string) (*Migration, error) {
 	for i, migration := range ms {
 		if migration.Version == current {
@@ -199,7 +167,6 @@ func (ms Migrations) Current(current string) (*Migration, error) {
 	return nil, errors.New("CURR")
 }
 
-// Next gets the next migration.
 func (ms Migrations) Next(current string) (*Migration, error) {
 	for i, migration := range ms {
 		if migration.Version > current {
@@ -210,7 +177,6 @@ func (ms Migrations) Next(current string) (*Migration, error) {
 	return nil, errors.New("NEXT")
 }
 
-// Previous : Get the previous migration.
 func (ms Migrations) Previous(current string) (*Migration, error) {
 	for i := len(ms) - 1; i >= 0; i-- {
 		if ms[i].Version < current {
@@ -221,7 +187,6 @@ func (ms Migrations) Previous(current string) (*Migration, error) {
 	return nil, errors.New("PREV")
 }
 
-// Last gets the last migration.
 func (ms Migrations) Last() (*Migration, error) {
 	if len(ms) == 0 {
 		return nil, errors.New("LAST")
@@ -231,14 +196,13 @@ func (ms Migrations) Last() (*Migration, error) {
 }
 
 func (ms Migrations) String() string {
-	str := ""
+	str := "\n"
 	for _, m := range ms {
 		str += fmt.Sprintln(m)
 	}
 	return str
 }
 
-// AddNamedMigration : Add a named migration.
 func AddNamedMigration(filename string, up func(*sql.Tx) error, down func(*sql.Tx) error) {
 	v, _ := GetVersionFromFileName(filename)
 	migration := &Migration{Version: v, Next: "", Previous: "", Registered: true, UpFn: up, DownFn: down, Source: filename}
@@ -279,7 +243,7 @@ func ConvertDbRecordsToMigrationObjects(rows *sql.Rows) (Migrations, error) {
 			return Migrations{}, errors.Wrap(err, "failed to scan row")
 		}
 		// skip base migration
-		if row.Version == "m000000_000000_base" {
+		if row.Version == BaseMigrationVersion {
 			continue
 		}
 

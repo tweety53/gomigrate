@@ -7,7 +7,6 @@ import (
 	errorsInternal "github.com/tweety53/gomigrate/internal/errors"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
-	"github.com/tweety53/gomigrate/internal/sql_dialect"
 	"regexp"
 	"strconv"
 )
@@ -75,7 +74,7 @@ func (a *ToAction) Run(params interface{}) error {
 	}
 
 	// try migrate down
-	migrationsHistory, err := sql_dialect.GetDialect().GetMigrationsHistory(a.db, 0)
+	migrationsHistory, err := db.GetMigrationsHistory(a.db, 0)
 	if err != nil {
 		return err
 	}
