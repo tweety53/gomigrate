@@ -1,20 +1,23 @@
 package action
 
 import (
-	"database/sql"
 	"github.com/pkg/errors"
-	errors2 "github.com/tweety53/gomigrate/internal/errors"
+	errorsInternal "github.com/tweety53/gomigrate/internal/errors"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
 	"github.com/tweety53/gomigrate/internal/repo"
+	"github.com/tweety53/gomigrate/internal/service"
 	"strconv"
 )
 
 var ErrInconsistentMigrationsData = errors.New("migrations data in repo and migration files path inconsistent, please check")
 
 type DownAction struct {
-	db             *sql.DB
-	migrationsPath string
+	svc *service.MigrationService
+}
+
+func NewDownAction(migrationsSvc *service.MigrationService) *DownAction {
+	return &DownAction{svc: migrationsSvc}
 }
 
 type DownActionParams struct {
@@ -43,22 +46,18 @@ func (p *DownActionParams) ValidateAndFill(args []string) error {
 	return nil
 }
 
-func NewDownAction(db *sql.DB, migrationPath string) *DownAction {
-	return &DownAction{db: db, migrationsPath: migrationPath}
-}
-
 func (a *DownAction) Run(params interface{}) error {
 	p, ok := params.(*DownActionParams)
 	if !ok {
-		return errors2.ErrInvalidActionParamsType
+		return errorsInternal.ErrInvalidActionParamsType
 	}
 
-	migrationsHistory, err := repo.GetMigrationsHistory(a.db, p.limit)
+	migrationHistoryRecords, err := a.svc.MigrationsRepo.GetMigrationsHistory(p.limit)
 	if err != nil {
 		return err
 	}
 
-	downMigrations, err := migration.ConvertDbRecordsToMigrationObjects(migrationsHistory)
+	downMigrations, err := migration.Convert(migrationHistoryRecords)
 	if err != nil {
 		return err
 	}
@@ -68,8 +67,8 @@ func (a *DownAction) Run(params interface{}) error {
 		return nil
 	}
 
-	downMigrations, err = migration.CollectMigrations(
-		a.migrationsPath,
+	downMigrations, err = a.svc.MigrationsCollector.CollectMigrations(
+		a.svc.MigrationsPath,
 		migration.GetComparableVersion(downMigrations[0].Version),
 		migration.GetComparableVersion(downMigrations[len(downMigrations)-1].Version))
 
@@ -91,7 +90,12 @@ func (a *DownAction) Run(params interface{}) error {
 
 	var reverted int
 	for i := range downMigrations {
-		if err = downMigrations[i].Down(a.db); err != nil {
+		r, ok := a.svc.MigrationsRepo.(*repo.MigrationsRepository)
+		if !ok {
+			return errors.New("MigrationRepo type assertion err")
+		}
+
+		if err = downMigrations[i].Down(r); err != nil {
 			if reverted == 1 {
 				logText = "migration was"
 			} else {

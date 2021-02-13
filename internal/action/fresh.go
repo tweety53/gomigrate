@@ -1,19 +1,17 @@
 package action
 
 import (
-	"database/sql"
 	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/log"
-	"github.com/tweety53/gomigrate/internal/repo"
+	"github.com/tweety53/gomigrate/internal/service"
 )
 
 type FreshAction struct {
-	db             *sql.DB
-	migrationsPath string
+	svc *service.MigrationService
 }
 
-func NewFreshAction(db *sql.DB, migrationsPath string) *FreshAction {
-	return &FreshAction{db: db, migrationsPath: migrationsPath}
+func NewFreshAction(migrationsSvc *service.MigrationService) *FreshAction {
+	return &FreshAction{svc: migrationsSvc}
 }
 
 type FreshActionParams struct{}
@@ -27,12 +25,12 @@ func (a *FreshAction) Run(_ interface{}) error {
 	}
 
 	// truncate repo
-	if err := repo.TruncateDatabase(a.db); err != nil {
+	if err := a.svc.DbOperationRepo.TruncateDatabase(); err != nil {
 		return err
 	}
 
 	// exec up action
-	upAction := NewUpAction(a.db, a.migrationsPath)
+	upAction := NewUpAction(a.svc)
 	params := new(UpActionParams)
 	if err := params.ValidateAndFill([]string{}); err != nil {
 		return err

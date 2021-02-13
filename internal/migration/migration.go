@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/pkg/errors"
+	"github.com/tweety53/gomigrate/internal/repo"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -16,11 +17,6 @@ const (
 )
 
 var registeredMigrations = map[string]*Migration{}
-
-type MigrationRecord struct {
-	Version   string
-	ApplyTime int
-}
 
 type Migration struct {
 	Version    string
@@ -43,21 +39,21 @@ func (m *Migration) String() string {
 	return fmt.Sprintf(m.Version)
 }
 
-func (m *Migration) Up(db *sql.DB) error {
-	if err := m.run(db, migrationDirectionUp); err != nil {
+func (m *Migration) Up(repo *repo.MigrationsRepository) error {
+	if err := m.run(repo, migrationDirectionUp); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (m *Migration) Down(db *sql.DB) error {
-	if err := m.run(db, migrationDirectionDown); err != nil {
+func (m *Migration) Down(repo *repo.MigrationsRepository) error {
+	if err := m.run(repo, migrationDirectionDown); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (m *Migration) run(db *sql.DB, direction MigrationDirection) error {
+func (m *Migration) run(repo *repo.MigrationsRepository, direction MigrationDirection) error {
 	switch filepath.Ext(m.Source) {
 	case ".sql":
 		f, err := os.Open(m.Source)
@@ -73,10 +69,10 @@ func (m *Migration) run(db *sql.DB, direction MigrationDirection) error {
 
 		if direction == migrationDirectionUp {
 			assembleUpFnFromStatements(statements, useTx, m)
-			return migrateUpGo(db, m)
+			return migrateUpGo(repo, m)
 		} else {
 			assembleDownFnFromStatements(statements, useTx, m)
-			return migrateDownGo(db, m)
+			return migrateDownGo(repo, m)
 		}
 
 	case ".go":
@@ -85,9 +81,9 @@ func (m *Migration) run(db *sql.DB, direction MigrationDirection) error {
 		}
 
 		if direction == migrationDirectionUp {
-			return migrateUpGo(db, m)
+			return migrateUpGo(repo, m)
 		} else {
-			return migrateDownGo(db, m)
+			return migrateDownGo(repo, m)
 		}
 	}
 
@@ -211,25 +207,17 @@ func AddNamedMigration(filename string, up func(*sql.Tx) error, down func(*sql.T
 	registeredMigrations[v] = migration
 }
 
-func ConvertDbRecordsToMigrationObjects(rows *sql.Rows) (Migrations, error) {
+func Convert(records repo.MigrationRecords) (Migrations, error) {
 	var migrations Migrations
 
-	for rows.Next() {
-		var (
-			err error
-			row MigrationRecord
-		)
-
-		if err = rows.Scan(&row.Version, &row.ApplyTime); err != nil {
-			return Migrations{}, errors.Wrap(err, "failed to scan row")
-		}
+	for i := range records {
 		// skip base migration
-		if row.Version == BaseMigrationVersion {
+		if records[i].Version == BaseMigrationVersion {
 			continue
 		}
 
 		migrations = append(migrations, &Migration{
-			Version:    row.Version,
+			Version:    records[i].Version,
 			Next:       "",
 			Previous:   "",
 			Source:     "",

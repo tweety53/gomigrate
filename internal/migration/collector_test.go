@@ -54,9 +54,10 @@ func TestCollectMigrations(t *testing.T) {
 		},
 	}
 
+	c := &MigrationsCollector{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := CollectMigrations(tt.args.dirpath, tt.args.current, tt.args.target)
+			got, err := c.CollectMigrations(tt.args.dirpath, tt.args.current, tt.args.target)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CollectMigrations() error = %v, wantErr %v", err, tt.wantErr)
 				return

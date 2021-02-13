@@ -7,9 +7,15 @@ import (
 	"sort"
 )
 
+type MigrationsCollectorInterface interface {
+	CollectMigrations(dirpath string, current, target int) (Migrations, error)
+}
+
+type MigrationsCollector struct{}
+
 // CollectMigrations returns all the valid looking migration scripts in the
 // migrations folder and go func registry, and key them by version.
-func CollectMigrations(dirpath string, current, target int) (Migrations, error) {
+func (c *MigrationsCollector) CollectMigrations(dirpath string, current, target int) (Migrations, error) {
 	if _, err := os.Stat(dirpath); os.IsNotExist(err) {
 		return nil, fmt.Errorf("%s directory does not exist", dirpath)
 	}

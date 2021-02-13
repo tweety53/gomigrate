@@ -1,20 +1,20 @@
 package action
 
 import (
-	"database/sql"
+	"github.com/pkg/errors"
 	errorsInternal "github.com/tweety53/gomigrate/internal/errors"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/repo"
+	"github.com/tweety53/gomigrate/internal/service"
 	"strconv"
 )
 
 type UpAction struct {
-	db             *sql.DB
-	migrationsPath string
+	svc *service.MigrationService
 }
 
-func NewUpAction(db *sql.DB, migrationsPath string) *UpAction {
-	return &UpAction{db: db, migrationsPath: migrationsPath}
+func NewUpAction(migrationsSvc *service.MigrationService) *UpAction {
+	return &UpAction{svc: migrationsSvc}
 }
 
 type UpActionParams struct {
@@ -43,7 +43,7 @@ func (a *UpAction) Run(params interface{}) error {
 		return errorsInternal.ErrInvalidActionParamsType
 	}
 
-	migrations, err := repo.GetNewMigrations(a.db, a.migrationsPath)
+	migrations, err := a.svc.GetNewMigrations()
 	if err != nil {
 		return err
 	}
@@ -86,7 +86,12 @@ func (a *UpAction) Run(params interface{}) error {
 
 	var applied int
 	for i := range migrations {
-		if err = migrations[i].Up(a.db); err != nil {
+		r, ok := a.svc.MigrationsRepo.(*repo.MigrationsRepository)
+		if !ok {
+			return errors.New("MigrationRepo type assertion err")
+		}
+
+		if err = migrations[i].Up(r); err != nil {
 			log.Errf("\n%d from %d %s applied.\n", applied, n, logText)
 			log.Err("\nMigration failed. The rest of the migrations are canceled.\n")
 			return err

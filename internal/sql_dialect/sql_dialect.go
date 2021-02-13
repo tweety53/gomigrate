@@ -2,7 +2,6 @@ package sql_dialect
 
 import (
 	"fmt"
-	"github.com/tweety53/gomigrate/internal/config"
 )
 
 type SQLDialect interface {
@@ -19,21 +18,16 @@ type SQLDialect interface {
 	MigrationsHistorySQL() string
 }
 
-var dialect SQLDialect
-
-func GetDialect() SQLDialect {
-	return dialect
-}
-
-func InitDialect(config *config.AppConfig) error {
-	switch config.SQLDialect {
+func InitDialect(v, migrationTable string) (SQLDialect, error) {
+	var dialect SQLDialect
+	switch v {
 	case "postgres":
 		dialect = &PostgresDialect{
-			config: config,
+			migrationTable: migrationTable,
 		}
 	default:
-		return fmt.Errorf("%q: unknown dialect", config.SQLDialect)
+		return nil, fmt.Errorf("%q: unknown dialect", v)
 	}
 
-	return nil
+	return dialect, nil
 }

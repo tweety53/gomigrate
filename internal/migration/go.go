@@ -1,24 +1,23 @@
 package migration
 
 import (
-	"database/sql"
 	"github.com/pkg/errors"
 	"github.com/tweety53/gomigrate/internal/log"
-	"github.com/tweety53/gomigrate/internal/sql_dialect"
+	"github.com/tweety53/gomigrate/internal/repo"
 	"path/filepath"
 	"time"
 )
 
-func migrateUpGo(db *sql.DB, m *Migration) error {
+func migrateUpGo(repo *repo.MigrationsRepository, m *Migration) error {
 	fn := m.UpFn
-	tx, err := db.Begin()
+	tx, err := repo.Db.Begin()
 	if err != nil {
 		return errors.Wrap(err, "failed to begin transaction")
 	}
 
 	log.Warnf("*** applying %s", filepath.Base(m.Source))
 	start := time.Now()
-	if _, err := tx.Exec(sql_dialect.GetDialect().InsertUnAppliedVersionSQL(), m.Version); err != nil {
+	if err := repo.InsertUnAppliedVersion(m.Version); err != nil {
 		tx.Rollback()
 
 		duration := time.Since(start)
@@ -32,12 +31,12 @@ func migrateUpGo(db *sql.DB, m *Migration) error {
 		if err := fn(tx); err != nil {
 			tx.Rollback()
 
-			tx, err := db.Begin()
+			tx, err := repo.Db.Begin()
 			if err != nil {
 				return errors.Wrap(err, "failed to begin transaction")
 			}
 
-			if _, err := tx.Exec(sql_dialect.GetDialect().DeleteVersionSQL(), m.Version); err != nil {
+			if err := repo.DeleteVersion(m.Version); err != nil {
 				tx.Rollback()
 
 				duration := time.Since(start)
@@ -51,15 +50,15 @@ func migrateUpGo(db *sql.DB, m *Migration) error {
 		}
 	}
 
-	if _, err := tx.Exec(sql_dialect.GetDialect().UpdateApplyTimeSQL(), int(time.Now().Unix()), m.Version); err != nil {
+	if err := repo.UpdateApplyTime(m.Version); err != nil {
 		tx.Rollback()
 
-		tx, err := db.Begin()
+		tx, err := repo.Db.Begin()
 		if err != nil {
 			return errors.Wrap(err, "failed to begin delete version transaction")
 		}
 
-		if _, err := tx.Exec(sql_dialect.GetDialect().DeleteVersionSQL(), m.Version); err != nil {
+		if err := repo.DeleteVersion(m.Version); err != nil {
 			tx.Rollback()
 
 			duration := time.Since(start)
@@ -88,16 +87,16 @@ func migrateUpGo(db *sql.DB, m *Migration) error {
 	return nil
 }
 
-func migrateDownGo(db *sql.DB, m *Migration) error {
+func migrateDownGo(repo *repo.MigrationsRepository, m *Migration) error {
 	fn := m.DownFn
-	tx, err := db.Begin()
+	tx, err := repo.Db.Begin()
 	if err != nil {
 		return errors.Wrap(err, "failed to begin transaction")
 	}
 
 	log.Warnf("*** reverting %s", filepath.Base(m.Source))
 	start := time.Now()
-	if _, err := tx.Exec(sql_dialect.GetDialect().LockVersionSQL(), m.Version); err != nil {
+	if err := repo.LockVersion(m.Version); err != nil {
 		tx.Rollback()
 
 		duration := time.Since(start)
@@ -117,7 +116,7 @@ func migrateDownGo(db *sql.DB, m *Migration) error {
 		}
 	}
 
-	if _, err := tx.Exec(sql_dialect.GetDialect().DeleteVersionSQL(), m.Version); err != nil {
+	if err := repo.DeleteVersion(m.Version); err != nil {
 		tx.Rollback()
 
 		duration := time.Since(start)

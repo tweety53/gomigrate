@@ -1,24 +1,20 @@
 package action
 
 import (
-	"database/sql"
 	"fmt"
 	errorsInternal "github.com/tweety53/gomigrate/internal/errors"
 	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
-	"github.com/tweety53/gomigrate/internal/repo"
-	"github.com/tweety53/gomigrate/internal/sql_dialect"
-	"time"
+	"github.com/tweety53/gomigrate/internal/service"
 )
 
 type MarkAction struct {
-	db             *sql.DB
-	migrationsPath string
+	svc *service.MigrationService
 }
 
-func NewMarkAction(db *sql.DB, migrationsPath string) *MarkAction {
-	return &MarkAction{db: db, migrationsPath: migrationsPath}
+func NewMarkAction(migrationsSvc *service.MigrationService) *MarkAction {
+	return &MarkAction{svc: migrationsSvc}
 }
 
 type MarkActionParams struct {
@@ -51,7 +47,7 @@ func (a *MarkAction) Run(params interface{}) error {
 	}
 
 	// try mark up
-	migrations, err := repo.GetNewMigrations(a.db, a.migrationsPath)
+	migrations, err := a.svc.GetNewMigrations()
 	if err != nil {
 		return err
 	}
@@ -65,7 +61,7 @@ func (a *MarkAction) Run(params interface{}) error {
 			}
 
 			for j := 0; j <= i; j++ {
-				if _, err := a.db.Exec(sql_dialect.GetDialect().InsertVersionSQL(), migrations[j].Version, int(time.Now().Unix())); err != nil {
+				if err := a.svc.MigrationsRepo.InsertVersion(migrations[j].Version); err != nil {
 					return err
 				}
 			}
@@ -76,12 +72,12 @@ func (a *MarkAction) Run(params interface{}) error {
 	}
 
 	// try migrate down
-	migrationsHistory, err := repo.GetMigrationsHistory(a.db, 0)
+	migrationsHistory, err := a.svc.MigrationsRepo.GetMigrationsHistory(0)
 	if err != nil {
 		return err
 	}
 
-	migrations, err = migration.ConvertDbRecordsToMigrationObjects(migrationsHistory)
+	migrations, err = migration.Convert(migrationsHistory)
 	if err != nil {
 		return err
 	}
@@ -95,7 +91,7 @@ func (a *MarkAction) Run(params interface{}) error {
 					return nil
 				}
 				for j := 0; j < i; j++ {
-					if _, err := a.db.Exec(sql_dialect.GetDialect().DeleteVersionSQL(), migrations[j].Version); err != nil {
+					if err := a.svc.MigrationsRepo.DeleteVersion(migrations[j].Version); err != nil {
 						return err
 					}
 				}
@@ -116,7 +112,7 @@ func (a *MarkAction) Run(params interface{}) error {
 		}
 
 		for i := range migrations {
-			if _, err := a.db.Exec(sql_dialect.GetDialect().DeleteVersionSQL(), migrations[i].Version); err != nil {
+			if err := a.svc.MigrationsRepo.DeleteVersion(migrations[i].Version); err != nil {
 				return err
 			}
 		}

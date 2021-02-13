@@ -1,21 +1,19 @@
 package action
 
 import (
-	"database/sql"
-	errors2 "github.com/tweety53/gomigrate/internal/errors"
+	errorsInternal "github.com/tweety53/gomigrate/internal/errors"
 	"github.com/tweety53/gomigrate/internal/log"
-	"github.com/tweety53/gomigrate/internal/migration"
-	"github.com/tweety53/gomigrate/internal/repo"
+	"github.com/tweety53/gomigrate/internal/service"
 	"strconv"
 	"time"
 )
 
 type HistoryAction struct {
-	db *sql.DB
+	svc *service.MigrationService
 }
 
-func NewHistoryAction(db *sql.DB) *HistoryAction {
-	return &HistoryAction{db: db}
+func NewHistoryAction(migrationsSvc *service.MigrationService) *HistoryAction {
+	return &HistoryAction{svc: migrationsSvc}
 }
 
 type HistoryActionParams struct {
@@ -47,23 +45,12 @@ func (p *HistoryActionParams) Get() interface{} {
 func (a *HistoryAction) Run(params interface{}) error {
 	p, ok := params.(*HistoryActionParams)
 	if !ok {
-		return errors2.ErrInvalidActionParamsType
+		return errorsInternal.ErrInvalidActionParamsType
 	}
 
-	migrationsHistory, err := repo.GetMigrationsHistory(a.db, p.limit)
+	migrationRecords, err := a.svc.MigrationsRepo.GetMigrationsHistory(p.limit)
 	if err != nil {
 		return err
-	}
-	defer migrationsHistory.Close()
-
-	var migrationRecords []migration.MigrationRecord
-	for migrationsHistory.Next() {
-		var migrationRecord migration.MigrationRecord
-		if err := migrationsHistory.Scan(&migrationRecord.Version, &migrationRecord.ApplyTime); err != nil {
-			return err
-		}
-
-		migrationRecords = append(migrationRecords, migrationRecord)
 	}
 
 	if len(migrationRecords) == 0 {

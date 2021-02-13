@@ -6,19 +6,28 @@ import (
 	"github.com/tweety53/gomigrate/internal/action"
 	"github.com/tweety53/gomigrate/internal/config"
 	"github.com/tweety53/gomigrate/internal/log"
+	"github.com/tweety53/gomigrate/internal/migration"
+	"github.com/tweety53/gomigrate/internal/service"
 	"github.com/tweety53/gomigrate/internal/sql_dialect"
 )
 
 func Run(a string, db *sql.DB, config *config.AppConfig, args []string) error {
-	err := sql_dialect.InitDialect(config)
+	log.SetVerbose(!config.Compact)
+
+	dialect, err := sql_dialect.InitDialect(config.SQLDialect, config.MigrationTable)
 	if err != nil {
 		return err
 	}
-	log.SetVerbose(!config.Compact)
+
+	migrationsSvc := service.NewMigrationService(
+		db,
+		dialect,
+		&migration.MigrationsCollector{},
+		config.MigrationsPath)
 
 	switch a {
 	case "create":
-		createAction := action.NewCreateAction(db, config.MigrationsPath)
+		createAction := action.NewCreateAction(config.MigrationsPath)
 		params := new(action.CreateActionParams)
 		if err := params.ValidateAndFill(args); err != nil {
 			return err
@@ -27,7 +36,7 @@ func Run(a string, db *sql.DB, config *config.AppConfig, args []string) error {
 			return err
 		}
 	case "down":
-		downAction := action.NewDownAction(db, config.MigrationsPath)
+		downAction := action.NewDownAction(migrationsSvc)
 		params := new(action.DownActionParams)
 		if err := params.ValidateAndFill(args); err != nil {
 			return err
@@ -36,7 +45,7 @@ func Run(a string, db *sql.DB, config *config.AppConfig, args []string) error {
 			return err
 		}
 	case "fresh":
-		freshAction := action.NewFreshAction(db, config.MigrationsPath)
+		freshAction := action.NewFreshAction(migrationsSvc)
 		params := new(action.FreshActionParams)
 		if err := params.ValidateAndFill(args); err != nil {
 			return err
@@ -45,7 +54,7 @@ func Run(a string, db *sql.DB, config *config.AppConfig, args []string) error {
 			return err
 		}
 	case "history":
-		historyAction := action.NewHistoryAction(db)
+		historyAction := action.NewHistoryAction(migrationsSvc)
 		params := new(action.HistoryActionParams)
 		if err := params.ValidateAndFill(args); err != nil {
 			return err
@@ -54,7 +63,7 @@ func Run(a string, db *sql.DB, config *config.AppConfig, args []string) error {
 			return err
 		}
 	case "mark":
-		markAction := action.NewMarkAction(db, config.MigrationsPath)
+		markAction := action.NewMarkAction(migrationsSvc)
 		params := new(action.MarkActionParams)
 		if err := params.ValidateAndFill(args); err != nil {
 			return err
@@ -63,7 +72,7 @@ func Run(a string, db *sql.DB, config *config.AppConfig, args []string) error {
 			return err
 		}
 	case "new":
-		newAction := action.NewNewAction(db, config.MigrationsPath)
+		newAction := action.NewNewAction(migrationsSvc)
 		params := new(action.NewActionParams)
 		if err := params.ValidateAndFill(args); err != nil {
 			return err
@@ -72,7 +81,7 @@ func Run(a string, db *sql.DB, config *config.AppConfig, args []string) error {
 			return err
 		}
 	case "redo":
-		redoAction := action.NewRedoAction(db, config.MigrationsPath)
+		redoAction := action.NewRedoAction(migrationsSvc)
 		params := new(action.RedoActionParams)
 		if err := params.ValidateAndFill(args); err != nil {
 			return err
@@ -81,7 +90,7 @@ func Run(a string, db *sql.DB, config *config.AppConfig, args []string) error {
 			return err
 		}
 	case "to":
-		toAction := action.NewToAction(db, config.MigrationsPath)
+		toAction := action.NewToAction(migrationsSvc)
 		params := new(action.ToActionParams)
 		if err := params.ValidateAndFill(args); err != nil {
 			return err
@@ -90,7 +99,7 @@ func Run(a string, db *sql.DB, config *config.AppConfig, args []string) error {
 			return err
 		}
 	case "up":
-		upAction := action.NewUpAction(db, config.MigrationsPath)
+		upAction := action.NewUpAction(migrationsSvc)
 		params := new(action.UpActionParams)
 		if err := params.ValidateAndFill(args); err != nil {
 			return err

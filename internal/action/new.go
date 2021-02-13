@@ -1,20 +1,18 @@
 package action
 
 import (
-	"database/sql"
 	errorsInternal "github.com/tweety53/gomigrate/internal/errors"
 	"github.com/tweety53/gomigrate/internal/log"
-	"github.com/tweety53/gomigrate/internal/repo"
+	"github.com/tweety53/gomigrate/internal/service"
 	"strconv"
 )
 
 type NewAction struct {
-	db             *sql.DB
-	migrationsPath string
+	svc *service.MigrationService
 }
 
-func NewNewAction(db *sql.DB, migrationsPath string) *NewAction {
-	return &NewAction{db: db, migrationsPath: migrationsPath}
+func NewNewAction(migrationsSvc *service.MigrationService) *NewAction {
+	return &NewAction{svc: migrationsSvc}
 }
 
 type NewActionParams struct {
@@ -49,7 +47,7 @@ func (a *NewAction) Run(params interface{}) error {
 		return errorsInternal.ErrInvalidActionParamsType
 	}
 
-	migrations, err := repo.GetNewMigrations(a.db, a.migrationsPath)
+	migrations, err := a.svc.GetNewMigrations()
 	if err != nil {
 		return err
 	}

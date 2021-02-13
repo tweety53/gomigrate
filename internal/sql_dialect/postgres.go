@@ -2,11 +2,10 @@ package sql_dialect
 
 import (
 	"fmt"
-	"github.com/tweety53/gomigrate/internal/config"
 )
 
 type PostgresDialect struct {
-	config *config.AppConfig
+	migrationTable string
 }
 
 func (pd PostgresDialect) CreateVersionTableSQL() string {
@@ -15,11 +14,11 @@ func (pd PostgresDialect) CreateVersionTableSQL() string {
 				CONSTRAINT migration_pkey
 					PRIMARY KEY,
 			apply_time INTEGER
-            );`, pd.config.MigrationTable)
+            );`, pd.migrationTable)
 }
 
 func (pd PostgresDialect) InsertVersionSQL() string {
-	return fmt.Sprintf("INSERT INTO %s (version, apply_time) VALUES ($1, $2);", pd.config.MigrationTable)
+	return fmt.Sprintf("INSERT INTO %s (version, apply_time) VALUES ($1, $2);", pd.migrationTable)
 }
 
 func (pd PostgresDialect) TableForeignKeysSQL() string {
@@ -64,21 +63,21 @@ DROP TABLE IF EXISTS %s;
 }
 
 func (pd PostgresDialect) DeleteVersionSQL() string {
-	return fmt.Sprintf("DELETE FROM %s WHERE version=$1;", pd.config.MigrationTable)
+	return fmt.Sprintf("DELETE FROM %s WHERE version=$1;", pd.migrationTable)
 }
 
 func (pd PostgresDialect) InsertUnAppliedVersionSQL() string {
-	return fmt.Sprintf("INSERT INTO %s (version) VALUES ($1);", pd.config.MigrationTable)
+	return fmt.Sprintf("INSERT INTO %s (version) VALUES ($1);", pd.migrationTable)
 }
 
 func (pd PostgresDialect) UpdateApplyTimeSQL() string {
-	return fmt.Sprintf("UPDATE %s SET apply_time=$1 WHERE version=$2;", pd.config.MigrationTable)
+	return fmt.Sprintf("UPDATE %s SET apply_time=$1 WHERE version=$2;", pd.migrationTable)
 }
 
 func (pd PostgresDialect) LockVersionSQL() string {
-	return fmt.Sprintf("SELECT * FROM %s WHERE version=$1 FOR UPDATE NOWAIT;", pd.config.MigrationTable)
+	return fmt.Sprintf("SELECT * FROM %s WHERE version=$1 FOR UPDATE NOWAIT;", pd.migrationTable)
 }
 
 func (pd PostgresDialect) MigrationsHistorySQL() string {
-	return fmt.Sprintf("SELECT version, apply_time FROM %s ORDER BY apply_time DESC, version DESC", pd.config.MigrationTable)
+	return fmt.Sprintf("SELECT version, apply_time FROM %s ORDER BY apply_time DESC, version DESC", pd.migrationTable)
 }

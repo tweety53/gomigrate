@@ -1,23 +1,23 @@
 package action
 
 import (
-	"database/sql"
 	"fmt"
-	errors2 "github.com/tweety53/gomigrate/internal/errors"
+	"github.com/pkg/errors"
+	errorsInternal "github.com/tweety53/gomigrate/internal/errors"
 	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
 	"github.com/tweety53/gomigrate/internal/repo"
+	"github.com/tweety53/gomigrate/internal/service"
 	"strconv"
 )
 
 type RedoAction struct {
-	db             *sql.DB
-	migrationsPath string
+	svc *service.MigrationService
 }
 
-func NewRedoAction(db *sql.DB, migrationsPath string) *RedoAction {
-	return &RedoAction{db: db, migrationsPath: migrationsPath}
+func NewRedoAction(migrationsSvc *service.MigrationService) *RedoAction {
+	return &RedoAction{svc: migrationsSvc}
 }
 
 type RedoActionParams struct {
@@ -49,16 +49,15 @@ func (p *RedoActionParams) Get() interface{} {
 func (a *RedoAction) Run(params interface{}) error {
 	p, ok := params.(*RedoActionParams)
 	if !ok {
-		return errors2.ErrInvalidActionParamsType
+		return errorsInternal.ErrInvalidActionParamsType
 	}
 
-	migrationsHistory, err := repo.GetMigrationsHistory(a.db, p.limit)
+	migrationHistoryRecords, err := a.svc.MigrationsRepo.GetMigrationsHistory(p.limit)
 	if err != nil {
 		return err
 	}
-	defer migrationsHistory.Close()
 
-	redoMigrations, err := migration.ConvertDbRecordsToMigrationObjects(migrationsHistory)
+	redoMigrations, err := migration.Convert(migrationHistoryRecords)
 	if err != nil {
 		return err
 	}
@@ -68,8 +67,8 @@ func (a *RedoAction) Run(params interface{}) error {
 		return nil
 	}
 
-	redoMigrations, err = migration.CollectMigrations(
-		a.migrationsPath,
+	redoMigrations, err = a.svc.MigrationsCollector.CollectMigrations(
+		a.svc.MigrationsPath,
 		migration.GetComparableVersion(redoMigrations[0].Version),
 		migration.GetComparableVersion(redoMigrations[len(redoMigrations)-1].Version))
 	if len(redoMigrations) == 0 {
@@ -93,10 +92,15 @@ func (a *RedoAction) Run(params interface{}) error {
 		return nil
 	}
 
+	r, ok := a.svc.MigrationsRepo.(*repo.MigrationsRepository)
+	if !ok {
+		return errors.New("MigrationRepo type assertion err")
+	}
+
 	// reverse for down
 	redoMigrations.Reverse()
 	for i := range redoMigrations {
-		if err := redoMigrations[i].Down(a.db); err != nil {
+		if err := redoMigrations[i].Down(r); err != nil {
 			log.Err("\nMigration failed. The rest of the migrations are canceled.\n")
 			return err
 		}
@@ -105,7 +109,7 @@ func (a *RedoAction) Run(params interface{}) error {
 	// reverse for up
 	redoMigrations.Reverse()
 	for i := range redoMigrations {
-		if err := redoMigrations[i].Up(a.db); err != nil {
+		if err := redoMigrations[i].Up(r); err != nil {
 			log.Err("\nMigration failed. The rest of the migrations are canceled.\n")
 			return err
 		}

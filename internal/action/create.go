@@ -1,7 +1,6 @@
 package action
 
 import (
-	"database/sql"
 	"fmt"
 	"github.com/pkg/errors"
 	errorsInternal "github.com/tweety53/gomigrate/internal/errors"
@@ -38,7 +37,6 @@ type tmplVars struct {
 }
 
 type CreateAction struct {
-	db             *sql.DB
 	migrationsPath string
 }
 
@@ -84,10 +82,9 @@ func (p *CreateActionParams) ValidateAndFill(args []string) error {
 	return nil
 }
 
-func NewCreateAction(db *sql.DB, migrationsPath string) *CreateAction {
+func NewCreateAction(migrationsPath string) *CreateAction {
 	return &CreateAction{
 		migrationsPath: migrationsPath,
-		db:             db,
 	}
 }
 
