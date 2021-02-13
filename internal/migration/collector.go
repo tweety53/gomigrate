@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 )
 
 // CollectMigrations returns all the valid looking migration scripts in the
@@ -69,6 +70,21 @@ func CollectMigrations(dirpath string, current, target int) (Migrations, error) 
 	migrations = sortAndConnectMigrations(migrations)
 
 	return migrations, nil
+}
+
+func sortAndConnectMigrations(migrations Migrations) Migrations {
+	sort.Sort(migrations)
+
+	for i, m := range migrations {
+		prev := ""
+		if i > 0 {
+			prev = migrations[i-1].Version
+			migrations[i-1].Next = m.Version
+		}
+		migrations[i].Previous = prev
+	}
+
+	return migrations
 }
 
 func versionInRange(v, current, target int) bool {

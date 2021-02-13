@@ -69,8 +69,9 @@ func main() {
 		appConfig = &config.AppConfig{
 			MigrationsPath: *migrationsPath,
 			MigrationTable: *migrationTable,
-			Compact:        false,
+			Compact:        *compact,
 			SQLDialect:     *sqlDialect,
+			DataSourceName: *dataSourceName,
 		}
 	}
 
@@ -80,6 +81,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("-dbstring=%q: %v\n", dsn, err)
 	}
+
 	err = db.Ping()
 	if err != nil {
 		log.Fatalf("gomigrate: database ping err: %v\n", err)
@@ -112,7 +114,7 @@ func main() {
 		os.Exit(int(exit_code.ExitCodeOK))
 	}
 
-	os.Exit(0)
+	os.Exit(int(exit_code.ExitCodeOK))
 }
 
 func showUsage() {
@@ -121,7 +123,7 @@ func showUsage() {
 	fmt.Print(usageActions)
 }
 
-var usagePrefix = `Usage: gomigrate [OPTIONS] ACTION [ACTION ARGS]
+var usagePrefix = `Usage: gomigrate [OPTIONS] ACTION [ACTION PARAMS]
 
 `
 

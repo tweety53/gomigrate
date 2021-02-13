@@ -3,20 +3,21 @@ package action
 import (
 	"database/sql"
 	"fmt"
-	"github.com/tweety53/gomigrate/internal/db"
 	errors2 "github.com/tweety53/gomigrate/internal/errors"
 	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
+	"github.com/tweety53/gomigrate/internal/repo"
 	"strconv"
 )
 
 type RedoAction struct {
-	db *sql.DB
+	db             *sql.DB
+	migrationsPath string
 }
 
-func NewRedoAction(db *sql.DB) *RedoAction {
-	return &RedoAction{db: db}
+func NewRedoAction(db *sql.DB, migrationsPath string) *RedoAction {
+	return &RedoAction{db: db, migrationsPath: migrationsPath}
 }
 
 type RedoActionParams struct {
@@ -51,7 +52,7 @@ func (a *RedoAction) Run(params interface{}) error {
 		return errors2.ErrInvalidActionParamsType
 	}
 
-	migrationsHistory, err := db.GetMigrationsHistory(a.db, p.limit)
+	migrationsHistory, err := repo.GetMigrationsHistory(a.db, p.limit)
 	if err != nil {
 		return err
 	}
@@ -68,7 +69,7 @@ func (a *RedoAction) Run(params interface{}) error {
 	}
 
 	redoMigrations, err = migration.CollectMigrations(
-		"/Users/yuriy.aleksandrov/go/src/gomigrate/migrations",
+		a.migrationsPath,
 		migration.GetComparableVersion(redoMigrations[0].Version),
 		migration.GetComparableVersion(redoMigrations[len(redoMigrations)-1].Version))
 	if len(redoMigrations) == 0 {
@@ -86,7 +87,7 @@ func (a *RedoAction) Run(params interface{}) error {
 	log.Warnf("Total %d %s to be redone:\n", n, logText)
 	log.Println(redoMigrations)
 
-	resp := helpers.AskForConfirmation(fmt.Sprintf("Redo the above %s?", logText), false)
+	resp := helpers.AskForConfirmation(fmt.Sprintf("Redo the above %s?", logText))
 	if !resp {
 		log.Info("Action was cancelled by user. Nothing has been performed.\n")
 		return nil

@@ -6,7 +6,6 @@ import (
 	"github.com/pkg/errors"
 	"os"
 	"path/filepath"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -25,12 +24,12 @@ type MigrationRecord struct {
 
 type Migration struct {
 	Version    string
-	Next       string // next version, or -1 if none
-	Previous   string // previous version, -1 if none
-	Source     string // path to .sql script or go file
+	Next       string
+	Previous   string
+	Source     string // path to .sql\.go file
 	Registered bool
-	UpFn       func(*sql.Tx) error // Up go migration function
-	DownFn     func(*sql.Tx) error // Down go migration function
+	UpFn       func(*sql.Tx) error
+	DownFn     func(*sql.Tx) error
 }
 
 type MigrationDirection string
@@ -51,7 +50,6 @@ func (m *Migration) Up(db *sql.DB) error {
 	return nil
 }
 
-// Down runs a down migration.
 func (m *Migration) Down(db *sql.DB) error {
 	if err := m.run(db, migrationDirectionDown); err != nil {
 		return err
@@ -64,7 +62,7 @@ func (m *Migration) run(db *sql.DB, direction MigrationDirection) error {
 	case ".sql":
 		f, err := os.Open(m.Source)
 		if err != nil {
-			return errors.Wrapf(err, "ERROR %v: failed to open SQL migration file", filepath.Base(m.Source))
+			return errors.Wrapf(err, "failed to open SQL migration file, err: %v", filepath.Base(m.Source))
 		}
 		defer f.Close()
 
@@ -116,13 +114,12 @@ func GetComparableVersion(version string) int {
 	prefix := strings.TrimLeft(parts[0], "m") + parts[1]
 	val, err := strconv.Atoi(prefix)
 	if err != nil {
-		panic("GetComparableVersion")
+		panic("cannot get comparable version from string:" + version)
 	}
 
 	return val
 }
 
-// Migrations slice.
 type Migrations []*Migration
 
 // helpers so we can use pkg sort
@@ -138,14 +135,14 @@ func (ms Migrations) Less(i, j int) bool {
 	iPrefix := strings.TrimLeft(iParts[0], "m") + iParts[1]
 	iVal, err := strconv.Atoi(iPrefix)
 	if err != nil {
-		panic(fmt.Sprintf("gomigrate: LESS %v:\n%v\n%v", ms[i].Version, ms[i].Source, ms[j].Source))
+		panic(fmt.Sprintf("gomigrate: Less() %v:\n%v\n%v,err: %v", ms[i].Version, ms[i].Source, ms[j].Source, err))
 	}
 
 	jParts := strings.Split(ms[j].Version, "_")
 	jPrefix := strings.TrimLeft(jParts[0], "m") + jParts[1]
 	jVal, err := strconv.Atoi(jPrefix)
 	if err != nil {
-		panic(fmt.Sprintf("gomigrate: LESS %v:\n%v\n%v", ms[i].Version, ms[i].Source, ms[j].Source))
+		panic(fmt.Sprintf("gomigrate: Less() %v:\n%v\n%v,err: %v", ms[i].Version, ms[i].Source, ms[j].Source, err))
 	}
 
 	return iVal < jVal
@@ -164,7 +161,7 @@ func (ms Migrations) Current(current string) (*Migration, error) {
 		}
 	}
 
-	return nil, errors.New("CURR")
+	return nil, errors.New("gomigrate: cannot get current version from migrations slice")
 }
 
 func (ms Migrations) Next(current string) (*Migration, error) {
@@ -174,7 +171,7 @@ func (ms Migrations) Next(current string) (*Migration, error) {
 		}
 	}
 
-	return nil, errors.New("NEXT")
+	return nil, errors.New("gomigrate: cannot get next version from migrations slice")
 }
 
 func (ms Migrations) Previous(current string) (*Migration, error) {
@@ -184,12 +181,12 @@ func (ms Migrations) Previous(current string) (*Migration, error) {
 		}
 	}
 
-	return nil, errors.New("PREV")
+	return nil, errors.New("gomigrate: cannot get previous version from migrations slice")
 }
 
 func (ms Migrations) Last() (*Migration, error) {
 	if len(ms) == 0 {
-		return nil, errors.New("LAST")
+		return nil, errors.New("gomigrate: cannot get last version from migrations slice")
 	}
 
 	return ms[len(ms)-1], nil
@@ -214,26 +211,10 @@ func AddNamedMigration(filename string, up func(*sql.Tx) error, down func(*sql.T
 	registeredMigrations[v] = migration
 }
 
-func sortAndConnectMigrations(migrations Migrations) Migrations {
-	sort.Sort(migrations)
-
-	for i, m := range migrations {
-		prev := ""
-		if i > 0 {
-			prev = migrations[i-1].Version
-			migrations[i-1].Next = m.Version
-		}
-		migrations[i].Previous = prev
-	}
-
-	return migrations
-}
-
 func ConvertDbRecordsToMigrationObjects(rows *sql.Rows) (Migrations, error) {
 	var migrations Migrations
 
 	for rows.Next() {
-
 		var (
 			err error
 			row MigrationRecord

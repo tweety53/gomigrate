@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/pkg/errors"
-	errors2 "github.com/tweety53/gomigrate/internal/errors"
+	errorsInternal "github.com/tweety53/gomigrate/internal/errors"
 	"github.com/tweety53/gomigrate/internal/exit_code"
 	"github.com/tweety53/gomigrate/internal/log"
 	"os"
@@ -16,7 +16,7 @@ import (
 )
 
 // Migrations version prefix format
-const versionFormat = "m060102_150405"
+const versionPrefixFormat = "m060102_150405"
 
 var (
 	ErrInvalidName          = errors.New("the migration name should contain letters, digits, underscore and/or backslash characters only")
@@ -47,10 +47,10 @@ type CreateActionParams struct {
 	mType MigrationType
 }
 
-func (c *CreateActionParams) Get() interface{} {
+func (p *CreateActionParams) Get() interface{} {
 	return &CreateActionParams{
-		name:  c.name,
-		mType: c.mType,
+		name:  p.name,
+		mType: p.mType,
 	}
 }
 
@@ -58,7 +58,7 @@ var migrationNameRegex = regexp.MustCompile("^[\\w\\\\]+$")
 
 func (p *CreateActionParams) ValidateAndFill(args []string) error {
 	if len(args) < 1 {
-		return errors2.ErrNotEnoughArgs
+		return errorsInternal.ErrNotEnoughArgs
 	}
 
 	if args[0] == "" {
@@ -94,14 +94,14 @@ func NewCreateAction(db *sql.DB, migrationsPath string) *CreateAction {
 func (a *CreateAction) Run(params interface{}) error {
 	p, ok := params.(*CreateActionParams)
 	if !ok {
-		return errors2.ErrInvalidActionParamsType
+		return errorsInternal.ErrInvalidActionParamsType
 	}
 
 	var (
 		tmpl *template.Template
 	)
 
-	versionPrefix := time.Now().Format(versionFormat)
+	versionPrefix := time.Now().Format(versionPrefixFormat)
 
 	if p.mType == migrationTypeGo {
 		tmpl = MigrationTemplateGo
@@ -119,7 +119,7 @@ func (a *CreateAction) Run(params interface{}) error {
 	path := filepath.Join(a.migrationsPath, fileName)
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
 		log.Err("Failed to create new migration.")
-		return &errors2.Error{
+		return &errorsInternal.Error{
 			Err:      err,
 			ExitCode: exit_code.ExitCodeIOErr,
 		}
@@ -128,7 +128,7 @@ func (a *CreateAction) Run(params interface{}) error {
 	f, err := os.Create(path)
 	if err != nil {
 		log.Err("Failed to create new migration.")
-		return &errors2.Error{
+		return &errorsInternal.Error{
 			Err:      err,
 			ExitCode: exit_code.ExitCodeIOErr,
 		}

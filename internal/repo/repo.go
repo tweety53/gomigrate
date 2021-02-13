@@ -1,8 +1,7 @@
-package db
+package repo
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/pkg/errors"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
@@ -11,14 +10,22 @@ import (
 	"time"
 )
 
-func GetNewMigrations(db *sql.DB) (migration.Migrations, error) {
+type MigrationsRepo interface {
+	GetNewMigrations(db *sql.DB, migrationsPath string) (migration.Migrations, error)
+	EnsureDBVersion(db *sql.DB) (string, error)
+	TruncateDatabase(db *sql.DB) error
+	GetFkRows(db *sql.DB, tableName string) (*sql.Rows, error)
+	GetMigrationsHistory(db *sql.DB, limit int) (*sql.Rows, error)
+}
+
+func GetNewMigrations(db *sql.DB, migrationsPath string) (migration.Migrations, error) {
 	if _, err := GetDBVersion(db); err != nil {
 		return nil, err
 	}
 
 	rows, err := GetMigrationsHistory(db, 0)
 	if err != nil {
-		return migration.Migrations{}, errors.New("cannot get migrations history from dbogar")
+		return migration.Migrations{}, errors.Wrap(err, "cannot get migrations history from repo")
 	}
 	defer rows.Close()
 
@@ -37,9 +44,9 @@ func GetNewMigrations(db *sql.DB) (migration.Migrations, error) {
 		applied[row.Version] = row.ApplyTime
 	}
 
-	allMigrations, err := migration.CollectMigrations("/Users/yuriy.aleksandrov/go/src/gomigrate/migrations", 0, 0)
+	allMigrations, err := migration.CollectMigrations(migrationsPath, 0, 0)
 	if err != nil {
-		return migration.Migrations{}, errors.New("cannot collect migr filesogar")
+		return migration.Migrations{}, errors.Wrapf(err, "cannot collect migration files from path: %s", migrationsPath)
 	}
 
 	newCnt := len(allMigrations) - len(applied)
@@ -70,7 +77,7 @@ func EnsureDBVersion(db *sql.DB) (string, error) {
 	return "", nil
 }
 
-// Create the db version table
+// Create the repo version table
 // and insert the initial 0 value into it
 func createVersionTable(db *sql.DB) error {
 	txn, err := db.Begin()
@@ -143,7 +150,7 @@ func TruncateDatabase(db *sql.DB) error {
 
 	// Then drop the tables
 	for _, name := range tableNames {
-		//todo: handle db views errors
+		//todo: handle repo views errors
 		_, err := db.Exec(sql_dialect.GetDialect().DropTableSQL(name))
 		if err != nil {
 			log.Errf("Cannot drop %s table, err: %v\n", err)
@@ -167,7 +174,7 @@ func GetFkRows(db *sql.DB, tableName string) (*sql.Rows, error) {
 }
 
 func GetMigrationsHistory(db *sql.DB, limit int) (*sql.Rows, error) {
-	query := fmt.Sprintf("SELECT version, apply_time FROM %s ORDER BY apply_time DESC, version DESC", "migration")
+	query := sql_dialect.GetDialect().MigrationsHistorySQL()
 	if limit > 0 {
 		query += " LIMIT " + strconv.Itoa(limit)
 	}

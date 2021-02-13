@@ -3,21 +3,22 @@ package action
 import (
 	"database/sql"
 	"fmt"
-	"github.com/tweety53/gomigrate/internal/db"
 	errorsInternal "github.com/tweety53/gomigrate/internal/errors"
 	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
+	"github.com/tweety53/gomigrate/internal/repo"
 	"github.com/tweety53/gomigrate/internal/sql_dialect"
 	"time"
 )
 
 type MarkAction struct {
-	db *sql.DB
+	db             *sql.DB
+	migrationsPath string
 }
 
-func NewMarkAction(db *sql.DB) *MarkAction {
-	return &MarkAction{db: db}
+func NewMarkAction(db *sql.DB, migrationsPath string) *MarkAction {
+	return &MarkAction{db: db, migrationsPath: migrationsPath}
 }
 
 type MarkActionParams struct {
@@ -50,14 +51,14 @@ func (a *MarkAction) Run(params interface{}) error {
 	}
 
 	// try mark up
-	migrations, err := db.GetNewMigrations(a.db)
+	migrations, err := repo.GetNewMigrations(a.db, a.migrationsPath)
 	if err != nil {
 		return err
 	}
 
 	for i := range migrations {
 		if p.version == migrations[i].Version {
-			resp := helpers.AskForConfirmation(fmt.Sprintf("Set migration history at %s?", p.version), false)
+			resp := helpers.AskForConfirmation(fmt.Sprintf("Set migration history at %s?", p.version))
 			if !resp {
 				log.Info("Action was cancelled by user. Nothing has been performed.\n")
 				return nil
@@ -75,7 +76,7 @@ func (a *MarkAction) Run(params interface{}) error {
 	}
 
 	// try migrate down
-	migrationsHistory, err := db.GetMigrationsHistory(a.db, 0)
+	migrationsHistory, err := repo.GetMigrationsHistory(a.db, 0)
 	if err != nil {
 		return err
 	}
@@ -88,7 +89,7 @@ func (a *MarkAction) Run(params interface{}) error {
 	for i := range migrations {
 		if p.version == migrations[i].Version {
 			if i != 0 {
-				resp := helpers.AskForConfirmation(fmt.Sprintf("Set migration history at %s?", p.version), false)
+				resp := helpers.AskForConfirmation(fmt.Sprintf("Set migration history at %s?", p.version))
 				if !resp {
 					log.Info("Action was cancelled by user. Nothing has been performed.\n")
 					return nil
@@ -108,7 +109,7 @@ func (a *MarkAction) Run(params interface{}) error {
 	}
 
 	if p.version == migration.BaseMigrationVersion {
-		resp := helpers.AskForConfirmation(fmt.Sprintf("Set migration history at %s?", p.version), false)
+		resp := helpers.AskForConfirmation(fmt.Sprintf("Set migration history at %s?", p.version))
 		if !resp {
 			log.Info("Action was cancelled by user. Nothing has been performed.\n")
 			return nil

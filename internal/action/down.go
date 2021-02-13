@@ -3,17 +3,18 @@ package action
 import (
 	"database/sql"
 	"github.com/pkg/errors"
-	"github.com/tweety53/gomigrate/internal/db"
 	errors2 "github.com/tweety53/gomigrate/internal/errors"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
+	"github.com/tweety53/gomigrate/internal/repo"
 	"strconv"
 )
 
-var ErrInconsistentMigrationsData = errors.New("migrations data in db and migration files path inconsistent, please check")
+var ErrInconsistentMigrationsData = errors.New("migrations data in repo and migration files path inconsistent, please check")
 
 type DownAction struct {
-	db *sql.DB
+	db             *sql.DB
+	migrationsPath string
 }
 
 type DownActionParams struct {
@@ -42,8 +43,8 @@ func (p *DownActionParams) ValidateAndFill(args []string) error {
 	return nil
 }
 
-func NewDownAction(db *sql.DB) *DownAction {
-	return &DownAction{db: db}
+func NewDownAction(db *sql.DB, migrationPath string) *DownAction {
+	return &DownAction{db: db, migrationsPath: migrationPath}
 }
 
 func (a *DownAction) Run(params interface{}) error {
@@ -52,7 +53,7 @@ func (a *DownAction) Run(params interface{}) error {
 		return errors2.ErrInvalidActionParamsType
 	}
 
-	migrationsHistory, err := db.GetMigrationsHistory(a.db, p.limit)
+	migrationsHistory, err := repo.GetMigrationsHistory(a.db, p.limit)
 	if err != nil {
 		return err
 	}
@@ -68,7 +69,7 @@ func (a *DownAction) Run(params interface{}) error {
 	}
 
 	downMigrations, err = migration.CollectMigrations(
-		"/Users/yuriy.aleksandrov/go/src/gomigrate/migrations",
+		a.migrationsPath,
 		migration.GetComparableVersion(downMigrations[0].Version),
 		migration.GetComparableVersion(downMigrations[len(downMigrations)-1].Version))
 

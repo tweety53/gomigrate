@@ -3,10 +3,10 @@ package action
 import (
 	"database/sql"
 	"github.com/pkg/errors"
-	"github.com/tweety53/gomigrate/internal/db"
 	errorsInternal "github.com/tweety53/gomigrate/internal/errors"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
+	"github.com/tweety53/gomigrate/internal/repo"
 	"regexp"
 	"strconv"
 )
@@ -14,11 +14,12 @@ import (
 var ErrUnableToFindVersion = errors.New("unable to find migration with this version")
 
 type ToAction struct {
-	db *sql.DB
+	db             *sql.DB
+	migrationsPath string
 }
 
-func NewToAction(db *sql.DB) *ToAction {
-	return &ToAction{db: db}
+func NewToAction(db *sql.DB, migrationsPath string) *ToAction {
+	return &ToAction{db: db, migrationsPath: migrationsPath}
 }
 
 type ToActionParams struct {
@@ -53,14 +54,14 @@ func (a *ToAction) Run(params interface{}) error {
 	}
 
 	// try migrate up
-	migrations, err := db.GetNewMigrations(a.db)
+	migrations, err := repo.GetNewMigrations(a.db, a.migrationsPath)
 	if err != nil {
 		return err
 	}
 
 	for i := range migrations {
 		if p.version == migrations[i].Version {
-			upAction := NewUpAction(a.db)
+			upAction := NewUpAction(a.db, a.migrationsPath)
 			params := new(UpActionParams)
 			if err := params.ValidateAndFill([]string{strconv.Itoa(i + 1)}); err != nil {
 				return err
@@ -74,7 +75,7 @@ func (a *ToAction) Run(params interface{}) error {
 	}
 
 	// try migrate down
-	migrationsHistory, err := db.GetMigrationsHistory(a.db, 0)
+	migrationsHistory, err := repo.GetMigrationsHistory(a.db, 0)
 	if err != nil {
 		return err
 	}
@@ -87,7 +88,7 @@ func (a *ToAction) Run(params interface{}) error {
 	for i := range migrations {
 		if p.version == migrations[i].Version {
 			if i != 0 {
-				downAction := NewDownAction(a.db)
+				downAction := NewDownAction(a.db, a.migrationsPath)
 				params := new(DownActionParams)
 				if err := params.ValidateAndFill([]string{strconv.Itoa(i)}); err != nil {
 					return err

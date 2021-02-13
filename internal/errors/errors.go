@@ -17,6 +17,10 @@ type Error struct {
 }
 
 func (e *Error) Error() string {
+	if e.Err == nil {
+		return ""
+	}
+
 	return e.Err.Error()
 }
 

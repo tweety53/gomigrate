@@ -1,3 +1,4 @@
+//sql parsing completely borrowed from https://github.com/pressly/goose
 package migration
 
 import (
@@ -13,7 +14,7 @@ import (
 
 var (
 	matchSQLComments = regexp.MustCompile(`(?m)^--.*$[\r\n]*`)
-	matchEmptyEOL    = regexp.MustCompile(`(?m)^$[\r\n]*`) // TODO: Duplicate
+	matchEmptyEOL    = regexp.MustCompile(`(?m)^$[\r\n]*`)
 )
 
 func clearStatement(s string) string {

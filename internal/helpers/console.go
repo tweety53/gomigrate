@@ -3,25 +3,28 @@ package helpers
 import (
 	"fmt"
 	internalLog "github.com/tweety53/gomigrate/internal/log"
-	"log"
 	"strings"
 )
 
-func AskForConfirmation(text string, defaultResponse bool) bool {
+func AskForConfirmation(text string) bool {
 	internalLog.Warnln(text)
 	var response string
 
 	_, err := fmt.Scanln(&response)
 	if err != nil {
-		log.Fatal(err)
+		return false
 	}
 
+	return processResponse(response)
+}
+
+func processResponse(response string) bool {
 	switch strings.ToLower(response) {
-	case "y", "yes", "Y", "YES":
+	case "y", "yes":
 		return true
-	case "n", "no", "N", "NO":
+	case "n", "no":
 		return false
 	default:
-		return defaultResponse
+		return false
 	}
 }

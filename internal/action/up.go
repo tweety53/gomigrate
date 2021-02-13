@@ -2,14 +2,19 @@ package action
 
 import (
 	"database/sql"
-	"github.com/tweety53/gomigrate/internal/db"
-	errors2 "github.com/tweety53/gomigrate/internal/errors"
+	errorsInternal "github.com/tweety53/gomigrate/internal/errors"
 	"github.com/tweety53/gomigrate/internal/log"
+	"github.com/tweety53/gomigrate/internal/repo"
 	"strconv"
 )
 
 type UpAction struct {
-	db *sql.DB
+	db             *sql.DB
+	migrationsPath string
+}
+
+func NewUpAction(db *sql.DB, migrationsPath string) *UpAction {
+	return &UpAction{db: db, migrationsPath: migrationsPath}
 }
 
 type UpActionParams struct {
@@ -32,17 +37,13 @@ func (p *UpActionParams) ValidateAndFill(args []string) error {
 	return nil
 }
 
-func NewUpAction(db *sql.DB) *UpAction {
-	return &UpAction{db: db}
-}
-
 func (a *UpAction) Run(params interface{}) error {
 	p, ok := params.(*UpActionParams)
 	if !ok {
-		return errors2.ErrInvalidActionParamsType
+		return errorsInternal.ErrInvalidActionParamsType
 	}
 
-	migrations, err := db.GetNewMigrations(a.db)
+	migrations, err := repo.GetNewMigrations(a.db, a.migrationsPath)
 	if err != nil {
 		return err
 	}

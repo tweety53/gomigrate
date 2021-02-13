@@ -16,6 +16,7 @@ type SQLDialect interface {
 	TableForeignKeysSQL() string
 	DropFkSQL(tableName string, fkName string) string
 	DropTableSQL(tableName string) string
+	MigrationsHistorySQL() string
 }
 
 var dialect SQLDialect
@@ -24,14 +25,14 @@ func GetDialect() SQLDialect {
 	return dialect
 }
 
-func InitDialect(d string, config *config.AppConfig) error {
-	switch d {
+func InitDialect(config *config.AppConfig) error {
+	switch config.SQLDialect {
 	case "postgres":
 		dialect = &PostgresDialect{
 			config: config,
 		}
 	default:
-		return fmt.Errorf("%q: unknown dialect", d)
+		return fmt.Errorf("%q: unknown dialect", config.SQLDialect)
 	}
 
 	return nil

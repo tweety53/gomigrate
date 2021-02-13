@@ -78,3 +78,7 @@ func (pd PostgresDialect) UpdateApplyTimeSQL() string {
 func (pd PostgresDialect) LockVersionSQL() string {
 	return fmt.Sprintf("SELECT * FROM %s WHERE version=$1 FOR UPDATE NOWAIT;", pd.config.MigrationTable)
 }
+
+func (pd PostgresDialect) MigrationsHistorySQL() string {
+	return fmt.Sprintf("SELECT version, apply_time FROM %s ORDER BY apply_time DESC, version DESC", pd.config.MigrationTable)
+}

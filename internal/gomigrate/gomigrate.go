@@ -10,7 +10,7 @@ import (
 )
 
 func Run(a string, db *sql.DB, config *config.AppConfig, args []string) error {
-	err := sql_dialect.InitDialect(config.SQLDialect, config)
+	err := sql_dialect.InitDialect(config)
 	if err != nil {
 		return err
 	}
@@ -27,7 +27,7 @@ func Run(a string, db *sql.DB, config *config.AppConfig, args []string) error {
 			return err
 		}
 	case "down":
-		downAction := action.NewDownAction(db)
+		downAction := action.NewDownAction(db, config.MigrationsPath)
 		params := new(action.DownActionParams)
 		if err := params.ValidateAndFill(args); err != nil {
 			return err
@@ -36,7 +36,7 @@ func Run(a string, db *sql.DB, config *config.AppConfig, args []string) error {
 			return err
 		}
 	case "fresh":
-		freshAction := action.NewFreshAction(db)
+		freshAction := action.NewFreshAction(db, config.MigrationsPath)
 		params := new(action.FreshActionParams)
 		if err := params.ValidateAndFill(args); err != nil {
 			return err
@@ -54,7 +54,7 @@ func Run(a string, db *sql.DB, config *config.AppConfig, args []string) error {
 			return err
 		}
 	case "mark":
-		markAction := action.NewMarkAction(db)
+		markAction := action.NewMarkAction(db, config.MigrationsPath)
 		params := new(action.MarkActionParams)
 		if err := params.ValidateAndFill(args); err != nil {
 			return err
@@ -63,7 +63,7 @@ func Run(a string, db *sql.DB, config *config.AppConfig, args []string) error {
 			return err
 		}
 	case "new":
-		newAction := action.NewNewAction(db)
+		newAction := action.NewNewAction(db, config.MigrationsPath)
 		params := new(action.NewActionParams)
 		if err := params.ValidateAndFill(args); err != nil {
 			return err
@@ -72,7 +72,7 @@ func Run(a string, db *sql.DB, config *config.AppConfig, args []string) error {
 			return err
 		}
 	case "redo":
-		redoAction := action.NewRedoAction(db)
+		redoAction := action.NewRedoAction(db, config.MigrationsPath)
 		params := new(action.RedoActionParams)
 		if err := params.ValidateAndFill(args); err != nil {
 			return err
@@ -81,7 +81,7 @@ func Run(a string, db *sql.DB, config *config.AppConfig, args []string) error {
 			return err
 		}
 	case "to":
-		toAction := action.NewToAction(db)
+		toAction := action.NewToAction(db, config.MigrationsPath)
 		params := new(action.ToActionParams)
 		if err := params.ValidateAndFill(args); err != nil {
 			return err
@@ -90,7 +90,7 @@ func Run(a string, db *sql.DB, config *config.AppConfig, args []string) error {
 			return err
 		}
 	case "up":
-		upAction := action.NewUpAction(db)
+		upAction := action.NewUpAction(db, config.MigrationsPath)
 		params := new(action.UpActionParams)
 		if err := params.ValidateAndFill(args); err != nil {
 			return err
