@@ -1,8 +1,7 @@
 run:
   tests: false
   skip-files:
-    - "*_minimock.go$"
-    - lib/bad.go
+    - "_minimock.go$"
 
 linters-settings:
   funlen:
