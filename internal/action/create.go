@@ -68,14 +68,13 @@ func (p *CreateActionParams) ValidateAndFill(args []string) error {
 	}
 	p.name = name
 
-	var mType MigrationType
 	if len(args) != 2 {
 		p.mType = migrationTypeGo
 		return nil
 	}
 
 	p.mType = MigrationType(args[1])
-	if mType != migrationTypeGo && mType != migrationTypeSQL {
+	if p.mType != migrationTypeGo && p.mType != migrationTypeSQL {
 		return ErrUnknownMigrationType
 	}
 
