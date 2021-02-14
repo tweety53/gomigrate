@@ -14,13 +14,5 @@ linters:
   enable-all: true
   disable:
     - gochecknoglobals
-    - gochecknoinits
-    - godox
     - gofumpt
-    - gomnd
     - lll
-    - nakedret
-    - nlreturn
-    - testpackage
-    - wsl
-    - wrapcheck
