@@ -64,6 +64,7 @@ var bufferPool = sync.Pool{
 // within a statement. For these cases, we provide the explicit annotations
 // 'StatementBegin' and 'StatementEnd' to allow the script to
 // tell us to ignore semicolons.
+//nolint:funlen
 func parseSQLMigration(r io.Reader, direction MigrationDirection) (stmts []string, useTx bool, err error) {
 	var buf bytes.Buffer
 	scanBuf := bufferPool.Get().([]byte)

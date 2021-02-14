@@ -68,10 +68,10 @@ func (m *Migration) run(repo *repo.MigrationsRepository, direction MigrationDire
 		}
 
 		if direction == migrationDirectionUp {
-			assembleUpFnFromStatements(statements, useTx, m)
+			assembleFnFromStatements(statements, useTx, m, direction)
 			return migrateUpGo(repo, m)
 		} else {
-			assembleDownFnFromStatements(statements, useTx, m)
+			assembleFnFromStatements(statements, useTx, m, direction)
 			return migrateDownGo(repo, m)
 		}
 

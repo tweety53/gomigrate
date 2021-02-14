@@ -118,6 +118,6 @@ func Run(a string, db *sql.DB, config *config.GoMigrateConfig, args []string) er
 }
 
 func AddMigration(up func(*sql.Tx) error, down func(*sql.Tx) error) {
-	_, filename, _, _ := runtime.Caller(1)
+	_, filename, _, _ := runtime.Caller(1) //nolint:dogsled
 	migration.AddNamedMigration(filename, up, down)
 }

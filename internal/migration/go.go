@@ -18,8 +18,6 @@ func migrateUpGo(repo *repo.MigrationsRepository, m *Migration) error {
 	log.Warnf("*** applying %s", filepath.Base(m.Source))
 	start := time.Now()
 	if err := repo.InsertUnAppliedVersion(m.Version); err != nil {
-		tx.Rollback()
-
 		duration := time.Since(start)
 		log.Warnf("*** failed to apply %s (time: %.3f sec.)", filepath.Base(m.Source), duration.Seconds())
 		log.Warn("This version is currently being applied by another app")
@@ -29,7 +27,13 @@ func migrateUpGo(repo *repo.MigrationsRepository, m *Migration) error {
 	if fn != nil {
 		// Run Go migration function.
 		if err := fn(tx); err != nil {
-			tx.Rollback()
+			txErr := tx.Rollback()
+			if txErr != nil {
+				duration := time.Since(start)
+				log.Errf("*** failed to apply %s (time: %.3f sec.)\n", filepath.Base(m.Source), duration.Seconds())
+				log.Err("failed to rollback failed migration fn() execution")
+				return txErr
+			}
 
 			tx, err := repo.Db.Begin()
 			if err != nil {
@@ -37,7 +41,12 @@ func migrateUpGo(repo *repo.MigrationsRepository, m *Migration) error {
 			}
 
 			if err := repo.DeleteVersion(m.Version); err != nil {
-				tx.Rollback()
+				txErr := tx.Rollback()
+				if txErr != nil {
+					duration := time.Since(start)
+					log.Errf("*** failed to apply %s (time: %.3f sec.)\n", filepath.Base(m.Source), duration.Seconds())
+					return errors.Wrap(err, "failed to rollback delete version transaction for unapplied version")
+				}
 
 				duration := time.Since(start)
 				log.Errf("*** failed to apply %s (time: %.3f sec.)\n", filepath.Base(m.Source), duration.Seconds())
@@ -51,7 +60,13 @@ func migrateUpGo(repo *repo.MigrationsRepository, m *Migration) error {
 	}
 
 	if err := repo.UpdateApplyTime(m.Version); err != nil {
-		tx.Rollback()
+		txErr := tx.Rollback()
+		if txErr != nil {
+			duration := time.Since(start)
+			log.Errf("*** failed to apply %s (time: %.3f sec.)\n", filepath.Base(m.Source), duration.Seconds())
+			log.Err("UpdateApplyTime() query tx rollback failed")
+			return errors.Wrap(txErr, "update apply time query tx rollback failed")
+		}
 
 		tx, err := repo.Db.Begin()
 		if err != nil {
@@ -59,7 +74,12 @@ func migrateUpGo(repo *repo.MigrationsRepository, m *Migration) error {
 		}
 
 		if err := repo.DeleteVersion(m.Version); err != nil {
-			tx.Rollback()
+			txErr := tx.Rollback()
+			if txErr != nil {
+				duration := time.Since(start)
+				log.Errf("*** failed to apply %s (time: %.3f sec.)\n", filepath.Base(m.Source), duration.Seconds())
+				return errors.Wrap(txErr, "delete version query tx rollback failed")
+			}
 
 			duration := time.Since(start)
 			log.Errf("*** failed to apply %s (time: %.3f sec.)\n", filepath.Base(m.Source), duration.Seconds())
