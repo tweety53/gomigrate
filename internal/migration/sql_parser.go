@@ -1,15 +1,16 @@
-//sql parsing completely borrowed from https://github.com/pressly/goose
+// sql parsing completely borrowed from https://github.com/pressly/goose
 package migration
 
 import (
 	"bufio"
 	"bytes"
-	"github.com/pkg/errors"
-	"github.com/tweety53/gomigrate/internal/log"
 	"io"
 	"regexp"
 	"strings"
 	"sync"
+
+	"github.com/pkg/errors"
+	"github.com/tweety53/gomigrate/internal/log"
 )
 
 var (
@@ -39,6 +40,7 @@ type stateMachine parserState
 func (s *stateMachine) Get() parserState {
 	return parserState(*s)
 }
+
 func (s *stateMachine) Set(new parserState) {
 	log.Debugf("StateMachine: %v => %v", *s, new)
 	*s = stateMachine(new)

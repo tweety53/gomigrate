@@ -2,16 +2,17 @@ package action
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
-	"github.com/tweety53/gomigrate/internal/log"
-	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
-	"github.com/tweety53/gomigrate/pkg/exit_code"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/pkg/errors"
+	"github.com/tweety53/gomigrate/internal/log"
+	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
+	"github.com/tweety53/gomigrate/pkg/exit_code"
 )
 
 // Migrations version prefix format
@@ -52,7 +53,7 @@ func (p *CreateActionParams) Get() interface{} {
 	}
 }
 
-//todo: tests for regex
+// todo: tests for regex
 var migrationNameRegex = regexp.MustCompile("^[\\w\\\\]+$")
 
 func (p *CreateActionParams) ValidateAndFill(args []string) error {
@@ -96,9 +97,7 @@ func (a *CreateAction) Run(params interface{}) error {
 		return errorsInternal.ErrInvalidActionParamsType
 	}
 
-	var (
-		tmpl *template.Template
-	)
+	var tmpl *template.Template
 
 	versionPrefix := time.Now().Format(versionPrefixFormat)
 

@@ -17,7 +17,7 @@ func NewFreshAction(migrationsSvc *service.MigrationService) *FreshAction {
 type FreshActionParams struct{}
 
 func (a *FreshAction) Run(_ interface{}) error {
-	//todo: restrict action also for local env only
+	// todo: restrict action also for local env only
 	res := helpers.AskForConfirmation("Are you sure you want to drop all tables and related constraints and start the migration from the beginning?\nAll data will be lost irreversibly!")
 	if !res {
 		log.Info("Action was cancelled by user. Nothing has been performed.")

@@ -1,9 +1,10 @@
 package errors
 
 import (
+	"testing"
+
 	"github.com/pkg/errors"
 	"github.com/tweety53/gomigrate/pkg/exit_code"
-	"testing"
 )
 
 func TestErrorExitCode(t *testing.T) {

@@ -3,12 +3,13 @@ package migration
 import (
 	"database/sql"
 	"fmt"
-	"github.com/pkg/errors"
-	"github.com/tweety53/gomigrate/internal/repo"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/pkg/errors"
+	"github.com/tweety53/gomigrate/internal/repo"
 )
 
 const (

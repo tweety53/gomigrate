@@ -1,13 +1,14 @@
 package action
 
 import (
+	"strconv"
+
 	"github.com/pkg/errors"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
 	"github.com/tweety53/gomigrate/internal/repo"
 	"github.com/tweety53/gomigrate/internal/service"
 	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
-	"strconv"
 )
 
 var ErrInconsistentMigrationsData = errors.New("migrations data in repo and migration files path inconsistent, please check")

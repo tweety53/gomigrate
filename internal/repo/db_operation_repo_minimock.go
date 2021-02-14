@@ -125,7 +125,7 @@ func (mmAllTableNames *mDbOperationRepoMockAllTableNames) Return(sa1 []string, e
 	return mmAllTableNames.mock
 }
 
-//Set uses given function f to mock the DbOperationRepo.AllTableNames method
+// Set uses given function f to mock the DbOperationRepo.AllTableNames method
 func (mmAllTableNames *mDbOperationRepoMockAllTableNames) Set(f func() (sa1 []string, err error)) *DbOperationRepoMock {
 	if mmAllTableNames.defaultExpectation != nil {
 		mmAllTableNames.mock.t.Fatalf("Default expectation is already set for the DbOperationRepo.AllTableNames method")
@@ -284,7 +284,7 @@ func (mmDropForeignKey *mDbOperationRepoMockDropForeignKey) Return(err error) *D
 	return mmDropForeignKey.mock
 }
 
-//Set uses given function f to mock the DbOperationRepo.DropForeignKey method
+// Set uses given function f to mock the DbOperationRepo.DropForeignKey method
 func (mmDropForeignKey *mDbOperationRepoMockDropForeignKey) Set(f func(tableName string, fkName string) (err error)) *DbOperationRepoMock {
 	if mmDropForeignKey.defaultExpectation != nil {
 		mmDropForeignKey.mock.t.Fatalf("Default expectation is already set for the DbOperationRepo.DropForeignKey method")
@@ -499,7 +499,7 @@ func (mmDropTable *mDbOperationRepoMockDropTable) Return(err error) *DbOperation
 	return mmDropTable.mock
 }
 
-//Set uses given function f to mock the DbOperationRepo.DropTable method
+// Set uses given function f to mock the DbOperationRepo.DropTable method
 func (mmDropTable *mDbOperationRepoMockDropTable) Set(f func(tableName string) (err error)) *DbOperationRepoMock {
 	if mmDropTable.defaultExpectation != nil {
 		mmDropTable.mock.t.Fatalf("Default expectation is already set for the DbOperationRepo.DropTable method")
@@ -715,7 +715,7 @@ func (mmGetForeignKeys *mDbOperationRepoMockGetForeignKeys) Return(f1 ForeignKey
 	return mmGetForeignKeys.mock
 }
 
-//Set uses given function f to mock the DbOperationRepo.GetForeignKeys method
+// Set uses given function f to mock the DbOperationRepo.GetForeignKeys method
 func (mmGetForeignKeys *mDbOperationRepoMockGetForeignKeys) Set(f func(tableName string) (f1 ForeignKeys, err error)) *DbOperationRepoMock {
 	if mmGetForeignKeys.defaultExpectation != nil {
 		mmGetForeignKeys.mock.t.Fatalf("Default expectation is already set for the DbOperationRepo.GetForeignKeys method")
@@ -915,7 +915,7 @@ func (mmTruncateDatabase *mDbOperationRepoMockTruncateDatabase) Return(err error
 	return mmTruncateDatabase.mock
 }
 
-//Set uses given function f to mock the DbOperationRepo.TruncateDatabase method
+// Set uses given function f to mock the DbOperationRepo.TruncateDatabase method
 func (mmTruncateDatabase *mDbOperationRepoMockTruncateDatabase) Set(f func() (err error)) *DbOperationRepoMock {
 	if mmTruncateDatabase.defaultExpectation != nil {
 		mmTruncateDatabase.mock.t.Fatalf("Default expectation is already set for the DbOperationRepo.TruncateDatabase method")

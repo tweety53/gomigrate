@@ -1,13 +1,14 @@
 package action
 
 import (
+	"strconv"
+
 	"github.com/pkg/errors"
 	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
 	"github.com/tweety53/gomigrate/internal/service"
 	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
-	"strconv"
 )
 
 var ErrUnableToFindVersion = errors.New("unable to find migration with this version")
@@ -29,7 +30,7 @@ func (p *ToActionParams) ValidateAndFill(args []string) error {
 		return errorsInternal.ErrNotEnoughArgs
 	}
 
-	//todo: implement all version formats like in yii/migrate???
+	// todo: implement all version formats like in yii/migrate???
 	if !helpers.ValidMigrationVersion(args[0]) {
 		return errorsInternal.ErrInvalidVersionFormat
 	}

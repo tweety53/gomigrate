@@ -2,12 +2,14 @@ package helpers
 
 import (
 	"fmt"
-	internalLog "github.com/tweety53/gomigrate/internal/log"
 	"strings"
+
+	internalLog "github.com/tweety53/gomigrate/internal/log"
 )
 
 func AskForConfirmation(text string) bool {
 	internalLog.Warnln(text)
+
 	var response string
 
 	_, err := fmt.Scanln(&response)

@@ -2,16 +2,17 @@ package repo
 
 import (
 	"database/sql"
+
 	"github.com/tweety53/gomigrate/internal/log"
-	"github.com/tweety53/gomigrate/internal/sql_dialect"
+	"github.com/tweety53/gomigrate/internal/sqldialect"
 )
 
 type DbOperationsRepository struct {
 	db      *sql.DB
-	dialect sql_dialect.SQLDialect
+	dialect sqldialect.SQLDialect
 }
 
-func NewDbOperationsRepository(db *sql.DB, dialect sql_dialect.SQLDialect) *DbOperationsRepository {
+func NewDbOperationsRepository(db *sql.DB, dialect sqldialect.SQLDialect) *DbOperationsRepository {
 	return &DbOperationsRepository{db: db, dialect: dialect}
 }
 
@@ -47,7 +48,7 @@ func (r *DbOperationsRepository) TruncateDatabase() error {
 
 	// Then drop the tables
 	for _, name := range tableNames {
-		//todo: handle db view errors
+		// todo: handle db view errors
 		err := r.DropTable(name)
 		if err != nil {
 			log.Errf("Cannot drop %s table, err: %v\n", err)

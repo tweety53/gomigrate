@@ -1,11 +1,12 @@
 package migration
 
 import (
+	"path/filepath"
+	"time"
+
 	"github.com/pkg/errors"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/repo"
-	"path/filepath"
-	"time"
 )
 
 func migrateUpGo(repo *repo.MigrationsRepository, m *Migration) error {

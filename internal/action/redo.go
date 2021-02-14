@@ -2,6 +2,8 @@ package action
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/pkg/errors"
 	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/log"
@@ -9,7 +11,6 @@ import (
 	"github.com/tweety53/gomigrate/internal/repo"
 	"github.com/tweety53/gomigrate/internal/service"
 	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
-	"strconv"
 )
 
 type RedoAction struct {

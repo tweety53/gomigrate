@@ -2,11 +2,12 @@ package service
 
 import (
 	"database/sql"
+	"reflect"
+	"testing"
+
 	"github.com/gojuno/minimock/v3"
 	"github.com/tweety53/gomigrate/internal/migration"
 	"github.com/tweety53/gomigrate/internal/repo"
-	"reflect"
-	"testing"
 )
 
 func TestMigrationService_GetNewMigrations(t *testing.T) {

@@ -2,6 +2,7 @@ package migrations_test
 
 import (
 	"database/sql"
+
 	"github.com/tweety53/gomigrate/pkg/gomigrate"
 )
 

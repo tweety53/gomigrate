@@ -4,14 +4,15 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+
 	"github.com/tweety53/gomigrate/pkg/config"
 	"github.com/tweety53/gomigrate/pkg/errors"
 	"github.com/tweety53/gomigrate/pkg/exit_code"
 	"github.com/tweety53/gomigrate/pkg/gomigrate"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
-	"log"
-	"os"
 
 	_ "github.com/lib/pq"
 )

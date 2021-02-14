@@ -12,6 +12,7 @@ const (
 	resetColor  = "\033[00m"
 )
 
+//nolint:gochecknoglobals
 var verbose bool
 
 func SetVerbose(v bool) {

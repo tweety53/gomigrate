@@ -1,5 +1,8 @@
 run:
   tests: false
+  skip-files:
+    - "*_minimock.go$"
+    - lib/bad.go
 
 linters-settings:
   funlen:
@@ -9,3 +12,15 @@ linters-settings:
 linters:
   disable-all: false
   enable-all: true
+  disable:
+    - gochecknoglobals
+    - gochecknoinits
+    - godox
+    - gofumpt
+    - gomnd
+    - lll
+    - nakedret
+    - nlreturn
+    - testpackage
+    - wsl
+    - wrapcheck

@@ -2,6 +2,7 @@ package action
 
 import (
 	"fmt"
+
 	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
@@ -26,7 +27,7 @@ func (p *MarkActionParams) ValidateAndFill(args []string) error {
 		return errorsInternal.ErrNotEnoughArgs
 	}
 
-	//todo: implement all version formats like in yii/migrate???
+	// todo: implement all version formats like in yii/migrate???
 	if !helpers.ValidMigrationVersion(args[0]) {
 		return errorsInternal.ErrInvalidVersionFormat
 	}

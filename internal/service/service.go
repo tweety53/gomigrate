@@ -2,6 +2,7 @@ package service
 
 import (
 	"database/sql"
+
 	"github.com/pkg/errors"
 	"github.com/tweety53/gomigrate/internal/migration"
 	"github.com/tweety53/gomigrate/internal/repo"

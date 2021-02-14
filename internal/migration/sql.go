@@ -2,6 +2,7 @@ package migration
 
 import (
 	"database/sql"
+
 	"github.com/pkg/errors"
 	"github.com/tweety53/gomigrate/internal/log"
 )

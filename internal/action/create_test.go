@@ -1,12 +1,13 @@
 package action
 
 import (
-	"github.com/stretchr/testify/require"
-	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
 	"io/ioutil"
 	"log"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
 )
 
 func TestCreateActionParams_ValidateAndFill(t *testing.T) {
@@ -90,7 +91,7 @@ func TestCreateAction_Run(t *testing.T) {
 	type args struct {
 		params interface{}
 	}
-	//todo: check for all errs
+	// todo: check for all errs
 	dir, err := ioutil.TempDir("", "")
 	if err != nil {
 		log.Fatal(err)

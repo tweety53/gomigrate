@@ -1,9 +1,10 @@
 package action
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/require"
 	"github.com/tweety53/gomigrate/internal/service"
-	"testing"
 )
 
 func TestRedoActionParams_ValidateAndFill(t *testing.T) {

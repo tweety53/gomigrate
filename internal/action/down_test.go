@@ -1,12 +1,13 @@
 package action
 
 import (
+	"testing"
+
 	"github.com/gojuno/minimock/v3"
 	"github.com/stretchr/testify/require"
 	"github.com/tweety53/gomigrate/internal/migration"
 	"github.com/tweety53/gomigrate/internal/repo"
 	"github.com/tweety53/gomigrate/internal/service"
-	"testing"
 )
 
 func TestDownActionParams_ValidateAndFill(t *testing.T) {

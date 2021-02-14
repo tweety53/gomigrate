@@ -1,11 +1,12 @@
 package action
 
 import (
+	"strconv"
+	"time"
+
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/service"
 	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
-	"strconv"
-	"time"
 )
 
 type HistoryAction struct {

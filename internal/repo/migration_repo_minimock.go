@@ -159,7 +159,7 @@ func (mmCreateVersionTable *mMigrationRepoMockCreateVersionTable) Return(err err
 	return mmCreateVersionTable.mock
 }
 
-//Set uses given function f to mock the MigrationRepo.CreateVersionTable method
+// Set uses given function f to mock the MigrationRepo.CreateVersionTable method
 func (mmCreateVersionTable *mMigrationRepoMockCreateVersionTable) Set(f func() (err error)) *MigrationRepoMock {
 	if mmCreateVersionTable.defaultExpectation != nil {
 		mmCreateVersionTable.mock.t.Fatalf("Default expectation is already set for the MigrationRepo.CreateVersionTable method")
@@ -317,7 +317,7 @@ func (mmDeleteVersion *mMigrationRepoMockDeleteVersion) Return(err error) *Migra
 	return mmDeleteVersion.mock
 }
 
-//Set uses given function f to mock the MigrationRepo.DeleteVersion method
+// Set uses given function f to mock the MigrationRepo.DeleteVersion method
 func (mmDeleteVersion *mMigrationRepoMockDeleteVersion) Set(f func(v string) (err error)) *MigrationRepoMock {
 	if mmDeleteVersion.defaultExpectation != nil {
 		mmDeleteVersion.mock.t.Fatalf("Default expectation is already set for the MigrationRepo.DeleteVersion method")
@@ -518,7 +518,7 @@ func (mmEnsureDBVersion *mMigrationRepoMockEnsureDBVersion) Return(s1 string, er
 	return mmEnsureDBVersion.mock
 }
 
-//Set uses given function f to mock the MigrationRepo.EnsureDBVersion method
+// Set uses given function f to mock the MigrationRepo.EnsureDBVersion method
 func (mmEnsureDBVersion *mMigrationRepoMockEnsureDBVersion) Set(f func() (s1 string, err error)) *MigrationRepoMock {
 	if mmEnsureDBVersion.defaultExpectation != nil {
 		mmEnsureDBVersion.mock.t.Fatalf("Default expectation is already set for the MigrationRepo.EnsureDBVersion method")
@@ -662,7 +662,7 @@ func (mmGetDBVersion *mMigrationRepoMockGetDBVersion) Return(s1 string, err erro
 	return mmGetDBVersion.mock
 }
 
-//Set uses given function f to mock the MigrationRepo.GetDBVersion method
+// Set uses given function f to mock the MigrationRepo.GetDBVersion method
 func (mmGetDBVersion *mMigrationRepoMockGetDBVersion) Set(f func() (s1 string, err error)) *MigrationRepoMock {
 	if mmGetDBVersion.defaultExpectation != nil {
 		mmGetDBVersion.mock.t.Fatalf("Default expectation is already set for the MigrationRepo.GetDBVersion method")
@@ -821,7 +821,7 @@ func (mmGetMigrationsHistory *mMigrationRepoMockGetMigrationsHistory) Return(m1 
 	return mmGetMigrationsHistory.mock
 }
 
-//Set uses given function f to mock the MigrationRepo.GetMigrationsHistory method
+// Set uses given function f to mock the MigrationRepo.GetMigrationsHistory method
 func (mmGetMigrationsHistory *mMigrationRepoMockGetMigrationsHistory) Set(f func(limit int) (m1 MigrationRecords, err error)) *MigrationRepoMock {
 	if mmGetMigrationsHistory.defaultExpectation != nil {
 		mmGetMigrationsHistory.mock.t.Fatalf("Default expectation is already set for the MigrationRepo.GetMigrationsHistory method")
@@ -1036,7 +1036,7 @@ func (mmInsertUnAppliedVersion *mMigrationRepoMockInsertUnAppliedVersion) Return
 	return mmInsertUnAppliedVersion.mock
 }
 
-//Set uses given function f to mock the MigrationRepo.InsertUnAppliedVersion method
+// Set uses given function f to mock the MigrationRepo.InsertUnAppliedVersion method
 func (mmInsertUnAppliedVersion *mMigrationRepoMockInsertUnAppliedVersion) Set(f func(v string) (err error)) *MigrationRepoMock {
 	if mmInsertUnAppliedVersion.defaultExpectation != nil {
 		mmInsertUnAppliedVersion.mock.t.Fatalf("Default expectation is already set for the MigrationRepo.InsertUnAppliedVersion method")
@@ -1251,7 +1251,7 @@ func (mmInsertVersion *mMigrationRepoMockInsertVersion) Return(err error) *Migra
 	return mmInsertVersion.mock
 }
 
-//Set uses given function f to mock the MigrationRepo.InsertVersion method
+// Set uses given function f to mock the MigrationRepo.InsertVersion method
 func (mmInsertVersion *mMigrationRepoMockInsertVersion) Set(f func(v string) (err error)) *MigrationRepoMock {
 	if mmInsertVersion.defaultExpectation != nil {
 		mmInsertVersion.mock.t.Fatalf("Default expectation is already set for the MigrationRepo.InsertVersion method")
@@ -1466,7 +1466,7 @@ func (mmLockVersion *mMigrationRepoMockLockVersion) Return(err error) *Migration
 	return mmLockVersion.mock
 }
 
-//Set uses given function f to mock the MigrationRepo.LockVersion method
+// Set uses given function f to mock the MigrationRepo.LockVersion method
 func (mmLockVersion *mMigrationRepoMockLockVersion) Set(f func(v string) (err error)) *MigrationRepoMock {
 	if mmLockVersion.defaultExpectation != nil {
 		mmLockVersion.mock.t.Fatalf("Default expectation is already set for the MigrationRepo.LockVersion method")
@@ -1681,7 +1681,7 @@ func (mmUpdateApplyTime *mMigrationRepoMockUpdateApplyTime) Return(err error) *M
 	return mmUpdateApplyTime.mock
 }
 
-//Set uses given function f to mock the MigrationRepo.UpdateApplyTime method
+// Set uses given function f to mock the MigrationRepo.UpdateApplyTime method
 func (mmUpdateApplyTime *mMigrationRepoMockUpdateApplyTime) Set(f func(v string) (err error)) *MigrationRepoMock {
 	if mmUpdateApplyTime.defaultExpectation != nil {
 		mmUpdateApplyTime.mock.t.Fatalf("Default expectation is already set for the MigrationRepo.UpdateApplyTime method")

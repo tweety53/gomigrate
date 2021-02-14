@@ -2,18 +2,19 @@ package repo
 
 import (
 	"database/sql"
-	"github.com/pkg/errors"
-	"github.com/tweety53/gomigrate/internal/sql_dialect"
 	"strconv"
 	"time"
+
+	"github.com/pkg/errors"
+	"github.com/tweety53/gomigrate/internal/sqldialect"
 )
 
 type MigrationsRepository struct {
 	Db      *sql.DB
-	dialect sql_dialect.SQLDialect
+	dialect sqldialect.SQLDialect
 }
 
-func NewMigrationsRepository(db *sql.DB, dialect sql_dialect.SQLDialect) *MigrationsRepository {
+func NewMigrationsRepository(db *sql.DB, dialect sqldialect.SQLDialect) *MigrationsRepository {
 	return &MigrationsRepository{Db: db, dialect: dialect}
 }
 

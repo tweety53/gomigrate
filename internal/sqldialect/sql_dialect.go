@@ -1,4 +1,4 @@
-package sql_dialect
+package sqldialect
 
 import (
 	"fmt"

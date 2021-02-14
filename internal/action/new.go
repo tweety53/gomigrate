@@ -1,10 +1,11 @@
 package action
 
 import (
+	"strconv"
+
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/service"
 	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
-	"strconv"
 )
 
 type NewAction struct {

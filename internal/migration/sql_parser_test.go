@@ -74,7 +74,7 @@ func TestSplitStatements(t *testing.T) {
 }
 
 func TestUseTransactions(t *testing.T) {
-	//todo: implement NO TRANSACTION parsing tests
+	// todo: implement NO TRANSACTION parsing tests
 }
 
 func TestParsingErrors(t *testing.T) {
