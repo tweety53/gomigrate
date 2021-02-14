@@ -6,6 +6,7 @@ import (
 	"github.com/tweety53/gomigrate/internal/action"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
+	"github.com/tweety53/gomigrate/internal/repo"
 	"github.com/tweety53/gomigrate/internal/service"
 	"github.com/tweety53/gomigrate/internal/sql_dialect"
 	"github.com/tweety53/gomigrate/pkg/config"
@@ -22,7 +23,8 @@ func Run(a string, db *sql.DB, config *config.GoMigrateConfig, args []string) er
 
 	migrationsSvc := service.NewMigrationService(
 		db,
-		dialect,
+		repo.NewMigrationsRepository(db, dialect),
+		repo.NewDbOperationsRepository(db, dialect),
 		&migration.MigrationsCollector{},
 		config.MigrationsPath)
 

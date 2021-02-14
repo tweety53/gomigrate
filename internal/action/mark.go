@@ -27,7 +27,7 @@ func (p *MarkActionParams) ValidateAndFill(args []string) error {
 	}
 
 	//todo: implement all version formats like in yii/migrate???
-	if !versionRegex.MatchString(args[0]) {
+	if !helpers.ValidMigrationVersion(args[0]) {
 		return errorsInternal.ErrInvalidVersionFormat
 	}
 
@@ -71,16 +71,13 @@ func (a *MarkAction) Run(params interface{}) error {
 		}
 	}
 
-	// try migrate down
+	// try mark down
 	migrationsHistory, err := a.svc.MigrationsRepo.GetMigrationsHistory(0)
 	if err != nil {
 		return err
 	}
 
-	migrations, err = migration.Convert(migrationsHistory)
-	if err != nil {
-		return err
-	}
+	migrations = migration.Convert(migrationsHistory)
 
 	for i := range migrations {
 		if p.version == migrations[i].Version {

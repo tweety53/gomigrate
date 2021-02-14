@@ -207,7 +207,7 @@ func AddNamedMigration(filename string, up func(*sql.Tx) error, down func(*sql.T
 	registeredMigrations[v] = migration
 }
 
-func Convert(records repo.MigrationRecords) (Migrations, error) {
+func Convert(records repo.MigrationRecords) Migrations {
 	var migrations Migrations
 
 	for i := range records {
@@ -227,5 +227,5 @@ func Convert(records repo.MigrationRecords) (Migrations, error) {
 		})
 	}
 
-	return migrations, nil
+	return migrations
 }

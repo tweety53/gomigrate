@@ -57,10 +57,7 @@ func (a *DownAction) Run(params interface{}) error {
 		return err
 	}
 
-	downMigrations, err := migration.Convert(migrationHistoryRecords)
-	if err != nil {
-		return err
-	}
+	downMigrations := migration.Convert(migrationHistoryRecords)
 
 	if len(downMigrations) == 0 {
 		log.Warn("No migration has been done before.\n")

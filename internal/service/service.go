@@ -5,7 +5,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/tweety53/gomigrate/internal/migration"
 	"github.com/tweety53/gomigrate/internal/repo"
-	"github.com/tweety53/gomigrate/internal/sql_dialect"
 )
 
 type MigrationService struct {
@@ -16,11 +15,16 @@ type MigrationService struct {
 	MigrationsCollector migration.MigrationsCollectorInterface
 }
 
-func NewMigrationService(db *sql.DB, dialect sql_dialect.SQLDialect, migrationsCollector migration.MigrationsCollectorInterface, migrationsPath string) *MigrationService {
+func NewMigrationService(
+	db *sql.DB,
+	mRepo repo.MigrationRepo,
+	dboRepo repo.DbOperationRepo,
+	migrationsCollector migration.MigrationsCollectorInterface,
+	migrationsPath string) *MigrationService {
 	return &MigrationService{
 		Db:                  db,
-		MigrationsRepo:      repo.NewMigrationsRepository(db, dialect),
-		DbOperationRepo:     repo.NewDbOperationsRepository(db, dialect),
+		MigrationsRepo:      mRepo,
+		DbOperationRepo:     dboRepo,
 		MigrationsPath:      migrationsPath,
 		MigrationsCollector: migrationsCollector,
 	}

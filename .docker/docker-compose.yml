@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+  gomigrate:
+    container_name: gomigrate
+    build:
+      context: ./../../gomigrate
+      dockerfile: ./.docker/go/Dockerfile
+    environment:
+      DB_HOST: gomigrate-db
+    depends_on:
+      - gomigrate-db
+    tty: true
+    volumes:
+      - ../basic:/usr/src/
+  gomigrate-db:
+    container_name: gomigrate-db
+    image: postgres:12.2-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: gomigrate
+      POSTGRES_PASSWORD: gomigrate
+      POSTGRES_DB: gomigrate_test

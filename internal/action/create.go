@@ -52,6 +52,7 @@ func (p *CreateActionParams) Get() interface{} {
 	}
 }
 
+//todo: tests for regex
 var migrationNameRegex = regexp.MustCompile("^[\\w\\\\]+$")
 
 func (p *CreateActionParams) ValidateAndFill(args []string) error {
@@ -66,17 +67,19 @@ func (p *CreateActionParams) ValidateAndFill(args []string) error {
 	if !migrationNameRegex.MatchString(name) {
 		return ErrInvalidName
 	}
-	p.name = name
 
+	var mType MigrationType
 	if len(args) != 2 {
-		p.mType = migrationTypeGo
-		return nil
+		mType = migrationTypeGo
+	} else {
+		mType = MigrationType(args[1])
+		if mType != migrationTypeGo && mType != migrationTypeSQL {
+			return ErrUnknownMigrationType
+		}
 	}
 
-	p.mType = MigrationType(args[1])
-	if p.mType != migrationTypeGo && p.mType != migrationTypeSQL {
-		return ErrUnknownMigrationType
-	}
+	p.name = name
+	p.mType = mType
 
 	return nil
 }

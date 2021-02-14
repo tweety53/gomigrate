@@ -57,10 +57,7 @@ func (a *RedoAction) Run(params interface{}) error {
 		return err
 	}
 
-	redoMigrations, err := migration.Convert(migrationHistoryRecords)
-	if err != nil {
-		return err
-	}
+	redoMigrations := migration.Convert(migrationHistoryRecords)
 
 	if len(redoMigrations) == 0 {
 		log.Warn("No migration has been done before.\n")

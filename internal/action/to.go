@@ -2,11 +2,11 @@ package action
 
 import (
 	"github.com/pkg/errors"
+	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
 	"github.com/tweety53/gomigrate/internal/service"
 	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
-	"regexp"
 	"strconv"
 )
 
@@ -24,15 +24,13 @@ type ToActionParams struct {
 	version string
 }
 
-var versionRegex = regexp.MustCompile("^(m(\\d{6}_?\\d{6})(\\D*))")
-
 func (p *ToActionParams) ValidateAndFill(args []string) error {
 	if len(args) == 0 {
 		return errorsInternal.ErrNotEnoughArgs
 	}
 
 	//todo: implement all version formats like in yii/migrate???
-	if !versionRegex.MatchString(args[0]) {
+	if !helpers.ValidMigrationVersion(args[0]) {
 		return errorsInternal.ErrInvalidVersionFormat
 	}
 
@@ -78,10 +76,7 @@ func (a *ToAction) Run(params interface{}) error {
 		return err
 	}
 
-	migrations, err = migration.Convert(migrationsHistory)
-	if err != nil {
-		return err
-	}
+	migrations = migration.Convert(migrationsHistory)
 
 	for i := range migrations {
 		if p.version == migrations[i].Version {
