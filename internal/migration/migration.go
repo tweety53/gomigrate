@@ -77,7 +77,7 @@ func (m *Migration) run(repo *repo.MigrationsRepository, direction MigrationDire
 
 	case ".go":
 		if !m.Registered {
-			return errors.Errorf("ERROR %v", m.Source)
+			return errors.Errorf("not registered %v", m.Source)
 		}
 
 		if direction == migrationDirectionUp {

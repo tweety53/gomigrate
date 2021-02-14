@@ -2,10 +2,10 @@ package action
 
 import (
 	"github.com/pkg/errors"
-	errorsInternal "github.com/tweety53/gomigrate/internal/errors"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/repo"
 	"github.com/tweety53/gomigrate/internal/service"
+	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
 	"strconv"
 )
 

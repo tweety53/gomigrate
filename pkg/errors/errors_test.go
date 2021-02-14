@@ -2,7 +2,7 @@ package errors
 
 import (
 	"github.com/pkg/errors"
-	"github.com/tweety53/gomigrate/internal/exit_code"
+	"github.com/tweety53/gomigrate/pkg/exit_code"
 	"testing"
 )
 
@@ -30,9 +30,9 @@ func TestErrorExitCode(t *testing.T) {
 			want: exit_code.ExitCodeOK,
 		},
 		{
-			name: "Error with defined exit code",
+			name: "GoMigrateError with defined exit code",
 			args: args{
-				err: &Error{
+				err: &GoMigrateError{
 					Err:      errors.New("test err"),
 					ExitCode: exit_code.ExitCodeIOErr,
 				},
@@ -40,10 +40,10 @@ func TestErrorExitCode(t *testing.T) {
 			want: exit_code.ExitCodeIOErr,
 		},
 		{
-			name: "nested Error with defined exit code",
+			name: "nested GoMigrateError with defined exit code",
 			args: args{
-				err: &Error{
-					Err: &Error{
+				err: &GoMigrateError{
+					Err: &GoMigrateError{
 						Err:      errors.New("test err"),
 						ExitCode: exit_code.ExitCodeIOErr,
 					},
@@ -53,10 +53,10 @@ func TestErrorExitCode(t *testing.T) {
 			want: exit_code.ExitCodeIOErr,
 		},
 		{
-			name: "nested Error with undefined exit code",
+			name: "nested GoMigrateError with undefined exit code",
 			args: args{
-				err: &Error{
-					Err: &Error{
+				err: &GoMigrateError{
+					Err: &GoMigrateError{
 						Err: errors.New("test err"),
 					},
 					ExitCode: exit_code.ExitCodeOK,
@@ -102,12 +102,12 @@ func TestError_Error(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := &Error{
+			e := &GoMigrateError{
 				Err:      tt.fields.Err,
 				ExitCode: tt.fields.ExitCode,
 			}
 			if got := e.Error(); got != tt.want {
-				t.Errorf("Error() = %v, want %v", got, tt.want)
+				t.Errorf("GoMigrateError() = %v, want %v", got, tt.want)
 			}
 		})
 	}

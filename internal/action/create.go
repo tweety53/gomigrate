@@ -3,9 +3,9 @@ package action
 import (
 	"fmt"
 	"github.com/pkg/errors"
-	errorsInternal "github.com/tweety53/gomigrate/internal/errors"
-	"github.com/tweety53/gomigrate/internal/exit_code"
 	"github.com/tweety53/gomigrate/internal/log"
+	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
+	"github.com/tweety53/gomigrate/pkg/exit_code"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -116,7 +116,7 @@ func (a *CreateAction) Run(params interface{}) error {
 	path := filepath.Join(a.migrationsPath, fileName)
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
 		log.Err("Failed to create new migration.")
-		return &errorsInternal.Error{
+		return &errorsInternal.GoMigrateError{
 			Err:      err,
 			ExitCode: exit_code.ExitCodeIOErr,
 		}
@@ -125,7 +125,7 @@ func (a *CreateAction) Run(params interface{}) error {
 	f, err := os.Create(path)
 	if err != nil {
 		log.Err("Failed to create new migration.")
-		return &errorsInternal.Error{
+		return &errorsInternal.GoMigrateError{
 			Err:      err,
 			ExitCode: exit_code.ExitCodeIOErr,
 		}

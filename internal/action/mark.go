@@ -2,11 +2,11 @@ package action
 
 import (
 	"fmt"
-	errorsInternal "github.com/tweety53/gomigrate/internal/errors"
 	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
 	"github.com/tweety53/gomigrate/internal/service"
+	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
 )
 
 type MarkAction struct {

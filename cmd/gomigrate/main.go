@@ -4,10 +4,10 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
-	"github.com/tweety53/gomigrate/internal/config"
-	"github.com/tweety53/gomigrate/internal/errors"
-	"github.com/tweety53/gomigrate/internal/exit_code"
-	"github.com/tweety53/gomigrate/internal/gomigrate"
+	"github.com/tweety53/gomigrate/pkg/config"
+	"github.com/tweety53/gomigrate/pkg/errors"
+	"github.com/tweety53/gomigrate/pkg/exit_code"
+	"github.com/tweety53/gomigrate/pkg/gomigrate"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -49,7 +49,7 @@ func main() {
 		return
 	}
 
-	appConfig := &config.AppConfig{}
+	appConfig := &config.GoMigrateConfig{}
 
 	if *configPath != "" {
 		yamlConf, err := ioutil.ReadFile(*configPath)
@@ -65,7 +65,7 @@ func main() {
 			log.Fatalf("Unmarshal err: %v", err)
 		}
 	} else {
-		appConfig = &config.AppConfig{
+		appConfig = &config.GoMigrateConfig{
 			MigrationsPath: *migrationsPath,
 			MigrationTable: *migrationTable,
 			Compact:        *compact,

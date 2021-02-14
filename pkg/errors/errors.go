@@ -2,7 +2,7 @@ package errors
 
 import (
 	"github.com/pkg/errors"
-	"github.com/tweety53/gomigrate/internal/exit_code"
+	"github.com/tweety53/gomigrate/pkg/exit_code"
 )
 
 var (
@@ -11,12 +11,12 @@ var (
 	ErrInvalidVersionFormat    = errors.New("invalid version format")
 )
 
-type Error struct {
+type GoMigrateError struct {
 	Err      error
 	ExitCode exit_code.ExitCode
 }
 
-func (e *Error) Error() string {
+func (e *GoMigrateError) Error() string {
 	if e.Err == nil {
 		return ""
 	}
@@ -27,7 +27,7 @@ func (e *Error) Error() string {
 func ErrorExitCode(err error) exit_code.ExitCode {
 	if err == nil {
 		return exit_code.ExitCodeOK
-	} else if e, ok := err.(*Error); ok && e.ExitCode != exit_code.ExitCodeOK {
+	} else if e, ok := err.(*GoMigrateError); ok && e.ExitCode != exit_code.ExitCodeOK {
 		return e.ExitCode
 	} else if ok && e.Err != nil {
 		return ErrorExitCode(e.Err)
