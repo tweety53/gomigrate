@@ -14,7 +14,6 @@ import (
 	"os"
 
 	_ "github.com/lib/pq"
-	_ "github.com/tweety53/gomigrate/migrations"
 )
 
 var (

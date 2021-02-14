@@ -11,10 +11,10 @@ type PostgresDialect struct {
 func (pd PostgresDialect) CreateVersionTableSQL() string {
 	return fmt.Sprintf(`CREATE TABLE %s (
 			version TEXT NOT NULL
-				CONSTRAINT migration_pkey
+				CONSTRAINT %s
 					PRIMARY KEY,
 			apply_time INTEGER
-            );`, pd.migrationTable)
+            );`, pd.migrationTable, pd.migrationTable+"_pkey")
 }
 
 func (pd PostgresDialect) InsertVersionSQL() string {
