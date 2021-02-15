@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
+	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
 	"github.com/tweety53/gomigrate/internal/repo"
@@ -31,7 +32,7 @@ func (p *DownActionParams) Get() interface{} {
 
 func (p *DownActionParams) ValidateAndFill(args []string) error {
 	if len(args) > 0 {
-		if args[0] == "all" {
+		if args[0] == helpers.LimitAll {
 			p.limit = 0
 		} else {
 			var err error
@@ -69,21 +70,18 @@ func (a *DownAction) Run(params interface{}) error {
 		a.svc.MigrationsPath,
 		migration.GetComparableVersion(downMigrations[0].Version),
 		migration.GetComparableVersion(downMigrations[len(downMigrations)-1].Version))
+	if err != nil {
+		return err
+	}
 
 	if len(downMigrations) == 0 {
 		return ErrInconsistentMigrationsData
 	}
 
 	downMigrations.Reverse()
-	var logText string
 	n := len(downMigrations)
-	if n == 1 {
-		logText = "migration"
-	} else {
-		logText = "migrations"
-	}
 
-	log.Warnf("Total %d %s to be reverted:\n", n, logText)
+	log.Warnf("Total %d %s to be reverted:\n", n, helpers.ChooseLogText(n, true))
 	log.Infof("%s", downMigrations)
 
 	var reverted int
@@ -94,12 +92,7 @@ func (a *DownAction) Run(params interface{}) error {
 		}
 
 		if err = downMigrations[i].Down(r); err != nil {
-			if reverted == 1 {
-				logText = "migration was"
-			} else {
-				logText = "migrations were"
-			}
-			log.Errf("\n%d from %d %s reverted.\n", reverted, n, logText)
+			log.Errf("\n%d from %d %s reverted.\n", reverted, n, helpers.ChooseLogText(reverted, false))
 
 			return err
 		}
@@ -107,11 +100,6 @@ func (a *DownAction) Run(params interface{}) error {
 		reverted++
 	}
 
-	if n == 1 {
-		logText = "migration was"
-	} else {
-		logText = "migrations were"
-	}
 	log.Infof("\n%d reverted.\n", n)
 	log.Info("\nMigrated down successfully.\n")
 

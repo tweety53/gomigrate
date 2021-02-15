@@ -27,7 +27,7 @@ type RedoActionParams struct {
 
 func (p *RedoActionParams) ValidateAndFill(args []string) error {
 	if len(args) > 0 {
-		if args[0] == "all" {
+		if args[0] == helpers.LimitAll {
 			p.limit = 0
 		} else {
 			var err error
@@ -69,19 +69,20 @@ func (a *RedoAction) Run(params interface{}) error {
 		a.svc.MigrationsPath,
 		migration.GetComparableVersion(redoMigrations[0].Version),
 		migration.GetComparableVersion(redoMigrations[len(redoMigrations)-1].Version))
+	if err != nil {
+		return err
+	}
+
 	if len(redoMigrations) == 0 {
 		return ErrInconsistentMigrationsData
 	}
 
-	n := len(redoMigrations)
 	var logText string
-	if n == 1 {
-		logText = "migration"
-	} else {
-		logText = "migrations"
-	}
+	n := len(redoMigrations)
 
+	logText = helpers.ChooseLogText(n, true)
 	log.Warnf("Total %d %s to be redone:\n", n, logText)
+
 	log.Println(redoMigrations)
 
 	resp := helpers.AskForConfirmation(fmt.Sprintf("Redo the above %s?", logText))
@@ -113,13 +114,7 @@ func (a *RedoAction) Run(params interface{}) error {
 		}
 	}
 
-	if n == 1 {
-		logText = "migration was"
-	} else {
-		logText = "migrations were"
-	}
-
-	log.Infof("\n%d %s redone.\n", n, logText)
+	log.Infof("\n%d %s redone.\n", n, helpers.ChooseLogText(n, false))
 	log.Info("\nMigration redone successfully.\n")
 
 	return nil

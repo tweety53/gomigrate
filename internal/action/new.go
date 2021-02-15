@@ -3,6 +3,7 @@ package action
 import (
 	"strconv"
 
+	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/service"
 	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
@@ -22,7 +23,7 @@ type NewActionParams struct {
 
 func (p *NewActionParams) ValidateAndFill(args []string) error {
 	if len(args) > 0 {
-		if args[0] == "all" {
+		if args[0] == helpers.LimitAll {
 			p.limit = 0
 		} else {
 			var err error
@@ -59,18 +60,11 @@ func (a *NewAction) Run(params interface{}) error {
 	}
 
 	n := len(migrations)
-	var logText string
-	if n == 1 {
-		logText = "migration"
-	} else {
-		logText = "migrations"
-	}
-
 	if p.limit > 0 && n > p.limit {
 		migrations = migrations[:p.limit]
-		log.Warnf("Showing %d out of %d new %s:\n", p.limit, n, logText)
+		log.Warnf("Showing %d out of %d new %s:\n", p.limit, n, helpers.ChooseLogText(n, true))
 	} else {
-		log.Warnf("Found %d new %s:\n", n, logText)
+		log.Warnf("Found %d new %s:\n", n, helpers.ChooseLogText(n, true))
 	}
 
 	for _, migration := range migrations {

@@ -22,7 +22,7 @@ func (pd PostgresDialect) InsertVersionSQL() string {
 }
 
 func (pd PostgresDialect) TableForeignKeysSQL() string {
-	return fmt.Sprintf(`
+	return `
 SELECT
     tc.constraint_name as fk_name
 FROM 
@@ -34,11 +34,11 @@ FROM
       ON ccu.constraint_name = tc.constraint_name
       AND ccu.table_schema = tc.table_schema
 WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name=$1;
-`)
+`
 }
 
 func (pd PostgresDialect) AllTableNamesSQL() string {
-	return fmt.Sprintf(`
+	return `
 SELECT
     table_schema || '.' || table_name as table_name
 FROM
@@ -47,7 +47,7 @@ WHERE
     table_type = 'BASE TABLE'
 AND
     table_schema NOT IN ('pg_catalog', 'information_schema');
-`)
+`
 }
 
 func (pd PostgresDialect) DropFkSQL(tableName string, fkName string) string {

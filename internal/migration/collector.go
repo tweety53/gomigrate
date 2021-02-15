@@ -1,10 +1,11 @@
 package migration
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
+
+	"github.com/pkg/errors"
 )
 
 type MigrationsCollectorInterface interface {
@@ -17,7 +18,7 @@ type MigrationsCollector struct{}
 // migrations folder and go func registry, and key them by version.
 func (c *MigrationsCollector) CollectMigrations(dirpath string, current, target int) (Migrations, error) {
 	if _, err := os.Stat(dirpath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("%s directory does not exist", dirpath)
+		return nil, errors.Wrap(errors.New("directory does not exist"), dirpath)
 	}
 
 	var migrations Migrations
@@ -34,7 +35,7 @@ func (c *MigrationsCollector) CollectMigrations(dirpath string, current, target 
 		}
 
 		if versionInRange(GetComparableVersion(v), current, target) {
-			migration := &Migration{Version: v, Next: "", Previous: "", Source: file}
+			migration := &Migration{Version: v, Source: file}
 			migrations = append(migrations, migration)
 		}
 	}
@@ -68,7 +69,7 @@ func (c *MigrationsCollector) CollectMigrations(dirpath string, current, target 
 		}
 
 		if versionInRange(GetComparableVersion(v), current, target) {
-			migration := &Migration{Version: v, Next: "", Previous: "", Source: file, Registered: false}
+			migration := &Migration{Version: v, Source: file}
 			migrations = append(migrations, migration)
 		}
 	}
@@ -94,7 +95,7 @@ func sortAndConnectMigrations(migrations Migrations) Migrations {
 }
 
 func versionInRange(v, current, target int) bool {
-	if current == target && current == v && target == v {
+	if current == v && target == v {
 		return true
 	}
 

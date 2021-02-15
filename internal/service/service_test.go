@@ -68,9 +68,9 @@ func TestMigrationService_GetNewMigrations(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &MigrationService{
-				Db:                  tt.fields.Db,
+				DB:                  tt.fields.Db,
 				MigrationsRepo:      tt.fields.MigrationsRepo,
-				DbOperationRepo:     tt.fields.DbOperationRepo,
+				DBOperationRepo:     tt.fields.DbOperationRepo,
 				MigrationsPath:      tt.fields.MigrationsPath,
 				MigrationsCollector: tt.fields.MigrationsCollector,
 			}

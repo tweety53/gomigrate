@@ -1,8 +1,10 @@
 package sqldialect
 
 import (
-	"fmt"
+	"github.com/pkg/errors"
 )
+
+var ErrUnknownDialect = errors.New("unknown sql dialect")
 
 type SQLDialect interface {
 	CreateVersionTableSQL() string
@@ -26,7 +28,7 @@ func InitDialect(v, migrationTable string) (SQLDialect, error) {
 			migrationTable: migrationTable,
 		}
 	default:
-		return nil, fmt.Errorf("%q: unknown dialect", v)
+		return nil, errors.Wrap(ErrUnknownDialect, v)
 	}
 
 	return dialect, nil

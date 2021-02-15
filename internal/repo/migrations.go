@@ -10,12 +10,12 @@ import (
 )
 
 type MigrationsRepository struct {
-	Db      *sql.DB
+	DB      *sql.DB
 	dialect sqldialect.SQLDialect
 }
 
 func NewMigrationsRepository(db *sql.DB, dialect sqldialect.SQLDialect) *MigrationsRepository {
-	return &MigrationsRepository{Db: db, dialect: dialect}
+	return &MigrationsRepository{DB: db, dialect: dialect}
 }
 
 func (r *MigrationsRepository) GetMigrationsHistory(limit int) (MigrationRecords, error) {
@@ -26,9 +26,13 @@ func (r *MigrationsRepository) GetMigrationsHistory(limit int) (MigrationRecords
 
 	query += ";"
 
-	rows, err := r.Db.Query(query)
+	rows, err := r.DB.Query(query)
 	if err != nil {
 		return nil, err
+	}
+	defer rows.Close()
+	if rows.Err() != nil {
+		return nil, rows.Err()
 	}
 
 	var records MigrationRecords
@@ -46,7 +50,7 @@ func (r *MigrationsRepository) GetMigrationsHistory(limit int) (MigrationRecords
 }
 
 func (r *MigrationsRepository) InsertVersion(v string) error {
-	if _, err := r.Db.Exec(r.dialect.InsertVersionSQL(), v, int(time.Now().Unix())); err != nil {
+	if _, err := r.DB.Exec(r.dialect.InsertVersionSQL(), v, int(time.Now().Unix())); err != nil {
 		return err
 	}
 
@@ -54,7 +58,7 @@ func (r *MigrationsRepository) InsertVersion(v string) error {
 }
 
 func (r *MigrationsRepository) DeleteVersion(v string) error {
-	if _, err := r.Db.Exec(r.dialect.DeleteVersionSQL(), v); err != nil {
+	if _, err := r.DB.Exec(r.dialect.DeleteVersionSQL(), v); err != nil {
 		return err
 	}
 
@@ -80,7 +84,7 @@ func (r *MigrationsRepository) GetDBVersion() (string, error) {
 }
 
 func (r *MigrationsRepository) CreateVersionTable() error {
-	if _, err := r.Db.Exec(r.dialect.CreateVersionTableSQL()); err != nil {
+	if _, err := r.DB.Exec(r.dialect.CreateVersionTableSQL()); err != nil {
 		return err
 	}
 
@@ -88,7 +92,7 @@ func (r *MigrationsRepository) CreateVersionTable() error {
 }
 
 func (r *MigrationsRepository) InsertUnAppliedVersion(v string) error {
-	if _, err := r.Db.Exec(r.dialect.InsertUnAppliedVersionSQL(), v); err != nil {
+	if _, err := r.DB.Exec(r.dialect.InsertUnAppliedVersionSQL(), v); err != nil {
 		return err
 	}
 
@@ -96,7 +100,7 @@ func (r *MigrationsRepository) InsertUnAppliedVersion(v string) error {
 }
 
 func (r *MigrationsRepository) UpdateApplyTime(v string) error {
-	if _, err := r.Db.Exec(r.dialect.UpdateApplyTimeSQL(), int(time.Now().Unix()), v); err != nil {
+	if _, err := r.DB.Exec(r.dialect.UpdateApplyTimeSQL(), int(time.Now().Unix()), v); err != nil {
 		return err
 	}
 
@@ -104,7 +108,7 @@ func (r *MigrationsRepository) UpdateApplyTime(v string) error {
 }
 
 func (r *MigrationsRepository) LockVersion(v string) error {
-	if _, err := r.Db.Exec(r.dialect.LockVersionSQL(), v); err != nil {
+	if _, err := r.DB.Exec(r.dialect.LockVersionSQL(), v); err != nil {
 		return err
 	}
 

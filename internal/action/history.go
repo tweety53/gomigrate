@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/service"
 	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
@@ -23,7 +24,7 @@ type HistoryActionParams struct {
 
 func (p *HistoryActionParams) ValidateAndFill(args []string) error {
 	if len(args) > 0 {
-		if args[0] == "all" {
+		if args[0] == helpers.LimitAll {
 			p.limit = 0
 		} else {
 			var err error
@@ -60,23 +61,10 @@ func (a *HistoryAction) Run(params interface{}) error {
 	}
 
 	n := len(migrationRecords)
-	var logText string
 	if p.limit > 0 {
-		if n == 1 {
-			logText = "migration"
-		} else {
-			logText = "migrations"
-		}
-
-		log.Warnf("Showing the last %d applied %s:\n", n, logText)
+		log.Warnf("Showing the last %d applied %s:\n", n, helpers.ChooseLogText(n, true))
 	} else {
-		if n == 1 {
-			logText = "migration has"
-		} else {
-			logText = "migrations have"
-		}
-
-		log.Warnf("Total %d %s been applied before:\n", n, logText)
+		log.Warnf("Total %d %s been applied before:\n", n, helpers.ChooseLogText(n, false))
 	}
 
 	const timeFormat = "06-01-02 15:04:05"

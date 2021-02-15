@@ -1,4 +1,4 @@
-package exit_code
+package exitcode
 
 type ExitCode int
 

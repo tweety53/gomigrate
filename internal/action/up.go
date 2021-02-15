@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
+	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/repo"
 	"github.com/tweety53/gomigrate/internal/service"
@@ -66,20 +67,10 @@ func (a *UpAction) Run(params interface{}) error {
 
 	n := len(migrations)
 	if n == total {
-		if n == 1 {
-			logText = "migration"
-		} else {
-			logText = "migrations"
-		}
-
+		logText = helpers.ChooseLogText(n, true)
 		log.Warnf("Total %d new %s to be applied:\n", n, logText)
 	} else {
-		if total == 1 {
-			logText = "migration"
-		} else {
-			logText = "migrations"
-		}
-
+		logText = helpers.ChooseLogText(total, true)
 		log.Warnf("Total %d out of %d new %s to be applied:\n", n, total, logText)
 	}
 
@@ -98,20 +89,11 @@ func (a *UpAction) Run(params interface{}) error {
 			return err
 		}
 
-		if applied == 1 {
-			logText = "migration was"
-		} else {
-			logText = "migrations were"
-		}
+		logText = helpers.ChooseLogText(applied, false)
 
 		applied++
 	}
 
-	if n == 1 {
-		logText = "migration was"
-	} else {
-		logText = "migrations were"
-	}
 	log.Infof("\n%d applied.\n", n)
 	log.Info("\nMigrated up successfully.\n")
 

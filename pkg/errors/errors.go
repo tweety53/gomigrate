@@ -2,7 +2,7 @@ package errors
 
 import (
 	"github.com/pkg/errors"
-	"github.com/tweety53/gomigrate/pkg/exit_code"
+	"github.com/tweety53/gomigrate/pkg/exitcode"
 )
 
 var (
@@ -13,7 +13,7 @@ var (
 
 type GoMigrateError struct {
 	Err      error
-	ExitCode exit_code.ExitCode
+	ExitCode exitcode.ExitCode
 }
 
 func (e *GoMigrateError) Error() string {
@@ -24,14 +24,21 @@ func (e *GoMigrateError) Error() string {
 	return e.Err.Error()
 }
 
-func ErrorExitCode(err error) exit_code.ExitCode {
+func ErrorExitCode(err error) exitcode.ExitCode {
 	if err == nil {
-		return exit_code.ExitCodeOK
-	} else if e, ok := err.(*GoMigrateError); ok && e.ExitCode != exit_code.ExitCodeOK {
-		return e.ExitCode
-	} else if ok && e.Err != nil {
-		return ErrorExitCode(e.Err)
+		return exitcode.ExitCodeOK
 	}
 
-	return exit_code.ExitCodeUnspecified
+	var goMigrateErr *GoMigrateError
+	if errors.As(err, &goMigrateErr) {
+		if goMigrateErr.ExitCode != exitcode.ExitCodeOK {
+			return goMigrateErr.ExitCode
+		}
+
+		if goMigrateErr.Err != nil {
+			return ErrorExitCode(goMigrateErr.Err)
+		}
+	}
+
+	return exitcode.ExitCodeUnspecified
 }

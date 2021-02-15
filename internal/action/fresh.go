@@ -25,7 +25,7 @@ func (a *FreshAction) Run(_ interface{}) error {
 	}
 
 	// truncate repo
-	if err := a.svc.DbOperationRepo.TruncateDatabase(); err != nil {
+	if err := a.svc.DBOperationRepo.TruncateDatabase(); err != nil {
 		return err
 	}
 

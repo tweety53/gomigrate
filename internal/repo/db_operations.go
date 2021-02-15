@@ -7,13 +7,13 @@ import (
 	"github.com/tweety53/gomigrate/internal/sqldialect"
 )
 
-type DbOperationsRepository struct {
+type DBOperationsRepository struct {
 	db      *sql.DB
 	dialect sqldialect.SQLDialect
 }
 
-func NewDbOperationsRepository(db *sql.DB, dialect sqldialect.SQLDialect) *DbOperationsRepository {
-	return &DbOperationsRepository{db: db, dialect: dialect}
+func NewDBOperationsRepository(db *sql.DB, dialect sqldialect.SQLDialect) *DBOperationsRepository {
+	return &DBOperationsRepository{db: db, dialect: dialect}
 }
 
 type ForeignKey struct {
@@ -22,7 +22,7 @@ type ForeignKey struct {
 
 type ForeignKeys []*ForeignKey
 
-func (r *DbOperationsRepository) TruncateDatabase() error {
+func (r *DBOperationsRepository) TruncateDatabase() error {
 	tableNames, err := r.AllTableNames()
 	if err != nil {
 		return err
@@ -61,12 +61,15 @@ func (r *DbOperationsRepository) TruncateDatabase() error {
 	return nil
 }
 
-func (r *DbOperationsRepository) GetForeignKeys(tableName string) (ForeignKeys, error) {
+func (r *DBOperationsRepository) GetForeignKeys(tableName string) (ForeignKeys, error) {
 	fkRows, err := r.db.Query(r.dialect.TableForeignKeysSQL(), tableName)
 	if err != nil {
 		return nil, err
 	}
 	defer fkRows.Close()
+	if fkRows.Err() != nil {
+		return nil, fkRows.Err()
+	}
 
 	var fKeys ForeignKeys
 	for fkRows.Next() {
@@ -81,7 +84,7 @@ func (r *DbOperationsRepository) GetForeignKeys(tableName string) (ForeignKeys, 
 	return fKeys, nil
 }
 
-func (r *DbOperationsRepository) DropForeignKey(tableName string, fkName string) error {
+func (r *DBOperationsRepository) DropForeignKey(tableName string, fkName string) error {
 	if _, err := r.db.Exec(r.dialect.DropFkSQL(tableName, fkName)); err != nil {
 		return err
 	}
@@ -89,7 +92,7 @@ func (r *DbOperationsRepository) DropForeignKey(tableName string, fkName string)
 	return nil
 }
 
-func (r *DbOperationsRepository) DropTable(tableName string) error {
+func (r *DBOperationsRepository) DropTable(tableName string) error {
 	if _, err := r.db.Exec(r.dialect.DropTableSQL(tableName)); err != nil {
 		return err
 	}
@@ -97,12 +100,15 @@ func (r *DbOperationsRepository) DropTable(tableName string) error {
 	return nil
 }
 
-func (r *DbOperationsRepository) AllTableNames() ([]string, error) {
+func (r *DBOperationsRepository) AllTableNames() ([]string, error) {
 	tableNamesRows, err := r.db.Query(r.dialect.AllTableNamesSQL())
 	if err != nil {
 		return nil, err
 	}
 	defer tableNamesRows.Close()
+	if tableNamesRows.Err() != nil {
+		return nil, tableNamesRows.Err()
+	}
 
 	tableNames := make([]string, 0, 1024*1024*4)
 	// First drop all foreign keys

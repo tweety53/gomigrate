@@ -5,6 +5,7 @@ import (
 
 	"github.com/gojuno/minimock/v3"
 	"github.com/stretchr/testify/require"
+	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/migration"
 	"github.com/tweety53/gomigrate/internal/repo"
 	"github.com/tweety53/gomigrate/internal/service"
@@ -28,7 +29,7 @@ func TestDownActionParams_ValidateAndFill(t *testing.T) {
 		},
 		{
 			name:           "handle all limit",
-			args:           args{args: []string{"all"}},
+			args:           args{args: []string{helpers.LimitAll}},
 			expectedParams: &DownActionParams{limit: 0},
 			wantErr:        false,
 		},

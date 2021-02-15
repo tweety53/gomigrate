@@ -1,4 +1,5 @@
 // sql parsing completely borrowed from https://github.com/pressly/goose
+//nolint
 package migration
 
 import (
@@ -50,7 +51,7 @@ const scanBufSize = 4 * 1024 * 1024
 
 var matchEmptyLines = regexp.MustCompile(`^\s*$`)
 
-var bufferPool = sync.Pool{
+var bufferPool = &sync.Pool{
 	New: func() interface{} {
 		return make([]byte, scanBufSize)
 	},
@@ -66,8 +67,8 @@ var bufferPool = sync.Pool{
 // within a statement. For these cases, we provide the explicit annotations
 // 'StatementBegin' and 'StatementEnd' to allow the script to
 // tell us to ignore semicolons.
-//nolint:funlen
-func parseSQLMigration(r io.Reader, direction MigrationDirection) (stmts []string, useTx bool, err error) {
+//nolint
+func parseSQLMigration(r io.Reader, direction Direction) (stmts []string, useTx bool, err error) {
 	var buf bytes.Buffer
 	scanBuf := bufferPool.Get().([]byte)
 	defer bufferPool.Put(scanBuf)

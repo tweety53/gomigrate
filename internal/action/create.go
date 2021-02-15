@@ -12,10 +12,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/tweety53/gomigrate/internal/log"
 	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
-	"github.com/tweety53/gomigrate/pkg/exit_code"
+	"github.com/tweety53/gomigrate/pkg/exitcode"
 )
 
-// Migrations version prefix format
+// Migrations version prefix format.
 const versionPrefixFormat = "m060102_150405"
 
 var (
@@ -33,7 +33,6 @@ var (
 )
 
 type tmplVars struct {
-	Version   string
 	CamelName string
 }
 
@@ -54,7 +53,7 @@ func (p *CreateActionParams) Get() interface{} {
 }
 
 // todo: tests for regex
-var migrationNameRegex = regexp.MustCompile("^[\\w\\\\]+$")
+var migrationNameRegex = regexp.MustCompile(`^[\w\\]+$`)
 
 func (p *CreateActionParams) ValidateAndFill(args []string) error {
 	if len(args) < 1 {
@@ -119,7 +118,7 @@ func (a *CreateAction) Run(params interface{}) error {
 		log.Err("Failed to create new migration.")
 		return &errorsInternal.GoMigrateError{
 			Err:      err,
-			ExitCode: exit_code.ExitCodeIOErr,
+			ExitCode: exitcode.ExitCodeIOErr,
 		}
 	}
 
@@ -128,7 +127,7 @@ func (a *CreateAction) Run(params interface{}) error {
 		log.Err("Failed to create new migration.")
 		return &errorsInternal.GoMigrateError{
 			Err:      err,
-			ExitCode: exit_code.ExitCodeIOErr,
+			ExitCode: exitcode.ExitCodeIOErr,
 		}
 	}
 	defer f.Close()
@@ -148,7 +147,7 @@ var nameToCamelRegex = regexp.MustCompile("(^[A-Za-z])|_([A-Za-z])")
 
 func nameToCamelCase(name string) string {
 	return nameToCamelRegex.ReplaceAllStringFunc(name, func(s string) string {
-		return strings.ToUpper(strings.Replace(s, "_", "", -1))
+		return strings.ToUpper(strings.ReplaceAll(s, "_", ""))
 	})
 }
 

@@ -7,13 +7,14 @@ import (
 	internalLog "github.com/tweety53/gomigrate/internal/log"
 )
 
+const LimitAll = "all"
+
 func AskForConfirmation(text string) bool {
 	internalLog.Warnln(text)
 
 	var response string
 
-	_, err := fmt.Scanln(&response)
-	if err != nil {
+	if _, err := fmt.Scanln(&response); err != nil {
 		return false
 	}
 
@@ -29,4 +30,20 @@ func processResponse(response string) bool {
 	default:
 		return false
 	}
+}
+
+func ChooseLogText(n int, beforeRun bool) string {
+	if n == 1 {
+		if beforeRun {
+			return "migration"
+		}
+
+		return "migration was"
+	}
+
+	if beforeRun {
+		return "migrations"
+	}
+
+	return "migrations were"
 }

@@ -12,7 +12,7 @@ type MigrationRepo interface {
 	LockVersion(v string) error
 }
 
-type DbOperationRepo interface {
+type DBOperationRepo interface {
 	TruncateDatabase() error
 	GetForeignKeys(tableName string) (ForeignKeys, error)
 	DropForeignKey(tableName string, fkName string) error

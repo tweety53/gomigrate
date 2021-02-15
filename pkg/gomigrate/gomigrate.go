@@ -2,9 +2,9 @@ package gomigrate
 
 import (
 	"database/sql"
-	"fmt"
 	"runtime"
 
+	"github.com/pkg/errors"
 	"github.com/tweety53/gomigrate/internal/action"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
@@ -25,94 +25,51 @@ func Run(a string, db *sql.DB, config *config.GoMigrateConfig, args []string) er
 	migrationsSvc := service.NewMigrationService(
 		db,
 		repo.NewMigrationsRepository(db, dialect),
-		repo.NewDbOperationsRepository(db, dialect),
+		repo.NewDBOperationsRepository(db, dialect),
 		&migration.MigrationsCollector{},
 		config.MigrationsPath)
 
+	var (
+		act    action.Action
+		params action.Params
+	)
 	switch a {
 	case "create":
-		createAction := action.NewCreateAction(config.MigrationsPath)
-		params := new(action.CreateActionParams)
-		if err := params.ValidateAndFill(args); err != nil {
-			return err
-		}
-		if err := createAction.Run(params); err != nil {
-			return err
-		}
+		act = action.NewCreateAction(config.MigrationsPath)
+		params = new(action.CreateActionParams)
 	case "down":
-		downAction := action.NewDownAction(migrationsSvc)
-		params := new(action.DownActionParams)
-		if err := params.ValidateAndFill(args); err != nil {
-			return err
-		}
-		if err := downAction.Run(params); err != nil {
-			return err
-		}
+		act = action.NewDownAction(migrationsSvc)
+		params = new(action.DownActionParams)
 	case "fresh":
-		freshAction := action.NewFreshAction(migrationsSvc)
-		params := new(action.FreshActionParams)
-		if err := params.ValidateAndFill(args); err != nil {
-			return err
-		}
-		if err := freshAction.Run(params); err != nil {
-			return err
-		}
+		act = action.NewFreshAction(migrationsSvc)
+		params = new(action.FreshActionParams)
 	case "history":
-		historyAction := action.NewHistoryAction(migrationsSvc)
-		params := new(action.HistoryActionParams)
-		if err := params.ValidateAndFill(args); err != nil {
-			return err
-		}
-		if err := historyAction.Run(params); err != nil {
-			return err
-		}
+		act = action.NewHistoryAction(migrationsSvc)
+		params = new(action.HistoryActionParams)
 	case "mark":
-		markAction := action.NewMarkAction(migrationsSvc)
-		params := new(action.MarkActionParams)
-		if err := params.ValidateAndFill(args); err != nil {
-			return err
-		}
-		if err := markAction.Run(params); err != nil {
-			return err
-		}
+		act = action.NewMarkAction(migrationsSvc)
+		params = new(action.MarkActionParams)
 	case "new":
-		newAction := action.NewNewAction(migrationsSvc)
-		params := new(action.NewActionParams)
-		if err := params.ValidateAndFill(args); err != nil {
-			return err
-		}
-		if err := newAction.Run(params); err != nil {
-			return err
-		}
+		act = action.NewNewAction(migrationsSvc)
+		params = new(action.NewActionParams)
 	case "redo":
-		redoAction := action.NewRedoAction(migrationsSvc)
-		params := new(action.RedoActionParams)
-		if err := params.ValidateAndFill(args); err != nil {
-			return err
-		}
-		if err := redoAction.Run(params); err != nil {
-			return err
-		}
+		act = action.NewRedoAction(migrationsSvc)
+		params = new(action.RedoActionParams)
 	case "to":
-		toAction := action.NewToAction(migrationsSvc)
-		params := new(action.ToActionParams)
-		if err := params.ValidateAndFill(args); err != nil {
-			return err
-		}
-		if err := toAction.Run(params); err != nil {
-			return err
-		}
+		act = action.NewToAction(migrationsSvc)
+		params = new(action.ToActionParams)
 	case "up":
-		upAction := action.NewUpAction(migrationsSvc)
-		params := new(action.UpActionParams)
-		if err := params.ValidateAndFill(args); err != nil {
-			return err
-		}
-		if err := upAction.Run(params); err != nil {
-			return err
-		}
+		act = action.NewUpAction(migrationsSvc)
+		params = new(action.UpActionParams)
 	default:
-		return fmt.Errorf("%q: no such action", a)
+		return errors.Wrap(errors.New("no such action, run with -h flag to see help"), a)
+	}
+
+	if err := params.ValidateAndFill(args); err != nil {
+		return err
+	}
+	if err := act.Run(params); err != nil {
+		return err
 	}
 
 	return nil

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/pkg/errors"
-	"github.com/tweety53/gomigrate/pkg/exit_code"
+	"github.com/tweety53/gomigrate/pkg/exitcode"
 )
 
 func TestErrorExitCode(t *testing.T) {
@@ -14,31 +14,31 @@ func TestErrorExitCode(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want exit_code.ExitCode
+		want exitcode.ExitCode
 	}{
 		{
 			name: "error with undefined exit code",
 			args: args{
 				err: ErrInvalidActionParamsType,
 			},
-			want: exit_code.ExitCodeUnspecified,
+			want: exitcode.ExitCodeUnspecified,
 		},
 		{
 			name: "no error",
 			args: args{
 				err: nil,
 			},
-			want: exit_code.ExitCodeOK,
+			want: exitcode.ExitCodeOK,
 		},
 		{
 			name: "GoMigrateError with defined exit code",
 			args: args{
 				err: &GoMigrateError{
 					Err:      errors.New("test err"),
-					ExitCode: exit_code.ExitCodeIOErr,
+					ExitCode: exitcode.ExitCodeIOErr,
 				},
 			},
-			want: exit_code.ExitCodeIOErr,
+			want: exitcode.ExitCodeIOErr,
 		},
 		{
 			name: "nested GoMigrateError with defined exit code",
@@ -46,12 +46,12 @@ func TestErrorExitCode(t *testing.T) {
 				err: &GoMigrateError{
 					Err: &GoMigrateError{
 						Err:      errors.New("test err"),
-						ExitCode: exit_code.ExitCodeIOErr,
+						ExitCode: exitcode.ExitCodeIOErr,
 					},
-					ExitCode: exit_code.ExitCodeOK,
+					ExitCode: exitcode.ExitCodeOK,
 				},
 			},
-			want: exit_code.ExitCodeIOErr,
+			want: exitcode.ExitCodeIOErr,
 		},
 		{
 			name: "nested GoMigrateError with undefined exit code",
@@ -60,10 +60,10 @@ func TestErrorExitCode(t *testing.T) {
 					Err: &GoMigrateError{
 						Err: errors.New("test err"),
 					},
-					ExitCode: exit_code.ExitCodeOK,
+					ExitCode: exitcode.ExitCodeOK,
 				},
 			},
-			want: exit_code.ExitCodeUnspecified,
+			want: exitcode.ExitCodeUnspecified,
 		},
 	}
 
@@ -79,7 +79,7 @@ func TestErrorExitCode(t *testing.T) {
 func TestError_Error(t *testing.T) {
 	type fields struct {
 		Err      error
-		ExitCode exit_code.ExitCode
+		ExitCode exitcode.ExitCode
 	}
 	tests := []struct {
 		name   string

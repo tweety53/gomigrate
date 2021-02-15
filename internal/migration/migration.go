@@ -29,11 +29,11 @@ type Migration struct {
 	DownFn     func(*sql.Tx) error
 }
 
-type MigrationDirection string
+type Direction string
 
 var (
-	migrationDirectionUp   MigrationDirection = "up"
-	migrationDirectionDown MigrationDirection = "down"
+	migrationDirectionUp   Direction = "up"
+	migrationDirectionDown Direction = "down"
 )
 
 func (m *Migration) String() string {
@@ -54,7 +54,7 @@ func (m *Migration) Down(repo *repo.MigrationsRepository) error {
 	return nil
 }
 
-func (m *Migration) run(repo *repo.MigrationsRepository, direction MigrationDirection) error {
+func (m *Migration) run(repo *repo.MigrationsRepository, direction Direction) error {
 	switch filepath.Ext(m.Source) {
 	case ".sql":
 		f, err := os.Open(m.Source)
@@ -71,10 +71,10 @@ func (m *Migration) run(repo *repo.MigrationsRepository, direction MigrationDire
 		if direction == migrationDirectionUp {
 			assembleFnFromStatements(statements, useTx, m, direction)
 			return migrateUpGo(repo, m)
-		} else {
-			assembleFnFromStatements(statements, useTx, m, direction)
-			return migrateDownGo(repo, m)
 		}
+
+		assembleFnFromStatements(statements, useTx, m, direction)
+		return migrateDownGo(repo, m)
 
 	case ".go":
 		if !m.Registered {
@@ -83,9 +83,9 @@ func (m *Migration) run(repo *repo.MigrationsRepository, direction MigrationDire
 
 		if direction == migrationDirectionUp {
 			return migrateUpGo(repo, m)
-		} else {
-			return migrateDownGo(repo, m)
 		}
+
+		return migrateDownGo(repo, m)
 	}
 
 	return nil
@@ -119,7 +119,7 @@ func GetComparableVersion(version string) int {
 
 type Migrations []*Migration
 
-// helpers so we can use pkg sort
+// helpers so we can use pkg sort.
 func (ms Migrations) Len() int      { return len(ms) }
 func (ms Migrations) Swap(i, j int) { ms[i], ms[j] = ms[j], ms[i] }
 func (ms Migrations) Less(i, j int) bool {
@@ -209,7 +209,7 @@ func AddNamedMigration(filename string, up func(*sql.Tx) error, down func(*sql.T
 }
 
 func Convert(records repo.MigrationRecords) Migrations {
-	var migrations Migrations
+	migrations := make(Migrations, 0, len(records))
 
 	for i := range records {
 		// skip base migration

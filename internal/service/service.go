@@ -9,9 +9,9 @@ import (
 )
 
 type MigrationService struct {
-	Db                  *sql.DB
+	DB                  *sql.DB
 	MigrationsRepo      repo.MigrationRepo
-	DbOperationRepo     repo.DbOperationRepo
+	DBOperationRepo     repo.DBOperationRepo
 	MigrationsPath      string
 	MigrationsCollector migration.MigrationsCollectorInterface
 }
@@ -19,13 +19,13 @@ type MigrationService struct {
 func NewMigrationService(
 	db *sql.DB,
 	mRepo repo.MigrationRepo,
-	dboRepo repo.DbOperationRepo,
+	dboRepo repo.DBOperationRepo,
 	migrationsCollector migration.MigrationsCollectorInterface,
 	migrationsPath string) *MigrationService {
 	return &MigrationService{
-		Db:                  db,
+		DB:                  db,
 		MigrationsRepo:      mRepo,
-		DbOperationRepo:     dboRepo,
+		DBOperationRepo:     dboRepo,
 		MigrationsPath:      migrationsPath,
 		MigrationsCollector: migrationsCollector,
 	}

@@ -47,6 +47,12 @@ func (a *MarkAction) Run(params interface{}) error {
 		return errorsInternal.ErrInvalidActionParamsType
 	}
 
+	resp := helpers.AskForConfirmation(fmt.Sprintf("Set migration history at %s?", p.version))
+	if !resp {
+		log.Info("Action was cancelled by user. Nothing has been performed.\n")
+		return nil
+	}
+
 	// try mark up
 	migrations, err := a.svc.GetNewMigrations()
 	if err != nil {
@@ -55,20 +61,7 @@ func (a *MarkAction) Run(params interface{}) error {
 
 	for i := range migrations {
 		if p.version == migrations[i].Version {
-			resp := helpers.AskForConfirmation(fmt.Sprintf("Set migration history at %s?", p.version))
-			if !resp {
-				log.Info("Action was cancelled by user. Nothing has been performed.\n")
-				return nil
-			}
-
-			for j := 0; j <= i; j++ {
-				if err := a.svc.MigrationsRepo.InsertVersion(migrations[j].Version); err != nil {
-					return err
-				}
-			}
-			log.Infof("The migration history is set at %s.\nNo actual migration was performed.\n", p.version)
-
-			return nil
+			return markUp(i, a, migrations, p)
 		}
 	}
 
@@ -82,42 +75,50 @@ func (a *MarkAction) Run(params interface{}) error {
 
 	for i := range migrations {
 		if p.version == migrations[i].Version {
-			if i != 0 {
-				resp := helpers.AskForConfirmation(fmt.Sprintf("Set migration history at %s?", p.version))
-				if !resp {
-					log.Info("Action was cancelled by user. Nothing has been performed.\n")
-					return nil
-				}
-				for j := 0; j < i; j++ {
-					if err := a.svc.MigrationsRepo.DeleteVersion(migrations[j].Version); err != nil {
-						return err
-					}
-				}
-				log.Infof("The migration history is set at %s.\nNo actual migration was performed.\n", p.version)
-			} else {
-				log.Warnf("Already at '%s'. Nothing needs to be done.\n", p.version)
-			}
-
-			return nil
+			return markDown(i, a, migrations, p)
 		}
 	}
 
 	if p.version == migration.BaseMigrationVersion {
-		resp := helpers.AskForConfirmation(fmt.Sprintf("Set migration history at %s?", p.version))
-		if !resp {
-			log.Info("Action was cancelled by user. Nothing has been performed.\n")
-			return nil
-		}
+		return markToBaseVersion(migrations, a, p)
+	}
 
-		for i := range migrations {
-			if err := a.svc.MigrationsRepo.DeleteVersion(migrations[i].Version); err != nil {
+	return ErrUnableToFindVersion
+}
+
+func markDown(i int, a *MarkAction, migrations migration.Migrations, p *MarkActionParams) error {
+	if i != 0 {
+		for j := 0; j < i; j++ {
+			if err := a.svc.MigrationsRepo.DeleteVersion(migrations[j].Version); err != nil {
 				return err
 			}
 		}
 		log.Infof("The migration history is set at %s.\nNo actual migration was performed.\n", p.version)
-
-		return nil
+	} else {
+		log.Warnf("Already at '%s'. Nothing needs to be done.\n", p.version)
 	}
 
-	return ErrUnableToFindVersion
+	return nil
+}
+
+func markUp(i int, a *MarkAction, migrations migration.Migrations, p *MarkActionParams) error {
+	for j := 0; j <= i; j++ {
+		if err := a.svc.MigrationsRepo.InsertVersion(migrations[j].Version); err != nil {
+			return err
+		}
+	}
+	log.Infof("The migration history is set at %s.\nNo actual migration was performed.\n", p.version)
+
+	return nil
+}
+
+func markToBaseVersion(migrations migration.Migrations, a *MarkAction, p *MarkActionParams) error {
+	for i := range migrations {
+		if err := a.svc.MigrationsRepo.DeleteVersion(migrations[i].Version); err != nil {
+			return err
+		}
+	}
+	log.Infof("The migration history is set at %s.\nNo actual migration was performed.\n", p.version)
+
+	return nil
 }

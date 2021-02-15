@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/service"
 )
 
@@ -25,7 +26,7 @@ func TestNewActionParams_ValidateAndFill(t *testing.T) {
 		},
 		{
 			name:           "handle all limit",
-			args:           args{args: []string{"all"}},
+			args:           args{args: []string{helpers.LimitAll}},
 			expectedParams: &NewActionParams{limit: 0},
 			wantErr:        false,
 		},

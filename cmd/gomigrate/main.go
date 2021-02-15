@@ -8,13 +8,12 @@ import (
 	"log"
 	"os"
 
+	_ "github.com/lib/pq"
 	"github.com/tweety53/gomigrate/pkg/config"
 	"github.com/tweety53/gomigrate/pkg/errors"
-	"github.com/tweety53/gomigrate/pkg/exit_code"
+	"github.com/tweety53/gomigrate/pkg/exitcode"
 	"github.com/tweety53/gomigrate/pkg/gomigrate"
 	"gopkg.in/yaml.v2"
-
-	_ "github.com/lib/pq"
 )
 
 var (
@@ -86,16 +85,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("gomigrate: database ping err: %v\n", err)
 	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			log.Fatalf("gomigrate: failed to close DB: %v\n", err)
-		}
-	}()
-
-	var arguments []string
-	if len(args) > 3 {
-		arguments = append(arguments, args[3:]...)
-	}
+	db.Close()
 
 	switch action {
 	case "create":
@@ -104,19 +94,20 @@ func main() {
 			os.Exit(int(errors.ErrorExitCode(err)))
 		}
 
-		os.Exit(int(exit_code.ExitCodeOK))
+		os.Exit(int(exitcode.ExitCodeOK))
 	case "up", "down", "fresh", "history", "new", "redo", "to", "mark":
 		if err := gomigrate.Run(action, db, appConfig, args[1:]); err != nil {
 			log.Printf("gomigrate error: %v\n", err)
 			os.Exit(int(errors.ErrorExitCode(err)))
 		}
 
-		os.Exit(int(exit_code.ExitCodeOK))
+		os.Exit(int(exitcode.ExitCodeOK))
 	}
 
-	os.Exit(int(exit_code.ExitCodeOK))
+	os.Exit(int(exitcode.ExitCodeOK))
 }
 
+//nolint
 func showUsage() {
 	fmt.Print(usagePrefix)
 	flags.PrintDefaults()
