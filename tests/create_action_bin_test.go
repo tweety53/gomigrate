@@ -1,3 +1,5 @@
+// +build test_integration
+
 package tests
 
 import (

@@ -2,9 +2,10 @@ package version
 
 import (
 	"fmt"
-	"github.com/tweety53/gomigrate/internal/migration"
 	"regexp"
 	"time"
+
+	"github.com/tweety53/gomigrate/internal/migration"
 )
 
 // Migrations version prefix format.
