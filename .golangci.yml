@@ -21,3 +21,5 @@ linters:
     - nakedret
     - testpackage
     - wsl
+    - nestif
+    - gosec
