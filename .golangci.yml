@@ -2,6 +2,8 @@ run:
   tests: false
   skip-files:
     - "_minimock.go$"
+  skip-dirs:
+    - tests
 
 linters-settings:
   funlen:

@@ -1,10 +1,11 @@
 package config
 
 import (
-	"github.com/pkg/errors"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
+
+	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
 )
 
 type GoMigrateConfig struct {
