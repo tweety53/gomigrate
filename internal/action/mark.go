@@ -50,6 +50,7 @@ func (a *MarkAction) Run(params interface{}) error {
 	resp := helpers.AskForConfirmation(fmt.Sprintf("Set migration history at %s?", p.version))
 	if !resp {
 		log.Info("Action was cancelled by user. Nothing has been performed.\n")
+
 		return nil
 	}
 

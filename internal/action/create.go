@@ -116,6 +116,7 @@ func (a *CreateAction) Run(params interface{}) error {
 	path := filepath.Join(a.migrationsPath, fileName)
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
 		log.Err("Failed to create new migration.")
+
 		return &errorsInternal.GoMigrateError{
 			Err:      err,
 			ExitCode: exitcode.ExitCodeIOErr,
@@ -125,6 +126,7 @@ func (a *CreateAction) Run(params interface{}) error {
 	f, err := os.Create(path)
 	if err != nil {
 		log.Err("Failed to create new migration.")
+
 		return &errorsInternal.GoMigrateError{
 			Err:      err,
 			ExitCode: exitcode.ExitCodeIOErr,
@@ -140,6 +142,7 @@ func (a *CreateAction) Run(params interface{}) error {
 	}
 
 	log.Infof("New migration created successfully: %s\n", f.Name())
+
 	return nil
 }
 

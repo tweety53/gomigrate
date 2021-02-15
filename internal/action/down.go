@@ -63,6 +63,7 @@ func (a *DownAction) Run(params interface{}) error {
 
 	if len(downMigrations) == 0 {
 		log.Warn("No migration has been done before.\n")
+
 		return nil
 	}
 

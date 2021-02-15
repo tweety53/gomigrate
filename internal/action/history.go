@@ -57,6 +57,7 @@ func (a *HistoryAction) Run(params interface{}) error {
 
 	if len(migrationRecords) == 0 {
 		log.Warn("No migration has been done before.\n")
+
 		return nil
 	}
 

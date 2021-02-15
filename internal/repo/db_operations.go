@@ -39,6 +39,7 @@ func (r *DBOperationsRepository) TruncateDatabase() error {
 			_, err := r.db.Exec(r.dialect.DropFkSQL(tableNames[i], fKeys[i].name))
 			if err != nil {
 				log.Errf("Foreign key drop err: %v\n", err)
+
 				return err
 			}
 
@@ -52,6 +53,7 @@ func (r *DBOperationsRepository) TruncateDatabase() error {
 		err := r.DropTable(name)
 		if err != nil {
 			log.Errf("Cannot drop %s table, err: %v\n", err)
+
 			return err
 		}
 

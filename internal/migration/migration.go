@@ -44,6 +44,7 @@ func (m *Migration) Up(repo *repo.MigrationsRepository) error {
 	if err := m.run(repo, migrationDirectionUp); err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -51,6 +52,7 @@ func (m *Migration) Down(repo *repo.MigrationsRepository) error {
 	if err := m.run(repo, migrationDirectionDown); err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -70,10 +72,12 @@ func (m *Migration) run(repo *repo.MigrationsRepository, direction Direction) er
 
 		if direction == migrationDirectionUp {
 			assembleFnFromStatements(statements, useTx, m, direction)
+
 			return migrateUpGo(repo, m)
 		}
 
 		assembleFnFromStatements(statements, useTx, m, direction)
+
 		return migrateDownGo(repo, m)
 
 	case ".go":
@@ -194,6 +198,7 @@ func (ms Migrations) String() string {
 	for _, m := range ms {
 		str += fmt.Sprintln(m)
 	}
+
 	return str
 }
 

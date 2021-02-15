@@ -52,6 +52,7 @@ func (a *UpAction) Run(params interface{}) error {
 
 	if len(migrations) == 0 {
 		log.Info("No new migrations found. Your system is up-to-date.\n")
+
 		return nil
 	}
 
@@ -86,6 +87,7 @@ func (a *UpAction) Run(params interface{}) error {
 		if err = migrations[i].Up(r); err != nil {
 			log.Errf("\n%d from %d %s applied.\n", applied, n, logText)
 			log.Err("\nMigration failed. The rest of the migrations are canceled.\n")
+
 			return err
 		}
 

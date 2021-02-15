@@ -62,6 +62,7 @@ func (a *RedoAction) Run(params interface{}) error {
 
 	if len(redoMigrations) == 0 {
 		log.Warn("No migration has been done before.\n")
+
 		return nil
 	}
 
@@ -88,6 +89,7 @@ func (a *RedoAction) Run(params interface{}) error {
 	resp := helpers.AskForConfirmation(fmt.Sprintf("Redo the above %s?", logText))
 	if !resp {
 		log.Info("Action was cancelled by user. Nothing has been performed.\n")
+
 		return nil
 	}
 
@@ -101,6 +103,7 @@ func (a *RedoAction) Run(params interface{}) error {
 	for i := range redoMigrations {
 		if err := redoMigrations[i].Down(r); err != nil {
 			log.Err("\nMigration failed. The rest of the migrations are canceled.\n")
+
 			return err
 		}
 	}
@@ -110,6 +113,7 @@ func (a *RedoAction) Run(params interface{}) error {
 	for i := range redoMigrations {
 		if err := redoMigrations[i].Up(r); err != nil {
 			log.Err("\nMigration failed. The rest of the migrations are canceled.\n")
+
 			return err
 		}
 	}

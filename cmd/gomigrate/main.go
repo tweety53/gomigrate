@@ -41,11 +41,13 @@ func main() {
 	args := flags.Args()
 	if len(args) == 0 || *help {
 		flags.Usage()
+
 		return
 	}
 
 	if len(args) < 1 {
 		flags.Usage()
+
 		return
 	}
 

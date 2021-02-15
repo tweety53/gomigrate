@@ -21,6 +21,7 @@ func (a *FreshAction) Run(_ interface{}) error {
 	res := helpers.AskForConfirmation("Are you sure you want to drop all tables and related constraints and start the migration from the beginning?\nAll data will be lost irreversibly!")
 	if !res {
 		log.Info("Action was cancelled by user. Nothing has been performed.")
+
 		return nil
 	}
 

@@ -56,6 +56,7 @@ func (a *NewAction) Run(params interface{}) error {
 
 	if len(migrations) == 0 {
 		log.Info("No new migrations found. Your system is up-to-date.\n")
+
 		return nil
 	}
 
