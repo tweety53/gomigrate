@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -13,7 +12,6 @@ import (
 	"github.com/tweety53/gomigrate/pkg/errors"
 	"github.com/tweety53/gomigrate/pkg/exitcode"
 	"github.com/tweety53/gomigrate/pkg/gomigrate"
-	"gopkg.in/yaml.v2"
 )
 
 var (
@@ -51,28 +49,22 @@ func main() {
 		return
 	}
 
-	appConfig := &config.GoMigrateConfig{}
+	var appConfig *config.GoMigrateConfig
 
 	if *configPath != "" {
-		yamlConf, err := ioutil.ReadFile(*configPath)
+		appConfig, err = config.BuildFromFile(*configPath)
 		if err != nil {
-			log.Fatalf("yamlConf.Get err   #%v ", err)
-		}
-
-		// expand environment variables
-		yamlConf = []byte(os.ExpandEnv(string(yamlConf)))
-
-		err = yaml.Unmarshal(yamlConf, appConfig)
-		if err != nil {
-			log.Fatalf("Unmarshal err: %v", err)
+			log.Fatal(err)
 		}
 	} else {
-		appConfig = &config.GoMigrateConfig{
-			MigrationsPath: *migrationsPath,
-			MigrationTable: *migrationTable,
-			Compact:        *compact,
-			SQLDialect:     *sqlDialect,
-			DataSourceName: *dataSourceName,
+		appConfig, err = config.BuildFromArgs(
+			*migrationsPath,
+			*migrationTable,
+			*compact,
+			*sqlDialect,
+			*dataSourceName)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 
@@ -87,7 +79,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("gomigrate: database ping err: %v\n", err)
 	}
-	db.Close()
+	defer db.Close()
 
 	switch action {
 	case "create":
@@ -96,17 +88,17 @@ func main() {
 			os.Exit(int(errors.ErrorExitCode(err)))
 		}
 
-		os.Exit(int(exitcode.ExitCodeOK))
+		os.Exit(int(exitcode.OK))
 	case "up", "down", "fresh", "history", "new", "redo", "to", "mark":
 		if err := gomigrate.Run(action, db, appConfig, args[1:]); err != nil {
 			log.Printf("gomigrate error: %v\n", err)
 			os.Exit(int(errors.ErrorExitCode(err)))
 		}
 
-		os.Exit(int(exitcode.ExitCodeOK))
+		os.Exit(int(exitcode.OK))
 	}
 
-	os.Exit(int(exitcode.ExitCodeOK))
+	os.Exit(int(exitcode.OK))
 }
 
 //nolint

@@ -29,7 +29,7 @@ func migrateUpGo(repo *repo.MigrationsRepository, m *Migration) error {
 		log.Warnf(failedToApplyLogText, filepath.Base(m.Source), duration.Seconds())
 		log.Warn("This version is currently being applied by another app")
 
-		return nil
+		return err
 	}
 
 	if fn != nil {

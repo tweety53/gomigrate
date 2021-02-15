@@ -10,9 +10,6 @@ services:
       DB_HOST: gomigrate-db
     depends_on:
       - gomigrate-db
-    tty: true
-    volumes:
-      - ../basic:/usr/src/
   gomigrate-db:
     container_name: gomigrate-db
     image: postgres:12.2-alpine

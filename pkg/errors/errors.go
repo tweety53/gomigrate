@@ -26,12 +26,12 @@ func (e *GoMigrateError) Error() string {
 
 func ErrorExitCode(err error) exitcode.ExitCode {
 	if err == nil {
-		return exitcode.ExitCodeOK
+		return exitcode.OK
 	}
 
 	var goMigrateErr *GoMigrateError
 	if errors.As(err, &goMigrateErr) {
-		if goMigrateErr.ExitCode != exitcode.ExitCodeOK {
+		if goMigrateErr.ExitCode != exitcode.OK {
 			return goMigrateErr.ExitCode
 		}
 
@@ -40,5 +40,5 @@ func ErrorExitCode(err error) exitcode.ExitCode {
 		}
 	}
 
-	return exitcode.ExitCodeUnspecified
+	return exitcode.Unspecified
 }

@@ -23,5 +23,11 @@ CGO_ENABLED ?= 0
 
 Q = $(if $(filter 1,$V),,@)
 
+build:
+	go build -i -o gomigrate ./cmd/gomigrate
+
 check test tests: ; $(info $(M) running $(NAME:%=% )tests…) @ ## Run tests
 	$Q $(GO) test  -count=1 -tags $(TAGS) -timeout $(TIMEOUT)s $(ARGS) ./...
+
+test-integration: ; $(info $(M) running $(NAME:%=% )tests…) @ ## Run integration tests
+	$Q GOMAXPROCS=3 $(GO) test -v -p 3 -tags $(TAGS) -timeout $(TIMEOUT)s $(ARGS) ./tests

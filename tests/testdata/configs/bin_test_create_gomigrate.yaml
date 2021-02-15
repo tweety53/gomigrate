@@ -1,4 +1,4 @@
-gomigrate_migrations_path: '/app/tests/testdata/create_test'
+gomigrate_migrations_path: /app/tests/testdata/create_test
 gomigrate_migration_table: 'migration_test'
 gomigrate_compact: false
 gomigrate_sql_dialect: 'postgres'

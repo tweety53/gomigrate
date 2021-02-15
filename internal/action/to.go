@@ -1,10 +1,10 @@
 package action
 
 import (
+	"github.com/tweety53/gomigrate/internal/version"
 	"strconv"
 
 	"github.com/pkg/errors"
-	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
 	"github.com/tweety53/gomigrate/internal/service"
@@ -31,7 +31,7 @@ func (p *ToActionParams) ValidateAndFill(args []string) error {
 	}
 
 	// todo: implement all version formats like in yii/migrate???
-	if !helpers.ValidMigrationVersion(args[0]) {
+	if !version.ValidMigrationVersion(args[0]) {
 		return errorsInternal.ErrInvalidVersionFormat
 	}
 

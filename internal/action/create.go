@@ -1,35 +1,24 @@
 package action
 
 import (
-	"fmt"
+	"github.com/pkg/errors"
+	"github.com/tweety53/gomigrate/internal/log"
+	"github.com/tweety53/gomigrate/internal/migration"
+	"github.com/tweety53/gomigrate/internal/version"
+	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
+	"github.com/tweety53/gomigrate/pkg/exitcode"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"text/template"
-	"time"
-
-	"github.com/pkg/errors"
-	"github.com/tweety53/gomigrate/internal/log"
-	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
-	"github.com/tweety53/gomigrate/pkg/exitcode"
 )
-
-// Migrations version prefix format.
-const versionPrefixFormat = "m060102_150405"
 
 var (
 	ErrInvalidName          = errors.New("the migration name should contain letters, digits, underscore and/or backslash characters only")
 	ErrCannotSelectTmpl     = errors.New("something wrong, cannot select template")
 	ErrEmptyName            = errors.New("name cannot be empty")
 	ErrUnknownMigrationType = errors.New("unknown migration type passed")
-)
-
-type MigrationType string
-
-var (
-	migrationTypeGo  MigrationType = "go"
-	migrationTypeSQL MigrationType = "sql"
 )
 
 type tmplVars struct {
@@ -42,7 +31,7 @@ type CreateAction struct {
 
 type CreateActionParams struct {
 	name  string
-	mType MigrationType
+	mType migration.Type
 }
 
 func (p *CreateActionParams) Get() interface{} {
@@ -68,12 +57,12 @@ func (p *CreateActionParams) ValidateAndFill(args []string) error {
 		return ErrInvalidName
 	}
 
-	var mType MigrationType
+	var mType migration.Type
 	if len(args) != 2 {
-		mType = migrationTypeGo
+		mType = migration.TypeGo
 	} else {
-		mType = MigrationType(args[1])
-		if mType != migrationTypeGo && mType != migrationTypeSQL {
+		mType = migration.Type(args[1])
+		if mType != migration.TypeGo && mType != migration.TypeSQL {
 			return ErrUnknownMigrationType
 		}
 	}
@@ -98,28 +87,23 @@ func (a *CreateAction) Run(params interface{}) error {
 
 	var tmpl *template.Template
 
-	versionPrefix := time.Now().Format(versionPrefixFormat)
-
-	if p.mType == migrationTypeGo {
+	if p.mType == migration.TypeGo {
 		tmpl = MigrationTemplateGo
 	}
-	if p.mType == migrationTypeSQL {
+	if p.mType == migration.TypeSQL {
 		tmpl = MigrationTemplateSQL
 	}
 	if tmpl == nil {
 		return ErrCannotSelectTmpl
 	}
 
-	version := fmt.Sprintf("%s_%s", versionPrefix, p.name)
-	fileName := fmt.Sprintf("%s.%s", version, p.mType)
-
-	path := filepath.Join(a.migrationsPath, fileName)
+	path := filepath.Join(a.migrationsPath, version.BuildVersion(p.name, p.mType))
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
 		log.Err("Failed to create new migration.")
 
 		return &errorsInternal.GoMigrateError{
 			Err:      err,
-			ExitCode: exitcode.ExitCodeIOErr,
+			ExitCode: exitcode.IoErr,
 		}
 	}
 
@@ -129,7 +113,7 @@ func (a *CreateAction) Run(params interface{}) error {
 
 		return &errorsInternal.GoMigrateError{
 			Err:      err,
-			ExitCode: exitcode.ExitCodeIOErr,
+			ExitCode: exitcode.IoErr,
 		}
 	}
 	defer f.Close()

@@ -21,24 +21,24 @@ func TestErrorExitCode(t *testing.T) {
 			args: args{
 				err: ErrInvalidActionParamsType,
 			},
-			want: exitcode.ExitCodeUnspecified,
+			want: exitcode.Unspecified,
 		},
 		{
 			name: "no error",
 			args: args{
 				err: nil,
 			},
-			want: exitcode.ExitCodeOK,
+			want: exitcode.OK,
 		},
 		{
 			name: "GoMigrateError with defined exit code",
 			args: args{
 				err: &GoMigrateError{
 					Err:      errors.New("test err"),
-					ExitCode: exitcode.ExitCodeIOErr,
+					ExitCode: exitcode.IoErr,
 				},
 			},
-			want: exitcode.ExitCodeIOErr,
+			want: exitcode.IoErr,
 		},
 		{
 			name: "nested GoMigrateError with defined exit code",
@@ -46,12 +46,12 @@ func TestErrorExitCode(t *testing.T) {
 				err: &GoMigrateError{
 					Err: &GoMigrateError{
 						Err:      errors.New("test err"),
-						ExitCode: exitcode.ExitCodeIOErr,
+						ExitCode: exitcode.IoErr,
 					},
-					ExitCode: exitcode.ExitCodeOK,
+					ExitCode: exitcode.OK,
 				},
 			},
-			want: exitcode.ExitCodeIOErr,
+			want: exitcode.IoErr,
 		},
 		{
 			name: "nested GoMigrateError with undefined exit code",
@@ -60,10 +60,10 @@ func TestErrorExitCode(t *testing.T) {
 					Err: &GoMigrateError{
 						Err: errors.New("test err"),
 					},
-					ExitCode: exitcode.ExitCodeOK,
+					ExitCode: exitcode.OK,
 				},
 			},
-			want: exitcode.ExitCodeUnspecified,
+			want: exitcode.Unspecified,
 		},
 	}
 

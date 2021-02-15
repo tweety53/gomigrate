@@ -1,6 +1,7 @@
 package action
 
 import (
+	"github.com/tweety53/gomigrate/internal/migration"
 	"io/ioutil"
 	"log"
 	"os"
@@ -42,7 +43,7 @@ func TestCreateActionParams_ValidateAndFill(t *testing.T) {
 			name: "default filetype assign",
 			expectedParams: &CreateActionParams{
 				name:  "create_some_table",
-				mType: migrationTypeGo,
+				mType: migration.TypeGo,
 			},
 			args:    args{args: []string{"create_some_table"}},
 			wantErr: nil,
@@ -57,7 +58,7 @@ func TestCreateActionParams_ValidateAndFill(t *testing.T) {
 			name: "success validate .go",
 			expectedParams: &CreateActionParams{
 				name:  "create_some_table",
-				mType: migrationTypeGo,
+				mType: migration.TypeGo,
 			},
 			args:    args{args: []string{"create_some_table", "go"}},
 			wantErr: nil,
@@ -66,7 +67,7 @@ func TestCreateActionParams_ValidateAndFill(t *testing.T) {
 			name: "success validate .sql",
 			expectedParams: &CreateActionParams{
 				name:  "create_some_table",
-				mType: migrationTypeSQL,
+				mType: migration.TypeSQL,
 			},
 			args:    args{args: []string{"create_some_table", "sql"}},
 			wantErr: nil,
@@ -115,7 +116,7 @@ func TestCreateAction_Run(t *testing.T) {
 			fields: fields{migrationsPath: dir},
 			args: args{params: &CreateActionParams{
 				name:  "some_name",
-				mType: migrationTypeGo,
+				mType: migration.TypeGo,
 			}},
 			wantErr: nil,
 		},

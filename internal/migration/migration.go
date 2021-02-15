@@ -36,6 +36,13 @@ var (
 	migrationDirectionDown Direction = "down"
 )
 
+type Type string
+
+var (
+	TypeGo  Type = "go"
+	TypeSQL Type = "sql"
+)
+
 func (m *Migration) String() string {
 	return fmt.Sprintf(m.Version)
 }
