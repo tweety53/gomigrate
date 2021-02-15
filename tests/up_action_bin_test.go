@@ -3,16 +3,17 @@
 package tests
 
 import (
-	"github.com/stretchr/testify/require"
-	"github.com/tweety53/gomigrate/internal/repo"
-	"github.com/tweety53/gomigrate/internal/sqldialect"
-	"github.com/tweety53/gomigrate/pkg/config"
 	"log"
 	"os"
 	"os/exec"
 	"strconv"
 	"sync/atomic"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+	"github.com/tweety53/gomigrate/internal/repo"
+	"github.com/tweety53/gomigrate/internal/sqldialect"
+	"github.com/tweety53/gomigrate/pkg/config"
 )
 
 func Test_UpAction(t *testing.T) {

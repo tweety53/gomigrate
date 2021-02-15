@@ -1,17 +1,18 @@
 package action
 
 import (
+	"os"
+	"path/filepath"
+	"regexp"
+	"strings"
+	"text/template"
+
 	"github.com/pkg/errors"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
 	"github.com/tweety53/gomigrate/internal/version"
 	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
 	"github.com/tweety53/gomigrate/pkg/exitcode"
-	"os"
-	"path/filepath"
-	"regexp"
-	"strings"
-	"text/template"
 )
 
 var (

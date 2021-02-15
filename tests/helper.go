@@ -4,8 +4,9 @@ package tests
 
 import (
 	"database/sql"
-	"github.com/tweety53/gomigrate/pkg/config"
 	"log"
+
+	"github.com/tweety53/gomigrate/pkg/config"
 
 	_ "github.com/lib/pq"
 )

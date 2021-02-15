@@ -1,11 +1,12 @@
 package action
 
 import (
-	"github.com/tweety53/gomigrate/internal/migration"
 	"io/ioutil"
 	"log"
 	"os"
 	"testing"
+
+	"github.com/tweety53/gomigrate/internal/migration"
 
 	"github.com/stretchr/testify/require"
 	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"

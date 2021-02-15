@@ -3,12 +3,13 @@
 package tests
 
 import (
-	"github.com/stretchr/testify/require"
-	"github.com/tweety53/gomigrate/internal/migration"
-	"github.com/tweety53/gomigrate/internal/version"
 	"os"
 	"os/exec"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+	"github.com/tweety53/gomigrate/internal/migration"
+	"github.com/tweety53/gomigrate/internal/version"
 )
 
 const (

@@ -2,6 +2,7 @@ package action
 
 import (
 	"fmt"
+
 	"github.com/tweety53/gomigrate/internal/version"
 
 	"github.com/tweety53/gomigrate/internal/helpers"

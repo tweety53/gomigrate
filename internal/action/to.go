@@ -1,8 +1,9 @@
 package action
 
 import (
-	"github.com/tweety53/gomigrate/internal/version"
 	"strconv"
+
+	"github.com/tweety53/gomigrate/internal/version"
 
 	"github.com/pkg/errors"
 	"github.com/tweety53/gomigrate/internal/log"
