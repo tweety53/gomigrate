@@ -3,7 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/tweety53/gomigrate)](https://goreportcard.com/report/github.com/tweety53/gomigrate)
 
 # gomigrate
-___Database migrations written in go
+Database migrations written in go
 ## Databases supported
 * PostgreSQL
 ## Supported migration file types
@@ -53,6 +53,22 @@ Actions:
 
 ```
 ## Use in your go project as library (WIP)
+### Progress check list
+
+- [x] Наличие юнит-тестов на ключевые алгоритмы (core-логику) сервиса. - вохможно есть не все конечно :(
+- [x] Наличие валидных Dockerfile и Makefile для сервиса.
+- [x] Пайплайн - github actions : go build ... , go test ..., golangci-lint (есть нюанс что предложенный конфиг ломается на текущей версии либы на github actions, запускал с предложенным на локалке)
+
+- [x] Использовать как cli
+- [ ] Использовать как библиотеку из кода (отложено из-за непоняток с .go миграциями)
+- [ ] Поддержка миграций на Go (запускаются пока только если есть внутри самой программы)
+- [x] Поддержка миграций на SQL
+- [x] Реализован механизм блокировки на время миграции (на up все вроде бы ок, на down возможно нужно будет пересмотреть некоторые кейсы)
+- [x] Реализованы различные способы конфигурирования - yaml конфиг(c expand env) (с указанием пути через флаг -config) или флаги 
+- [x] Написаны юнит-тесты - написаны, но не полностью
+- [ ] Написаны интеграционные тесты - написаны для create, up, down
+- [ ] Тесты адекватны и полностью покрывают фукнционал
+- [ ] Понятность и чистота кода - текущий хз, рефакторинг будет по ходу и по окончанию написания юнит и инт. тестов
 
 
 
