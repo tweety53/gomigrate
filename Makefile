@@ -24,10 +24,13 @@ CGO_ENABLED ?= 0
 Q = $(if $(filter 1,$V),,@)
 
 build:
-	go build -i -o gomigrate ./cmd/gomigrate
+	$Q $(GO) build -i -o ./bin ./cmd/gomigrate
 
-check test tests: ; $(info $(M) running $(NAME:%=% )tests…) @ ## Run tests
-	$Q $(GO) test  -count=1 -tags $(TAGS) -timeout $(TIMEOUT)s $(ARGS) ./...
+check test tests: ; $(info $(M) running tests…) @ ## Run tests
+	$Q $(GO) test -v -race -count 100 ./...
 
-test-integration: ; $(info $(M) running $(NAME:%=% )tests…) @ ## Run integration tests
-	$Q GOMAXPROCS=3 $(GO) test -v -p 3 -tags=test_integration -timeout $(TIMEOUT)s $(ARGS) ./tests
+test-integration: ; $(info $(M) running integration tests…) @ ## Run integration tests
+	$Q GOMAXPROCS=6 $(GO) test -count=1 -timeout=30s -v -p 6 -tags=test_integration ./tests
+
+test-integration-docker: ;
+	$Q docker-compose -f .docker/docker-compose.yml up --build

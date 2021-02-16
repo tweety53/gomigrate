@@ -3,12 +3,11 @@ package action
 import (
 	"strconv"
 
-	"github.com/tweety53/gomigrate/internal/version"
-
 	"github.com/pkg/errors"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
 	"github.com/tweety53/gomigrate/internal/service"
+	"github.com/tweety53/gomigrate/internal/version"
 	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
 )
 
@@ -81,24 +80,26 @@ func (a *ToAction) Run(params interface{}) error {
 	migrations = migration.Convert(migrationsHistory)
 
 	for i := range migrations {
-		if p.version == migrations[i].Version {
-			if i != 0 {
-				downAction := NewDownAction(a.svc)
-				params := new(DownActionParams)
-				if err := params.ValidateAndFill([]string{strconv.Itoa(i)}); err != nil {
-					return err
-				}
-				if err := downAction.Run(params); err != nil {
-					return err
-				}
+		if p.version != migrations[i].Version {
+			continue
+		}
 
-				return nil
+		if i != 0 {
+			downAction := NewDownAction(a.svc)
+			params := new(DownActionParams)
+			if err := params.ValidateAndFill([]string{strconv.Itoa(i)}); err != nil {
+				return err
 			}
-
-			log.Warnf("Already at '%s'. Nothing needs to be done.\n", p.version)
+			if err := downAction.Run(params); err != nil {
+				return err
+			}
 
 			return nil
 		}
+
+		log.Warnf("Already at '%s'. Nothing needs to be done.\n", p.version)
+
+		return nil
 	}
 
 	return ErrUnableToFindVersion

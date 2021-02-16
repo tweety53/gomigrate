@@ -3,12 +3,11 @@ package action
 import (
 	"fmt"
 
-	"github.com/tweety53/gomigrate/internal/version"
-
 	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/migration"
 	"github.com/tweety53/gomigrate/internal/service"
+	"github.com/tweety53/gomigrate/internal/version"
 	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
 )
 

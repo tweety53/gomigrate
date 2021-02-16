@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 
@@ -79,26 +80,30 @@ func main() {
 	if err != nil {
 		log.Fatalf("gomigrate: database ping err: %v\n", err)
 	}
-	defer db.Close()
 
 	switch action {
 	case "create":
 		if err := gomigrate.Run("create", nil, appConfig, args[1:]); err != nil {
 			log.Printf("gomigrate error: %v\n", err)
-			os.Exit(int(errors.ErrorExitCode(err)))
+			shutdown(db, errors.ErrorExitCode(err))
 		}
 
-		os.Exit(int(exitcode.OK))
+		shutdown(db, exitcode.OK)
 	case "up", "down", "fresh", "history", "new", "redo", "to", "mark":
 		if err := gomigrate.Run(action, db, appConfig, args[1:]); err != nil {
 			log.Printf("gomigrate error: %v\n", err)
-			os.Exit(int(errors.ErrorExitCode(err)))
+			shutdown(db, errors.ErrorExitCode(err))
 		}
 
-		os.Exit(int(exitcode.OK))
+		shutdown(db, exitcode.OK)
 	}
 
-	os.Exit(int(exitcode.OK))
+	shutdown(db, exitcode.OK)
+}
+
+func shutdown(db io.Closer, exitCode exitcode.ExitCode) {
+	db.Close()
+	os.Exit(int(exitCode))
 }
 
 //nolint

@@ -6,9 +6,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/tweety53/gomigrate/internal/migration"
-
 	"github.com/stretchr/testify/require"
+	"github.com/tweety53/gomigrate/internal/migration"
 	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
 )
 

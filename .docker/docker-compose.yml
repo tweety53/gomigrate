@@ -10,11 +10,31 @@ services:
       DB_HOST: gomigrate-db
     depends_on:
       - gomigrate-db
+      - gomigrate-db-up-parallel
+      - gomigrate-db-down-parallel
   gomigrate-db:
     container_name: gomigrate-db
     image: postgres:12.2-alpine
     ports:
       - "5432:5432"
+    environment:
+      POSTGRES_USER: gomigrate
+      POSTGRES_PASSWORD: gomigrate
+      POSTGRES_DB: gomigrate_test
+  gomigrate-db-up-parallel:
+    container_name: gomigrate-db-up-parallel
+    image: postgres:12.2-alpine
+    ports:
+      - "15432:15432"
+    environment:
+      POSTGRES_USER: gomigrate
+      POSTGRES_PASSWORD: gomigrate
+      POSTGRES_DB: gomigrate_test
+  gomigrate-db-down-parallel:
+    container_name: gomigrate-db-down-parallel
+    image: postgres:12.2-alpine
+    ports:
+      - "25432:25432"
     environment:
       POSTGRES_USER: gomigrate
       POSTGRES_PASSWORD: gomigrate

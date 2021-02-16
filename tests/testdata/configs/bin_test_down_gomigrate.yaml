@@ -1,0 +1,5 @@
+gomigrate_migrations_path: /app/tests/testdata/migrations
+gomigrate_migration_table: 'migration_test'
+gomigrate_compact: true
+gomigrate_sql_dialect: 'postgres'
+gomigrate_dsn: 'host=gomigrate-db port=5432 user=gomigrate password=gomigrate dbname=gomigrate_test sslmode=disable'

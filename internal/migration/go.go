@@ -70,7 +70,7 @@ func migrateDownGo(repo *repo.MigrationsRepository, m *Migration) error {
 	log.Warnf("*** reverting %s", filepath.Base(m.Source))
 	start := time.Now()
 	if err := repo.LockVersion(m.Version); err != nil {
-		return handleLockVersionError(tx, start, m)
+		return handleLockVersionError(tx, start, m, err)
 	}
 
 	if fn != nil {
@@ -182,7 +182,7 @@ func handleDeleteVersionError(tx *sql.Tx, start time.Time, logText string, m *Mi
 	return errors.Wrap(err, "failed to execute delete version transaction for unapplied version")
 }
 
-func handleLockVersionError(tx *sql.Tx, start time.Time, m *Migration) error {
+func handleLockVersionError(tx *sql.Tx, start time.Time, m *Migration, err error) error {
 	txErr := tx.Rollback()
 	if txErr != nil {
 		duration := time.Since(start)
@@ -195,5 +195,5 @@ func handleLockVersionError(tx *sql.Tx, start time.Time, m *Migration) error {
 	log.Warnf(failedToRevertLogText, filepath.Base(m.Source), duration.Seconds())
 	log.Warn("This version is currently being reverted by another app")
 
-	return nil
+	return err
 }

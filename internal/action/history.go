@@ -26,16 +26,20 @@ func (p *HistoryActionParams) ValidateAndFill(args []string) error {
 	if len(args) > 0 {
 		if args[0] == helpers.LimitAll {
 			p.limit = 0
-		} else {
-			var err error
-			p.limit, err = strconv.Atoi(args[0])
-			if err != nil {
-				return err
-			}
+
+			return nil
 		}
-	} else {
-		p.limit = 10
+
+		var err error
+		p.limit, err = strconv.Atoi(args[0])
+		if err != nil {
+			return err
+		}
+
+		return nil
 	}
+
+	p.limit = 10
 
 	return nil
 }
