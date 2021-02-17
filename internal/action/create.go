@@ -16,10 +16,11 @@ import (
 )
 
 var (
-	ErrInvalidName          = errors.New("the migration name should contain letters, digits, underscore and/or backslash characters only")
-	ErrCannotSelectTmpl     = errors.New("something wrong, cannot select template")
-	ErrEmptyName            = errors.New("name cannot be empty")
-	ErrUnknownMigrationType = errors.New("unknown migration type passed")
+	ErrInvalidName           = errors.New("the migration name should contain letters, digits, underscore and/or backslash characters only")
+	ErrCannotSelectTmpl      = errors.New("something wrong, cannot select template")
+	ErrEmptyName             = errors.New("name cannot be empty")
+	ErrUnknownMigrationType  = errors.New("unknown migration type passed")
+	ErrUnknownSafeParamValue = errors.New("create action 'safe' param must be true or false")
 )
 
 type tmplVars struct {
@@ -33,12 +34,14 @@ type CreateAction struct {
 type CreateActionParams struct {
 	name  string
 	mType migration.Type
+	safe  bool
 }
 
 func (p *CreateActionParams) Get() interface{} {
 	return &CreateActionParams{
 		name:  p.name,
 		mType: p.mType,
+		safe:  p.safe,
 	}
 }
 
@@ -59,7 +62,7 @@ func (p *CreateActionParams) ValidateAndFill(args []string) error {
 	}
 
 	var mType migration.Type
-	if len(args) != 2 {
+	if len(args) == 1 {
 		mType = migration.TypeGo
 	} else {
 		mType = migration.Type(args[1])
@@ -68,8 +71,23 @@ func (p *CreateActionParams) ValidateAndFill(args []string) error {
 		}
 	}
 
+	var safe bool
+	if len(args) <= 2 {
+		safe = true
+	} else {
+		switch args[2] {
+		case "true":
+			safe = true
+		case "false":
+			safe = false
+		default:
+			return ErrUnknownSafeParamValue
+		}
+	}
+
 	p.name = name
 	p.mType = mType
+	p.safe = safe
 
 	return nil
 }
@@ -89,10 +107,18 @@ func (a *CreateAction) Run(params interface{}) error {
 	var tmpl *template.Template
 
 	if p.mType == migration.TypeGo {
-		tmpl = MigrationTemplateGo
+		if p.safe {
+			tmpl = MigrationTemplateGoSafe
+		} else {
+			tmpl = MigrationTemplateGo
+		}
 	}
 	if p.mType == migration.TypeSQL {
-		tmpl = MigrationTemplateSQL
+		if p.safe {
+			tmpl = MigrationTemplateSQLSafe
+		} else {
+			tmpl = MigrationTemplateSQL
+		}
 	}
 	if tmpl == nil {
 		return ErrCannotSelectTmpl
@@ -139,7 +165,19 @@ func nameToCamelCase(name string) string {
 	})
 }
 
-var MigrationTemplateSQL = template.Must(template.New("gomigrate.sql-migration").Parse(`-- +gomigrate Up
+var MigrationTemplateSQLSafe = template.Must(template.New("gomigrate.sql-migration-safe").Parse(`-- +gomigrate Up
+-- +gomigrate StatementBegin
+// write down up SQL here
+-- +gomigrate StatementEnd
+
+-- +gomigrate Down
+-- +gomigrate StatementBegin
+// write down down SQL here
+-- +gomigrate StatementEnd
+`))
+
+var MigrationTemplateSQL = template.Must(template.New("gomigrate.sql-migration").Parse(`-- +gomigrate NO TRANSACTION
+-- +gomigrate Up
 -- +gomigrate StatementBegin
 // write down up SQL here
 -- +gomigrate StatementEnd
@@ -161,12 +199,34 @@ func init() {
 	gomigrate.AddMigration(up{{.CamelName}}, down{{.CamelName}})
 }
 
-func up{{.CamelName}}(tx *sql.Tx) error {
+func up{{.CamelName}}(db *sql.DB) error {
 	// This code is executed when the migration is applied.
 	return nil
 }
 
-func down{{.CamelName}}(tx *sql.Tx) error {
+func down{{.CamelName}}(db *sql.DB) error {
+	// This code is executed when the migration is rolled back.
+	return nil
+}
+`))
+
+var MigrationTemplateGoSafe = template.Must(template.New("gomigrate.go-migration-safe").Parse(`package migrations
+
+import (
+	"database/sql"
+	"github.com/tweety53/gomigrate/pkg/gomigrate"
+)
+
+func init() {
+	gomigrate.AddSafeMigration(safeUp{{.CamelName}}, safeDown{{.CamelName}})
+}
+
+func safeUp{{.CamelName}}(tx *sql.Tx) error {
+	// This code is executed when the migration is applied.
+	return nil
+}
+
+func safeDown{{.CamelName}}(tx *sql.Tx) error {
 	// This code is executed when the migration is rolled back.
 	return nil
 }

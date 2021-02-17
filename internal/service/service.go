@@ -33,7 +33,7 @@ func NewMigrationService(
 
 func (s *MigrationService) GetNewMigrations() (migration.Migrations, error) {
 	if _, err := s.MigrationsRepo.GetDBVersion(); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "cannot get db version")
 	}
 
 	records, err := s.MigrationsRepo.GetMigrationsHistory(0)

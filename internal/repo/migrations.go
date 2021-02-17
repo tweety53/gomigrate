@@ -6,16 +6,25 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/tweety53/gomigrate/internal/log"
 	"github.com/tweety53/gomigrate/internal/sqldialect"
 )
 
 type MigrationsRepository struct {
-	DB      *sql.DB
+	db      *sql.DB
 	dialect sqldialect.SQLDialect
 }
 
 func NewMigrationsRepository(db *sql.DB, dialect sqldialect.SQLDialect) *MigrationsRepository {
-	return &MigrationsRepository{DB: db, dialect: dialect}
+	return &MigrationsRepository{db: db, dialect: dialect}
+}
+
+func (r *MigrationsRepository) GetDB() (*sql.DB, error) {
+	if r.db == nil {
+		return nil, errors.New("cannot get db, not initialized")
+	}
+
+	return r.db, nil
 }
 
 func (r *MigrationsRepository) GetMigrationsHistory(limit int) (MigrationRecords, error) {
@@ -26,7 +35,7 @@ func (r *MigrationsRepository) GetMigrationsHistory(limit int) (MigrationRecords
 
 	query += ";"
 
-	rows, err := r.DB.Query(query)
+	rows, err := r.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -46,11 +55,11 @@ func (r *MigrationsRepository) GetMigrationsHistory(limit int) (MigrationRecords
 		records = append(records, &row)
 	}
 
-	return records, err
+	return records, nil
 }
 
 func (r *MigrationsRepository) InsertVersion(v string) error {
-	if _, err := r.DB.Exec(r.dialect.InsertVersionSQL(), v, int(time.Now().Unix())); err != nil {
+	if _, err := r.db.Exec(r.dialect.InsertVersionSQL(), v, int(time.Now().Unix())); err != nil {
 		return err
 	}
 
@@ -58,7 +67,7 @@ func (r *MigrationsRepository) InsertVersion(v string) error {
 }
 
 func (r *MigrationsRepository) DeleteVersion(v string) error {
-	if _, err := r.DB.Exec(r.dialect.DeleteVersionSQL(), v); err != nil {
+	if _, err := r.db.Exec(r.dialect.DeleteVersionSQL(), v); err != nil {
 		return err
 	}
 
@@ -84,7 +93,10 @@ func (r *MigrationsRepository) GetDBVersion() (string, error) {
 }
 
 func (r *MigrationsRepository) CreateVersionTable() error {
-	if _, err := r.DB.Exec(r.dialect.CreateVersionTableSQL()); err != nil {
+	if _, err := r.db.Exec(r.dialect.CreateVersionTableSQL()); err != nil {
+		log.Warnf("*** failed to apply (cannot create migrations table)")
+		log.Warn("Maybe version table already created by another app? Please check error below")
+
 		return err
 	}
 
@@ -92,7 +104,7 @@ func (r *MigrationsRepository) CreateVersionTable() error {
 }
 
 func (r *MigrationsRepository) InsertUnAppliedVersion(v string) error {
-	if _, err := r.DB.Exec(r.dialect.InsertUnAppliedVersionSQL(), v); err != nil {
+	if _, err := r.db.Exec(r.dialect.InsertUnAppliedVersionSQL(), v); err != nil {
 		return err
 	}
 
@@ -100,7 +112,7 @@ func (r *MigrationsRepository) InsertUnAppliedVersion(v string) error {
 }
 
 func (r *MigrationsRepository) UpdateApplyTime(v string) error {
-	if _, err := r.DB.Exec(r.dialect.UpdateApplyTimeSQL(), int(time.Now().Unix()), v); err != nil {
+	if _, err := r.db.Exec(r.dialect.UpdateApplyTimeSQL(), int(time.Now().Unix()), v); err != nil {
 		return err
 	}
 
@@ -108,7 +120,7 @@ func (r *MigrationsRepository) UpdateApplyTime(v string) error {
 }
 
 func (r *MigrationsRepository) LockVersion(v string) error {
-	if _, err := r.DB.Exec(r.dialect.LockVersionSQL(), v); err != nil {
+	if _, err := r.db.Exec(r.dialect.LockVersionSQL(), v); err != nil {
 		return err
 	}
 

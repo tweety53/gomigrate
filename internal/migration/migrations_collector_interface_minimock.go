@@ -108,7 +108,7 @@ func (mmCollectMigrations *mMigrationsCollectorInterfaceMockCollectMigrations) R
 	return mmCollectMigrations.mock
 }
 
-// Set uses given function f to mock the MigrationsCollectorInterface.CollectMigrations method
+//Set uses given function f to mock the MigrationsCollectorInterface.CollectMigrations method
 func (mmCollectMigrations *mMigrationsCollectorInterfaceMockCollectMigrations) Set(f func(dirpath string, current int, target int) (m1 Migrations, err error)) *MigrationsCollectorInterfaceMock {
 	if mmCollectMigrations.defaultExpectation != nil {
 		mmCollectMigrations.mock.t.Fatalf("Default expectation is already set for the MigrationsCollectorInterface.CollectMigrations method")

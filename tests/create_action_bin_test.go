@@ -44,6 +44,22 @@ func Test_CreateAction(t *testing.T) {
 			args:    []string{"test_name_kek+"},
 			wantErr: true,
 		},
+		{
+			name: "create action: type sql safe=true",
+			args: []string{"test_name_sql_safe", "sql", "true"},
+		},
+		{
+			name: "create action: type sql safe=false",
+			args: []string{"test_name_sql_non_safe", "sql", "false"},
+		},
+		{
+			name: "create action: type go safe=true",
+			args: []string{"test_name_go_safe", "go", "true"},
+		},
+		{
+			name: "create action: type go safe=false",
+			args: []string{"test_name_go_non_safe", "go", "false"},
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

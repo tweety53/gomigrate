@@ -83,7 +83,7 @@ func (a *DownAction) Run(params interface{}) error {
 		return ErrInconsistentMigrationsData
 	}
 
-	downMigrations.Reverse()
+	downMigrations = downMigrations.Reverse()
 	n := len(downMigrations)
 
 	log.Warnf("Total %d %s to be reverted:\n", n, helpers.ChooseLogText(n, true))
@@ -96,7 +96,7 @@ func (a *DownAction) Run(params interface{}) error {
 			return errors.New("MigrationRepo type assertion err")
 		}
 
-		if err = downMigrations[i].Down(r); err != nil {
+		if err = downMigrations[i].Down(r, &migration.Runner{}); err != nil {
 			log.Errf("\n%d from %d %s reverted.\n", reverted, n, helpers.ChooseLogText(reverted, false))
 
 			return err

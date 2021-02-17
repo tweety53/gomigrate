@@ -75,3 +75,55 @@ func Test_processResponse(t *testing.T) {
 		})
 	}
 }
+
+func TestChooseLogText(t *testing.T) {
+	type args struct {
+		n         int
+		beforeRun bool
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "one before migrations apply/revert",
+			args: args{
+				n:         1,
+				beforeRun: true,
+			},
+			want: migrationText,
+		},
+		{
+			name: "few before migrations apply/revert",
+			args: args{
+				n:         3,
+				beforeRun: true,
+			},
+			want: migrationsText,
+		},
+		{
+			name: "one after migrations apply/revert",
+			args: args{
+				n:         1,
+				beforeRun: false,
+			},
+			want: migrationWasText,
+		},
+		{
+			name: "few after migrations apply/revert",
+			args: args{
+				n:         3,
+				beforeRun: false,
+			},
+			want: migrationsWereText,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ChooseLogText(tt.args.n, tt.args.beforeRun); got != tt.want {
+				t.Errorf("ChooseLogText() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

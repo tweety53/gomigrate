@@ -14,7 +14,7 @@ func TestMigrationService_GetNewMigrations(t *testing.T) {
 	type fields struct {
 		Db                  *sql.DB
 		MigrationsRepo      *repo.MigrationRepoMock
-		DbOperationRepo     *repo.DbOperationRepoMock
+		DbOperationRepo     *repo.DBOperationRepoMock
 		MigrationsPath      string
 		MigrationsCollector *migration.MigrationsCollectorInterfaceMock
 	}

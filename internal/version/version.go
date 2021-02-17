@@ -21,5 +21,6 @@ func ValidMigrationVersion(v string) bool {
 func BuildVersion(name string, mType migration.Type) string {
 	versionPrefix := time.Now().Format(versionPrefixFormat)
 	version := fmt.Sprintf("%s_%s", versionPrefix, name)
+
 	return fmt.Sprintf("%s.%s", version, mType)
 }

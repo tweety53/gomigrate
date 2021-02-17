@@ -103,9 +103,9 @@ func (a *RedoAction) Run(params interface{}) error {
 	}
 
 	// reverse for down
-	redoMigrations.Reverse()
+	redoMigrations = redoMigrations.Reverse()
 	for i := range redoMigrations {
-		if err := redoMigrations[i].Down(r); err != nil {
+		if err := redoMigrations[i].Down(r, &migration.Runner{}); err != nil {
 			log.Err("\nMigration failed. The rest of the migrations are canceled.\n")
 
 			return err
@@ -113,9 +113,9 @@ func (a *RedoAction) Run(params interface{}) error {
 	}
 
 	// reverse for up
-	redoMigrations.Reverse()
+	redoMigrations = redoMigrations.Reverse()
 	for i := range redoMigrations {
-		if err := redoMigrations[i].Up(r); err != nil {
+		if err := redoMigrations[i].Up(r, &migration.Runner{}); err != nil {
 			log.Err("\nMigration failed. The rest of the migrations are canceled.\n")
 
 			return err

@@ -7,10 +7,10 @@ import (
 )
 
 func init() {
-	gomigrate.AddSafeMigration(upAddAccountsTable, downAddAccountsTable)
+	gomigrate.AddSafeMigration(safeUpAddAccountsTable, safeDownAddAccountsTable)
 }
 
-func upAddAccountsTable(tx *sql.Tx) error {
+func safeUpAddAccountsTable(tx *sql.Tx) error {
 	_, err := tx.Exec(`CREATE TABLE accounts (
 	user_id serial PRIMARY KEY,
 	username VARCHAR ( 50 ) UNIQUE NOT NULL,
@@ -25,7 +25,7 @@ func upAddAccountsTable(tx *sql.Tx) error {
 	return nil
 }
 
-func downAddAccountsTable(tx *sql.Tx) error {
+func safeDownAddAccountsTable(tx *sql.Tx) error {
 	_, err := tx.Exec(`DROP TABLE accounts;`)
 	if err != nil {
 		return err

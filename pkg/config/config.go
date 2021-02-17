@@ -1,10 +1,13 @@
 package config
 
 import (
+	"database/sql"
 	"io/ioutil"
 	"os"
 
 	"github.com/pkg/errors"
+	"github.com/tweety53/gomigrate/internal/repo"
+	"github.com/tweety53/gomigrate/internal/sqldialect"
 	"gopkg.in/yaml.v2"
 )
 
@@ -41,12 +44,30 @@ func BuildFromArgs(
 	compact bool,
 	sqlDialect string,
 	dataSourceName string,
-) (*GoMigrateConfig, error) {
+) *GoMigrateConfig {
 	return &GoMigrateConfig{
 		MigrationsPath: migrationsPath,
 		MigrationTable: migrationTable,
 		Compact:        compact,
 		SQLDialect:     sqlDialect,
 		DataSourceName: dataSourceName,
-	}, nil
+	}
+}
+
+func Validate(conf *GoMigrateConfig, db *sql.DB) error {
+	if _, err := os.Stat(conf.MigrationsPath); err != nil {
+		return errors.Wrap(err, "gomigrate config: bad migrations path")
+	}
+
+	dialect, err := sqldialect.InitDialect(conf.SQLDialect, conf.MigrationTable)
+	if err != nil {
+		return errors.Wrap(err, "gomigrate config: unknown sql dialect")
+	}
+
+	mRepo := repo.NewMigrationsRepository(db, dialect)
+	if _, err := mRepo.EnsureDBVersion(); err != nil {
+		return errors.Wrap(err, "gomigrate config: cannot check/create migrations table in DB")
+	}
+
+	return nil
 }

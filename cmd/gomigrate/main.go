@@ -22,7 +22,7 @@ var (
 	migrationTable = flags.String("t", "", "table name which contains migrations data")
 	dataSourceName = flags.String("dsn", "", "full data source name")
 	configPath     = flags.String("config", "", "path to gomigrate config file")
-	sqlDialect     = flags.String("d", "", "your DB sql dialect")
+	sqlDialect     = flags.String("d", "", "your db sql dialect")
 
 	help = flags.Bool("h", false, "print help")
 )
@@ -58,22 +58,17 @@ func main() {
 			log.Fatal(err)
 		}
 	} else {
-		appConfig, err = config.BuildFromArgs(
+		appConfig = config.BuildFromArgs(
 			*migrationsPath,
 			*migrationTable,
 			*compact,
 			*sqlDialect,
 			*dataSourceName)
-		if err != nil {
-			log.Fatal(err)
-		}
 	}
 
-	dsn, action := appConfig.DataSourceName, args[0]
-
-	db, err := sql.Open(appConfig.SQLDialect, dsn)
+	db, err := sql.Open(appConfig.SQLDialect, appConfig.DataSourceName)
 	if err != nil {
-		log.Fatalf("-dbstring=%q: %v\n", dsn, err)
+		log.Fatalf("-dsn=%q: %v\n", appConfig.DataSourceName, err)
 	}
 
 	err = db.Ping()
@@ -81,7 +76,13 @@ func main() {
 		log.Fatalf("gomigrate: database ping err: %v\n", err)
 	}
 
-	switch action {
+	err = config.Validate(appConfig, db)
+	if err != nil {
+		log.Printf("%v\n", err)
+		shutdown(db, exitcode.Unspecified)
+	}
+
+	switch args[0] {
 	case "create":
 		if err := gomigrate.Run("create", nil, appConfig, args[1:]); err != nil {
 			log.Printf("gomigrate error: %v\n", err)
@@ -90,7 +91,7 @@ func main() {
 
 		shutdown(db, exitcode.OK)
 	case "up", "down", "fresh", "history", "new", "redo", "to", "mark":
-		if err := gomigrate.Run(action, db, appConfig, args[1:]); err != nil {
+		if err := gomigrate.Run(args[0], db, appConfig, args[1:]); err != nil {
 			log.Printf("gomigrate error: %v\n", err)
 			shutdown(db, errors.ErrorExitCode(err))
 		}
@@ -119,10 +120,14 @@ var usagePrefix = `Usage: gomigrate [OPTIONS] ACTION [ACTION PARAMS]
 
 var usageActions = `
 Actions:
-	create [name:string] [type:enum[sql|go,default:go]] - Creates a new migration
-	  create add_new_table     #create new m000000_000000_add_new_table.go file
-	  create add_new_table go  #create new m000000_000000_add_new_table.go file
-	  create add_new_table sql #create new m000000_000000_add_new_table.sql file
+	create [name:string] [type:enum[sql|go,default:go]] [safe:bool,default:true] - Creates a new migration
+	  create add_new_table           #create new m000000_000000_add_new_table.go file (will be executed in transaction)
+	  create add_new_table go        #create new m000000_000000_add_new_table.go file (will be executed in transaction)
+	  create add_new_table go true   #create new m000000_000000_add_new_table.go file (will be executed in transaction)
+	  create add_new_table go false  #create new m000000_000000_add_new_table.go file (will be executed without transaction)
+	  create add_new_table sql       #create new m000000_000000_add_new_table.sql file (will be executed in transaction)
+	  create add_new_table sql true  #create new m000000_000000_add_new_table.sql file (will be executed in transaction)
+	  create add_new_table sql false #create new m000000_000000_add_new_table.sql file (will be executed without transaction)
 
 	down [limit:int|all,default:1] - Downgrades the application by reverting old migrations
 	  down     #revert last applied migration

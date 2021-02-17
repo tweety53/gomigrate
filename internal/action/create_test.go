@@ -40,10 +40,11 @@ func TestCreateActionParams_ValidateAndFill(t *testing.T) {
 			wantErr:        ErrInvalidName,
 		},
 		{
-			name: "default filetype assign",
+			name: "default filetype and safe assign",
 			expectedParams: &CreateActionParams{
 				name:  "create_some_table",
 				mType: migration.TypeGo,
+				safe:  true,
 			},
 			args:    args{args: []string{"create_some_table"}},
 			wantErr: nil,
@@ -59,6 +60,7 @@ func TestCreateActionParams_ValidateAndFill(t *testing.T) {
 			expectedParams: &CreateActionParams{
 				name:  "create_some_table",
 				mType: migration.TypeGo,
+				safe:  true,
 			},
 			args:    args{args: []string{"create_some_table", "go"}},
 			wantErr: nil,
@@ -68,9 +70,36 @@ func TestCreateActionParams_ValidateAndFill(t *testing.T) {
 			expectedParams: &CreateActionParams{
 				name:  "create_some_table",
 				mType: migration.TypeSQL,
+				safe:  true,
 			},
 			args:    args{args: []string{"create_some_table", "sql"}},
 			wantErr: nil,
+		},
+		{
+			name: "success validate .sql safe=true",
+			expectedParams: &CreateActionParams{
+				name:  "create_some_table",
+				mType: migration.TypeSQL,
+				safe:  true,
+			},
+			args:    args{args: []string{"create_some_table", "sql", "true"}},
+			wantErr: nil,
+		},
+		{
+			name: "success validate .sql safe=false",
+			expectedParams: &CreateActionParams{
+				name:  "create_some_table",
+				mType: migration.TypeSQL,
+				safe:  false,
+			},
+			args:    args{args: []string{"create_some_table", "sql", "false"}},
+			wantErr: nil,
+		},
+		{
+			name:           "error validate .sql safe=kek",
+			expectedParams: &CreateActionParams{},
+			args:           args{args: []string{"create_some_table", "sql", "kek"}},
+			wantErr:        ErrUnknownSafeParamValue,
 		},
 	}
 	for _, tt := range tests {

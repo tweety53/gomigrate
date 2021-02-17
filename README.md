@@ -3,22 +3,44 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/tweety53/gomigrate)](https://goreportcard.com/report/github.com/tweety53/gomigrate)
 
 # gomigrate
-Database migrations written in go
+Database migrations written in go, with https://github.com/yiisoft/yii2 like API
 ## Databases supported
-* PostgreSQL
+* PostgreSQL (dialect: postgres)
 ## Supported migration file types
 * .sql
 * .go (WIP)
 ## CLI usage
+
+###install and run in your system
+* ```go get https://github.com/tweety53/gomigrate/cmd/gomigrate```
+* run from your ```GOBIN``` path with options:
+
+###run options
+* -config string - (only .yaml type supported, env variables expanding supported) 
+  * Example: -config /app/config/gomigrate.yaml (copy config from https://github.com/tweety53/gomigrate/blob/master/examples/gomigrate.yaml and update with your actual environment)
+
+OR
+
+* -c bool default: false - indicates whether the console output should be compacted (this is something like verbose:true)
+* -p string - the directory containing the migration classes
+* -t string - table name which contains migrations data
+* -dsn string - full data source name
+* -d string - your DB sql dialect (see available [here](#databases-supported))
+
+###and then add action(required) and params(optional, depends on action)
 ```text
 Usage: gomigrate [OPTIONS] ACTION [ACTION PARAMS]
 
 Actions:
-	create [name:string] [type:enum[sql|go,default:go]] - Creates a new migration
-	  create add_new_table     #create new m000000_000000_add_new_table.go file
-	  create add_new_table go  #create new m000000_000000_add_new_table.go file
-	  create add_new_table sql #create new m000000_000000_add_new_table.sql file
-
+	create [name:string] [type:enum[sql|go,default:go]] [safe:bool,default:true] - Creates a new migration
+	  create add_new_table           #create new m000000_000000_add_new_table.go file (will be executed in transaction)
+	  create add_new_table go        #create new m000000_000000_add_new_table.go file (will be executed in transaction)
+	  create add_new_table go true   #create new m000000_000000_add_new_table.go file (will be executed in transaction)
+	  create add_new_table go false  #create new m000000_000000_add_new_table.go file (will be executed without transaction)
+	  create add_new_table sql       #create new m000000_000000_add_new_table.sql file (will be executed in transaction)
+	  create add_new_table sql true  #create new m000000_000000_add_new_table.sql file (will be executed in transaction)
+	  create add_new_table sql false #create new m000000_000000_add_new_table.sql file (will be executed without transaction)
+	  
 	down [limit:int|all,default:1] - Downgrades the application by reverting old migrations
 	  down     #revert last applied migration
 	  down 3   #revert last 3 applied migrations

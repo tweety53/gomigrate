@@ -75,7 +75,12 @@ func Run(a string, db *sql.DB, config *config.GoMigrateConfig, args []string) er
 	return nil
 }
 
-func AddMigration(up func(*sql.Tx) error, down func(*sql.Tx) error) {
+func AddSafeMigration(up func(*sql.Tx) error, down func(*sql.Tx) error) {
+	_, filename, _, _ := runtime.Caller(1) //nolint:dogsled
+	migration.AddSafeNamedMigration(filename, up, down)
+}
+
+func AddMigration(up func(*sql.DB) error, down func(*sql.DB) error) {
 	_, filename, _, _ := runtime.Caller(1) //nolint:dogsled
 	migration.AddNamedMigration(filename, up, down)
 }

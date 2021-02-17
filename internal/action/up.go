@@ -3,10 +3,9 @@ package action
 import (
 	"strconv"
 
-	"github.com/pkg/errors"
 	"github.com/tweety53/gomigrate/internal/helpers"
 	"github.com/tweety53/gomigrate/internal/log"
-	"github.com/tweety53/gomigrate/internal/repo"
+	"github.com/tweety53/gomigrate/internal/migration"
 	"github.com/tweety53/gomigrate/internal/service"
 	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
 )
@@ -79,12 +78,7 @@ func (a *UpAction) Run(params interface{}) error {
 
 	var applied int
 	for i := range migrations {
-		r, ok := a.svc.MigrationsRepo.(*repo.MigrationsRepository)
-		if !ok {
-			return errors.New("MigrationRepo type assertion err")
-		}
-
-		if err = migrations[i].Up(r); err != nil {
+		if err = migrations[i].Up(a.svc.MigrationsRepo, &migration.Runner{}); err != nil {
 			log.Errf("\n%d from %d %s applied.\n", applied, n, logText)
 			log.Err("\nMigration failed. The rest of the migrations are canceled.\n")
 

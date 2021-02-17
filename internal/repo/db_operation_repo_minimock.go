@@ -10,101 +10,101 @@ import (
 	"github.com/gojuno/minimock/v3"
 )
 
-// DbOperationRepoMock implements DBOperationRepo
-type DbOperationRepoMock struct {
+// DBOperationRepoMock implements DBOperationRepo
+type DBOperationRepoMock struct {
 	t minimock.Tester
 
 	funcAllTableNames          func() (sa1 []string, err error)
 	inspectFuncAllTableNames   func()
 	afterAllTableNamesCounter  uint64
 	beforeAllTableNamesCounter uint64
-	AllTableNamesMock          mDbOperationRepoMockAllTableNames
+	AllTableNamesMock          mDBOperationRepoMockAllTableNames
 
 	funcDropForeignKey          func(tableName string, fkName string) (err error)
 	inspectFuncDropForeignKey   func(tableName string, fkName string)
 	afterDropForeignKeyCounter  uint64
 	beforeDropForeignKeyCounter uint64
-	DropForeignKeyMock          mDbOperationRepoMockDropForeignKey
+	DropForeignKeyMock          mDBOperationRepoMockDropForeignKey
 
 	funcDropTable          func(tableName string) (err error)
 	inspectFuncDropTable   func(tableName string)
 	afterDropTableCounter  uint64
 	beforeDropTableCounter uint64
-	DropTableMock          mDbOperationRepoMockDropTable
+	DropTableMock          mDBOperationRepoMockDropTable
 
 	funcGetForeignKeys          func(tableName string) (f1 ForeignKeys, err error)
 	inspectFuncGetForeignKeys   func(tableName string)
 	afterGetForeignKeysCounter  uint64
 	beforeGetForeignKeysCounter uint64
-	GetForeignKeysMock          mDbOperationRepoMockGetForeignKeys
+	GetForeignKeysMock          mDBOperationRepoMockGetForeignKeys
 
 	funcTruncateDatabase          func() (err error)
 	inspectFuncTruncateDatabase   func()
 	afterTruncateDatabaseCounter  uint64
 	beforeTruncateDatabaseCounter uint64
-	TruncateDatabaseMock          mDbOperationRepoMockTruncateDatabase
+	TruncateDatabaseMock          mDBOperationRepoMockTruncateDatabase
 }
 
-// NewDbOperationRepoMock returns a mock for DBOperationRepo
-func NewDbOperationRepoMock(t minimock.Tester) *DbOperationRepoMock {
-	m := &DbOperationRepoMock{t: t}
+// NewDBOperationRepoMock returns a mock for DBOperationRepo
+func NewDBOperationRepoMock(t minimock.Tester) *DBOperationRepoMock {
+	m := &DBOperationRepoMock{t: t}
 	if controller, ok := t.(minimock.MockController); ok {
 		controller.RegisterMocker(m)
 	}
 
-	m.AllTableNamesMock = mDbOperationRepoMockAllTableNames{mock: m}
+	m.AllTableNamesMock = mDBOperationRepoMockAllTableNames{mock: m}
 
-	m.DropForeignKeyMock = mDbOperationRepoMockDropForeignKey{mock: m}
-	m.DropForeignKeyMock.callArgs = []*DbOperationRepoMockDropForeignKeyParams{}
+	m.DropForeignKeyMock = mDBOperationRepoMockDropForeignKey{mock: m}
+	m.DropForeignKeyMock.callArgs = []*DBOperationRepoMockDropForeignKeyParams{}
 
-	m.DropTableMock = mDbOperationRepoMockDropTable{mock: m}
-	m.DropTableMock.callArgs = []*DbOperationRepoMockDropTableParams{}
+	m.DropTableMock = mDBOperationRepoMockDropTable{mock: m}
+	m.DropTableMock.callArgs = []*DBOperationRepoMockDropTableParams{}
 
-	m.GetForeignKeysMock = mDbOperationRepoMockGetForeignKeys{mock: m}
-	m.GetForeignKeysMock.callArgs = []*DbOperationRepoMockGetForeignKeysParams{}
+	m.GetForeignKeysMock = mDBOperationRepoMockGetForeignKeys{mock: m}
+	m.GetForeignKeysMock.callArgs = []*DBOperationRepoMockGetForeignKeysParams{}
 
-	m.TruncateDatabaseMock = mDbOperationRepoMockTruncateDatabase{mock: m}
+	m.TruncateDatabaseMock = mDBOperationRepoMockTruncateDatabase{mock: m}
 
 	return m
 }
 
-type mDbOperationRepoMockAllTableNames struct {
-	mock               *DbOperationRepoMock
-	defaultExpectation *DbOperationRepoMockAllTableNamesExpectation
-	expectations       []*DbOperationRepoMockAllTableNamesExpectation
+type mDBOperationRepoMockAllTableNames struct {
+	mock               *DBOperationRepoMock
+	defaultExpectation *DBOperationRepoMockAllTableNamesExpectation
+	expectations       []*DBOperationRepoMockAllTableNamesExpectation
 }
 
-// DbOperationRepoMockAllTableNamesExpectation specifies expectation struct of the DBOperationRepo.AllTableNames
-type DbOperationRepoMockAllTableNamesExpectation struct {
-	mock *DbOperationRepoMock
+// DBOperationRepoMockAllTableNamesExpectation specifies expectation struct of the DBOperationRepo.AllTableNames
+type DBOperationRepoMockAllTableNamesExpectation struct {
+	mock *DBOperationRepoMock
 
-	results *DbOperationRepoMockAllTableNamesResults
+	results *DBOperationRepoMockAllTableNamesResults
 	Counter uint64
 }
 
-// DbOperationRepoMockAllTableNamesResults contains results of the DBOperationRepo.AllTableNames
-type DbOperationRepoMockAllTableNamesResults struct {
+// DBOperationRepoMockAllTableNamesResults contains results of the DBOperationRepo.AllTableNames
+type DBOperationRepoMockAllTableNamesResults struct {
 	sa1 []string
 	err error
 }
 
 // Expect sets up expected params for DBOperationRepo.AllTableNames
-func (mmAllTableNames *mDbOperationRepoMockAllTableNames) Expect() *mDbOperationRepoMockAllTableNames {
+func (mmAllTableNames *mDBOperationRepoMockAllTableNames) Expect() *mDBOperationRepoMockAllTableNames {
 	if mmAllTableNames.mock.funcAllTableNames != nil {
-		mmAllTableNames.mock.t.Fatalf("DbOperationRepoMock.AllTableNames mock is already set by Set")
+		mmAllTableNames.mock.t.Fatalf("DBOperationRepoMock.AllTableNames mock is already set by Set")
 	}
 
 	if mmAllTableNames.defaultExpectation == nil {
-		mmAllTableNames.defaultExpectation = &DbOperationRepoMockAllTableNamesExpectation{}
+		mmAllTableNames.defaultExpectation = &DBOperationRepoMockAllTableNamesExpectation{}
 	}
 
 	return mmAllTableNames
 }
 
 // Inspect accepts an inspector function that has same arguments as the DBOperationRepo.AllTableNames
-func (mmAllTableNames *mDbOperationRepoMockAllTableNames) Inspect(f func()) *mDbOperationRepoMockAllTableNames {
+func (mmAllTableNames *mDBOperationRepoMockAllTableNames) Inspect(f func()) *mDBOperationRepoMockAllTableNames {
 	if mmAllTableNames.mock.inspectFuncAllTableNames != nil {
-		mmAllTableNames.mock.t.Fatalf("Inspect function is already set for DbOperationRepoMock.AllTableNames")
+		mmAllTableNames.mock.t.Fatalf("Inspect function is already set for DBOperationRepoMock.AllTableNames")
 	}
 
 	mmAllTableNames.mock.inspectFuncAllTableNames = f
@@ -113,20 +113,20 @@ func (mmAllTableNames *mDbOperationRepoMockAllTableNames) Inspect(f func()) *mDb
 }
 
 // Return sets up results that will be returned by DBOperationRepo.AllTableNames
-func (mmAllTableNames *mDbOperationRepoMockAllTableNames) Return(sa1 []string, err error) *DbOperationRepoMock {
+func (mmAllTableNames *mDBOperationRepoMockAllTableNames) Return(sa1 []string, err error) *DBOperationRepoMock {
 	if mmAllTableNames.mock.funcAllTableNames != nil {
-		mmAllTableNames.mock.t.Fatalf("DbOperationRepoMock.AllTableNames mock is already set by Set")
+		mmAllTableNames.mock.t.Fatalf("DBOperationRepoMock.AllTableNames mock is already set by Set")
 	}
 
 	if mmAllTableNames.defaultExpectation == nil {
-		mmAllTableNames.defaultExpectation = &DbOperationRepoMockAllTableNamesExpectation{mock: mmAllTableNames.mock}
+		mmAllTableNames.defaultExpectation = &DBOperationRepoMockAllTableNamesExpectation{mock: mmAllTableNames.mock}
 	}
-	mmAllTableNames.defaultExpectation.results = &DbOperationRepoMockAllTableNamesResults{sa1, err}
+	mmAllTableNames.defaultExpectation.results = &DBOperationRepoMockAllTableNamesResults{sa1, err}
 	return mmAllTableNames.mock
 }
 
-// Set uses given function f to mock the DBOperationRepo.AllTableNames method
-func (mmAllTableNames *mDbOperationRepoMockAllTableNames) Set(f func() (sa1 []string, err error)) *DbOperationRepoMock {
+//Set uses given function f to mock the DBOperationRepo.AllTableNames method
+func (mmAllTableNames *mDBOperationRepoMockAllTableNames) Set(f func() (sa1 []string, err error)) *DBOperationRepoMock {
 	if mmAllTableNames.defaultExpectation != nil {
 		mmAllTableNames.mock.t.Fatalf("Default expectation is already set for the DBOperationRepo.AllTableNames method")
 	}
@@ -140,7 +140,7 @@ func (mmAllTableNames *mDbOperationRepoMockAllTableNames) Set(f func() (sa1 []st
 }
 
 // AllTableNames implements DBOperationRepo
-func (mmAllTableNames *DbOperationRepoMock) AllTableNames() (sa1 []string, err error) {
+func (mmAllTableNames *DBOperationRepoMock) AllTableNames() (sa1 []string, err error) {
 	mm_atomic.AddUint64(&mmAllTableNames.beforeAllTableNamesCounter, 1)
 	defer mm_atomic.AddUint64(&mmAllTableNames.afterAllTableNamesCounter, 1)
 
@@ -153,30 +153,30 @@ func (mmAllTableNames *DbOperationRepoMock) AllTableNames() (sa1 []string, err e
 
 		mm_results := mmAllTableNames.AllTableNamesMock.defaultExpectation.results
 		if mm_results == nil {
-			mmAllTableNames.t.Fatal("No results are set for the DbOperationRepoMock.AllTableNames")
+			mmAllTableNames.t.Fatal("No results are set for the DBOperationRepoMock.AllTableNames")
 		}
 		return (*mm_results).sa1, (*mm_results).err
 	}
 	if mmAllTableNames.funcAllTableNames != nil {
 		return mmAllTableNames.funcAllTableNames()
 	}
-	mmAllTableNames.t.Fatalf("Unexpected call to DbOperationRepoMock.AllTableNames.")
+	mmAllTableNames.t.Fatalf("Unexpected call to DBOperationRepoMock.AllTableNames.")
 	return
 }
 
-// AllTableNamesAfterCounter returns a count of finished DbOperationRepoMock.AllTableNames invocations
-func (mmAllTableNames *DbOperationRepoMock) AllTableNamesAfterCounter() uint64 {
+// AllTableNamesAfterCounter returns a count of finished DBOperationRepoMock.AllTableNames invocations
+func (mmAllTableNames *DBOperationRepoMock) AllTableNamesAfterCounter() uint64 {
 	return mm_atomic.LoadUint64(&mmAllTableNames.afterAllTableNamesCounter)
 }
 
-// AllTableNamesBeforeCounter returns a count of DbOperationRepoMock.AllTableNames invocations
-func (mmAllTableNames *DbOperationRepoMock) AllTableNamesBeforeCounter() uint64 {
+// AllTableNamesBeforeCounter returns a count of DBOperationRepoMock.AllTableNames invocations
+func (mmAllTableNames *DBOperationRepoMock) AllTableNamesBeforeCounter() uint64 {
 	return mm_atomic.LoadUint64(&mmAllTableNames.beforeAllTableNamesCounter)
 }
 
 // MinimockAllTableNamesDone returns true if the count of the AllTableNames invocations corresponds
 // the number of defined expectations
-func (m *DbOperationRepoMock) MinimockAllTableNamesDone() bool {
+func (m *DBOperationRepoMock) MinimockAllTableNamesDone() bool {
 	for _, e := range m.AllTableNamesMock.expectations {
 		if mm_atomic.LoadUint64(&e.Counter) < 1 {
 			return false
@@ -195,62 +195,62 @@ func (m *DbOperationRepoMock) MinimockAllTableNamesDone() bool {
 }
 
 // MinimockAllTableNamesInspect logs each unmet expectation
-func (m *DbOperationRepoMock) MinimockAllTableNamesInspect() {
+func (m *DBOperationRepoMock) MinimockAllTableNamesInspect() {
 	for _, e := range m.AllTableNamesMock.expectations {
 		if mm_atomic.LoadUint64(&e.Counter) < 1 {
-			m.t.Error("Expected call to DbOperationRepoMock.AllTableNames")
+			m.t.Error("Expected call to DBOperationRepoMock.AllTableNames")
 		}
 	}
 
 	// if default expectation was set then invocations count should be greater than zero
 	if m.AllTableNamesMock.defaultExpectation != nil && mm_atomic.LoadUint64(&m.afterAllTableNamesCounter) < 1 {
-		m.t.Error("Expected call to DbOperationRepoMock.AllTableNames")
+		m.t.Error("Expected call to DBOperationRepoMock.AllTableNames")
 	}
 	// if func was set then invocations count should be greater than zero
 	if m.funcAllTableNames != nil && mm_atomic.LoadUint64(&m.afterAllTableNamesCounter) < 1 {
-		m.t.Error("Expected call to DbOperationRepoMock.AllTableNames")
+		m.t.Error("Expected call to DBOperationRepoMock.AllTableNames")
 	}
 }
 
-type mDbOperationRepoMockDropForeignKey struct {
-	mock               *DbOperationRepoMock
-	defaultExpectation *DbOperationRepoMockDropForeignKeyExpectation
-	expectations       []*DbOperationRepoMockDropForeignKeyExpectation
+type mDBOperationRepoMockDropForeignKey struct {
+	mock               *DBOperationRepoMock
+	defaultExpectation *DBOperationRepoMockDropForeignKeyExpectation
+	expectations       []*DBOperationRepoMockDropForeignKeyExpectation
 
-	callArgs []*DbOperationRepoMockDropForeignKeyParams
+	callArgs []*DBOperationRepoMockDropForeignKeyParams
 	mutex    sync.RWMutex
 }
 
-// DbOperationRepoMockDropForeignKeyExpectation specifies expectation struct of the DBOperationRepo.DropForeignKey
-type DbOperationRepoMockDropForeignKeyExpectation struct {
-	mock    *DbOperationRepoMock
-	params  *DbOperationRepoMockDropForeignKeyParams
-	results *DbOperationRepoMockDropForeignKeyResults
+// DBOperationRepoMockDropForeignKeyExpectation specifies expectation struct of the DBOperationRepo.DropForeignKey
+type DBOperationRepoMockDropForeignKeyExpectation struct {
+	mock    *DBOperationRepoMock
+	params  *DBOperationRepoMockDropForeignKeyParams
+	results *DBOperationRepoMockDropForeignKeyResults
 	Counter uint64
 }
 
-// DbOperationRepoMockDropForeignKeyParams contains parameters of the DBOperationRepo.DropForeignKey
-type DbOperationRepoMockDropForeignKeyParams struct {
+// DBOperationRepoMockDropForeignKeyParams contains parameters of the DBOperationRepo.DropForeignKey
+type DBOperationRepoMockDropForeignKeyParams struct {
 	tableName string
 	fkName    string
 }
 
-// DbOperationRepoMockDropForeignKeyResults contains results of the DBOperationRepo.DropForeignKey
-type DbOperationRepoMockDropForeignKeyResults struct {
+// DBOperationRepoMockDropForeignKeyResults contains results of the DBOperationRepo.DropForeignKey
+type DBOperationRepoMockDropForeignKeyResults struct {
 	err error
 }
 
 // Expect sets up expected params for DBOperationRepo.DropForeignKey
-func (mmDropForeignKey *mDbOperationRepoMockDropForeignKey) Expect(tableName string, fkName string) *mDbOperationRepoMockDropForeignKey {
+func (mmDropForeignKey *mDBOperationRepoMockDropForeignKey) Expect(tableName string, fkName string) *mDBOperationRepoMockDropForeignKey {
 	if mmDropForeignKey.mock.funcDropForeignKey != nil {
-		mmDropForeignKey.mock.t.Fatalf("DbOperationRepoMock.DropForeignKey mock is already set by Set")
+		mmDropForeignKey.mock.t.Fatalf("DBOperationRepoMock.DropForeignKey mock is already set by Set")
 	}
 
 	if mmDropForeignKey.defaultExpectation == nil {
-		mmDropForeignKey.defaultExpectation = &DbOperationRepoMockDropForeignKeyExpectation{}
+		mmDropForeignKey.defaultExpectation = &DBOperationRepoMockDropForeignKeyExpectation{}
 	}
 
-	mmDropForeignKey.defaultExpectation.params = &DbOperationRepoMockDropForeignKeyParams{tableName, fkName}
+	mmDropForeignKey.defaultExpectation.params = &DBOperationRepoMockDropForeignKeyParams{tableName, fkName}
 	for _, e := range mmDropForeignKey.expectations {
 		if minimock.Equal(e.params, mmDropForeignKey.defaultExpectation.params) {
 			mmDropForeignKey.mock.t.Fatalf("Expectation set by When has same params: %#v", *mmDropForeignKey.defaultExpectation.params)
@@ -261,9 +261,9 @@ func (mmDropForeignKey *mDbOperationRepoMockDropForeignKey) Expect(tableName str
 }
 
 // Inspect accepts an inspector function that has same arguments as the DBOperationRepo.DropForeignKey
-func (mmDropForeignKey *mDbOperationRepoMockDropForeignKey) Inspect(f func(tableName string, fkName string)) *mDbOperationRepoMockDropForeignKey {
+func (mmDropForeignKey *mDBOperationRepoMockDropForeignKey) Inspect(f func(tableName string, fkName string)) *mDBOperationRepoMockDropForeignKey {
 	if mmDropForeignKey.mock.inspectFuncDropForeignKey != nil {
-		mmDropForeignKey.mock.t.Fatalf("Inspect function is already set for DbOperationRepoMock.DropForeignKey")
+		mmDropForeignKey.mock.t.Fatalf("Inspect function is already set for DBOperationRepoMock.DropForeignKey")
 	}
 
 	mmDropForeignKey.mock.inspectFuncDropForeignKey = f
@@ -272,20 +272,20 @@ func (mmDropForeignKey *mDbOperationRepoMockDropForeignKey) Inspect(f func(table
 }
 
 // Return sets up results that will be returned by DBOperationRepo.DropForeignKey
-func (mmDropForeignKey *mDbOperationRepoMockDropForeignKey) Return(err error) *DbOperationRepoMock {
+func (mmDropForeignKey *mDBOperationRepoMockDropForeignKey) Return(err error) *DBOperationRepoMock {
 	if mmDropForeignKey.mock.funcDropForeignKey != nil {
-		mmDropForeignKey.mock.t.Fatalf("DbOperationRepoMock.DropForeignKey mock is already set by Set")
+		mmDropForeignKey.mock.t.Fatalf("DBOperationRepoMock.DropForeignKey mock is already set by Set")
 	}
 
 	if mmDropForeignKey.defaultExpectation == nil {
-		mmDropForeignKey.defaultExpectation = &DbOperationRepoMockDropForeignKeyExpectation{mock: mmDropForeignKey.mock}
+		mmDropForeignKey.defaultExpectation = &DBOperationRepoMockDropForeignKeyExpectation{mock: mmDropForeignKey.mock}
 	}
-	mmDropForeignKey.defaultExpectation.results = &DbOperationRepoMockDropForeignKeyResults{err}
+	mmDropForeignKey.defaultExpectation.results = &DBOperationRepoMockDropForeignKeyResults{err}
 	return mmDropForeignKey.mock
 }
 
-// Set uses given function f to mock the DBOperationRepo.DropForeignKey method
-func (mmDropForeignKey *mDbOperationRepoMockDropForeignKey) Set(f func(tableName string, fkName string) (err error)) *DbOperationRepoMock {
+//Set uses given function f to mock the DBOperationRepo.DropForeignKey method
+func (mmDropForeignKey *mDBOperationRepoMockDropForeignKey) Set(f func(tableName string, fkName string) (err error)) *DBOperationRepoMock {
 	if mmDropForeignKey.defaultExpectation != nil {
 		mmDropForeignKey.mock.t.Fatalf("Default expectation is already set for the DBOperationRepo.DropForeignKey method")
 	}
@@ -300,27 +300,27 @@ func (mmDropForeignKey *mDbOperationRepoMockDropForeignKey) Set(f func(tableName
 
 // When sets expectation for the DBOperationRepo.DropForeignKey which will trigger the result defined by the following
 // Then helper
-func (mmDropForeignKey *mDbOperationRepoMockDropForeignKey) When(tableName string, fkName string) *DbOperationRepoMockDropForeignKeyExpectation {
+func (mmDropForeignKey *mDBOperationRepoMockDropForeignKey) When(tableName string, fkName string) *DBOperationRepoMockDropForeignKeyExpectation {
 	if mmDropForeignKey.mock.funcDropForeignKey != nil {
-		mmDropForeignKey.mock.t.Fatalf("DbOperationRepoMock.DropForeignKey mock is already set by Set")
+		mmDropForeignKey.mock.t.Fatalf("DBOperationRepoMock.DropForeignKey mock is already set by Set")
 	}
 
-	expectation := &DbOperationRepoMockDropForeignKeyExpectation{
+	expectation := &DBOperationRepoMockDropForeignKeyExpectation{
 		mock:   mmDropForeignKey.mock,
-		params: &DbOperationRepoMockDropForeignKeyParams{tableName, fkName},
+		params: &DBOperationRepoMockDropForeignKeyParams{tableName, fkName},
 	}
 	mmDropForeignKey.expectations = append(mmDropForeignKey.expectations, expectation)
 	return expectation
 }
 
 // Then sets up DBOperationRepo.DropForeignKey return parameters for the expectation previously defined by the When method
-func (e *DbOperationRepoMockDropForeignKeyExpectation) Then(err error) *DbOperationRepoMock {
-	e.results = &DbOperationRepoMockDropForeignKeyResults{err}
+func (e *DBOperationRepoMockDropForeignKeyExpectation) Then(err error) *DBOperationRepoMock {
+	e.results = &DBOperationRepoMockDropForeignKeyResults{err}
 	return e.mock
 }
 
 // DropForeignKey implements DBOperationRepo
-func (mmDropForeignKey *DbOperationRepoMock) DropForeignKey(tableName string, fkName string) (err error) {
+func (mmDropForeignKey *DBOperationRepoMock) DropForeignKey(tableName string, fkName string) (err error) {
 	mm_atomic.AddUint64(&mmDropForeignKey.beforeDropForeignKeyCounter, 1)
 	defer mm_atomic.AddUint64(&mmDropForeignKey.afterDropForeignKeyCounter, 1)
 
@@ -328,7 +328,7 @@ func (mmDropForeignKey *DbOperationRepoMock) DropForeignKey(tableName string, fk
 		mmDropForeignKey.inspectFuncDropForeignKey(tableName, fkName)
 	}
 
-	mm_params := &DbOperationRepoMockDropForeignKeyParams{tableName, fkName}
+	mm_params := &DBOperationRepoMockDropForeignKeyParams{tableName, fkName}
 
 	// Record call args
 	mmDropForeignKey.DropForeignKeyMock.mutex.Lock()
@@ -345,40 +345,40 @@ func (mmDropForeignKey *DbOperationRepoMock) DropForeignKey(tableName string, fk
 	if mmDropForeignKey.DropForeignKeyMock.defaultExpectation != nil {
 		mm_atomic.AddUint64(&mmDropForeignKey.DropForeignKeyMock.defaultExpectation.Counter, 1)
 		mm_want := mmDropForeignKey.DropForeignKeyMock.defaultExpectation.params
-		mm_got := DbOperationRepoMockDropForeignKeyParams{tableName, fkName}
+		mm_got := DBOperationRepoMockDropForeignKeyParams{tableName, fkName}
 		if mm_want != nil && !minimock.Equal(*mm_want, mm_got) {
-			mmDropForeignKey.t.Errorf("DbOperationRepoMock.DropForeignKey got unexpected parameters, want: %#v, got: %#v%s\n", *mm_want, mm_got, minimock.Diff(*mm_want, mm_got))
+			mmDropForeignKey.t.Errorf("DBOperationRepoMock.DropForeignKey got unexpected parameters, want: %#v, got: %#v%s\n", *mm_want, mm_got, minimock.Diff(*mm_want, mm_got))
 		}
 
 		mm_results := mmDropForeignKey.DropForeignKeyMock.defaultExpectation.results
 		if mm_results == nil {
-			mmDropForeignKey.t.Fatal("No results are set for the DbOperationRepoMock.DropForeignKey")
+			mmDropForeignKey.t.Fatal("No results are set for the DBOperationRepoMock.DropForeignKey")
 		}
 		return (*mm_results).err
 	}
 	if mmDropForeignKey.funcDropForeignKey != nil {
 		return mmDropForeignKey.funcDropForeignKey(tableName, fkName)
 	}
-	mmDropForeignKey.t.Fatalf("Unexpected call to DbOperationRepoMock.DropForeignKey. %v %v", tableName, fkName)
+	mmDropForeignKey.t.Fatalf("Unexpected call to DBOperationRepoMock.DropForeignKey. %v %v", tableName, fkName)
 	return
 }
 
-// DropForeignKeyAfterCounter returns a count of finished DbOperationRepoMock.DropForeignKey invocations
-func (mmDropForeignKey *DbOperationRepoMock) DropForeignKeyAfterCounter() uint64 {
+// DropForeignKeyAfterCounter returns a count of finished DBOperationRepoMock.DropForeignKey invocations
+func (mmDropForeignKey *DBOperationRepoMock) DropForeignKeyAfterCounter() uint64 {
 	return mm_atomic.LoadUint64(&mmDropForeignKey.afterDropForeignKeyCounter)
 }
 
-// DropForeignKeyBeforeCounter returns a count of DbOperationRepoMock.DropForeignKey invocations
-func (mmDropForeignKey *DbOperationRepoMock) DropForeignKeyBeforeCounter() uint64 {
+// DropForeignKeyBeforeCounter returns a count of DBOperationRepoMock.DropForeignKey invocations
+func (mmDropForeignKey *DBOperationRepoMock) DropForeignKeyBeforeCounter() uint64 {
 	return mm_atomic.LoadUint64(&mmDropForeignKey.beforeDropForeignKeyCounter)
 }
 
-// Calls returns a list of arguments used in each call to DbOperationRepoMock.DropForeignKey.
+// Calls returns a list of arguments used in each call to DBOperationRepoMock.DropForeignKey.
 // The list is in the same order as the calls were made (i.e. recent calls have a higher index)
-func (mmDropForeignKey *mDbOperationRepoMockDropForeignKey) Calls() []*DbOperationRepoMockDropForeignKeyParams {
+func (mmDropForeignKey *mDBOperationRepoMockDropForeignKey) Calls() []*DBOperationRepoMockDropForeignKeyParams {
 	mmDropForeignKey.mutex.RLock()
 
-	argCopy := make([]*DbOperationRepoMockDropForeignKeyParams, len(mmDropForeignKey.callArgs))
+	argCopy := make([]*DBOperationRepoMockDropForeignKeyParams, len(mmDropForeignKey.callArgs))
 	copy(argCopy, mmDropForeignKey.callArgs)
 
 	mmDropForeignKey.mutex.RUnlock()
@@ -388,7 +388,7 @@ func (mmDropForeignKey *mDbOperationRepoMockDropForeignKey) Calls() []*DbOperati
 
 // MinimockDropForeignKeyDone returns true if the count of the DropForeignKey invocations corresponds
 // the number of defined expectations
-func (m *DbOperationRepoMock) MinimockDropForeignKeyDone() bool {
+func (m *DBOperationRepoMock) MinimockDropForeignKeyDone() bool {
 	for _, e := range m.DropForeignKeyMock.expectations {
 		if mm_atomic.LoadUint64(&e.Counter) < 1 {
 			return false
@@ -407,65 +407,65 @@ func (m *DbOperationRepoMock) MinimockDropForeignKeyDone() bool {
 }
 
 // MinimockDropForeignKeyInspect logs each unmet expectation
-func (m *DbOperationRepoMock) MinimockDropForeignKeyInspect() {
+func (m *DBOperationRepoMock) MinimockDropForeignKeyInspect() {
 	for _, e := range m.DropForeignKeyMock.expectations {
 		if mm_atomic.LoadUint64(&e.Counter) < 1 {
-			m.t.Errorf("Expected call to DbOperationRepoMock.DropForeignKey with params: %#v", *e.params)
+			m.t.Errorf("Expected call to DBOperationRepoMock.DropForeignKey with params: %#v", *e.params)
 		}
 	}
 
 	// if default expectation was set then invocations count should be greater than zero
 	if m.DropForeignKeyMock.defaultExpectation != nil && mm_atomic.LoadUint64(&m.afterDropForeignKeyCounter) < 1 {
 		if m.DropForeignKeyMock.defaultExpectation.params == nil {
-			m.t.Error("Expected call to DbOperationRepoMock.DropForeignKey")
+			m.t.Error("Expected call to DBOperationRepoMock.DropForeignKey")
 		} else {
-			m.t.Errorf("Expected call to DbOperationRepoMock.DropForeignKey with params: %#v", *m.DropForeignKeyMock.defaultExpectation.params)
+			m.t.Errorf("Expected call to DBOperationRepoMock.DropForeignKey with params: %#v", *m.DropForeignKeyMock.defaultExpectation.params)
 		}
 	}
 	// if func was set then invocations count should be greater than zero
 	if m.funcDropForeignKey != nil && mm_atomic.LoadUint64(&m.afterDropForeignKeyCounter) < 1 {
-		m.t.Error("Expected call to DbOperationRepoMock.DropForeignKey")
+		m.t.Error("Expected call to DBOperationRepoMock.DropForeignKey")
 	}
 }
 
-type mDbOperationRepoMockDropTable struct {
-	mock               *DbOperationRepoMock
-	defaultExpectation *DbOperationRepoMockDropTableExpectation
-	expectations       []*DbOperationRepoMockDropTableExpectation
+type mDBOperationRepoMockDropTable struct {
+	mock               *DBOperationRepoMock
+	defaultExpectation *DBOperationRepoMockDropTableExpectation
+	expectations       []*DBOperationRepoMockDropTableExpectation
 
-	callArgs []*DbOperationRepoMockDropTableParams
+	callArgs []*DBOperationRepoMockDropTableParams
 	mutex    sync.RWMutex
 }
 
-// DbOperationRepoMockDropTableExpectation specifies expectation struct of the DBOperationRepo.DropTable
-type DbOperationRepoMockDropTableExpectation struct {
-	mock    *DbOperationRepoMock
-	params  *DbOperationRepoMockDropTableParams
-	results *DbOperationRepoMockDropTableResults
+// DBOperationRepoMockDropTableExpectation specifies expectation struct of the DBOperationRepo.DropTable
+type DBOperationRepoMockDropTableExpectation struct {
+	mock    *DBOperationRepoMock
+	params  *DBOperationRepoMockDropTableParams
+	results *DBOperationRepoMockDropTableResults
 	Counter uint64
 }
 
-// DbOperationRepoMockDropTableParams contains parameters of the DBOperationRepo.DropTable
-type DbOperationRepoMockDropTableParams struct {
+// DBOperationRepoMockDropTableParams contains parameters of the DBOperationRepo.DropTable
+type DBOperationRepoMockDropTableParams struct {
 	tableName string
 }
 
-// DbOperationRepoMockDropTableResults contains results of the DBOperationRepo.DropTable
-type DbOperationRepoMockDropTableResults struct {
+// DBOperationRepoMockDropTableResults contains results of the DBOperationRepo.DropTable
+type DBOperationRepoMockDropTableResults struct {
 	err error
 }
 
 // Expect sets up expected params for DBOperationRepo.DropTable
-func (mmDropTable *mDbOperationRepoMockDropTable) Expect(tableName string) *mDbOperationRepoMockDropTable {
+func (mmDropTable *mDBOperationRepoMockDropTable) Expect(tableName string) *mDBOperationRepoMockDropTable {
 	if mmDropTable.mock.funcDropTable != nil {
-		mmDropTable.mock.t.Fatalf("DbOperationRepoMock.DropTable mock is already set by Set")
+		mmDropTable.mock.t.Fatalf("DBOperationRepoMock.DropTable mock is already set by Set")
 	}
 
 	if mmDropTable.defaultExpectation == nil {
-		mmDropTable.defaultExpectation = &DbOperationRepoMockDropTableExpectation{}
+		mmDropTable.defaultExpectation = &DBOperationRepoMockDropTableExpectation{}
 	}
 
-	mmDropTable.defaultExpectation.params = &DbOperationRepoMockDropTableParams{tableName}
+	mmDropTable.defaultExpectation.params = &DBOperationRepoMockDropTableParams{tableName}
 	for _, e := range mmDropTable.expectations {
 		if minimock.Equal(e.params, mmDropTable.defaultExpectation.params) {
 			mmDropTable.mock.t.Fatalf("Expectation set by When has same params: %#v", *mmDropTable.defaultExpectation.params)
@@ -476,9 +476,9 @@ func (mmDropTable *mDbOperationRepoMockDropTable) Expect(tableName string) *mDbO
 }
 
 // Inspect accepts an inspector function that has same arguments as the DBOperationRepo.DropTable
-func (mmDropTable *mDbOperationRepoMockDropTable) Inspect(f func(tableName string)) *mDbOperationRepoMockDropTable {
+func (mmDropTable *mDBOperationRepoMockDropTable) Inspect(f func(tableName string)) *mDBOperationRepoMockDropTable {
 	if mmDropTable.mock.inspectFuncDropTable != nil {
-		mmDropTable.mock.t.Fatalf("Inspect function is already set for DbOperationRepoMock.DropTable")
+		mmDropTable.mock.t.Fatalf("Inspect function is already set for DBOperationRepoMock.DropTable")
 	}
 
 	mmDropTable.mock.inspectFuncDropTable = f
@@ -487,20 +487,20 @@ func (mmDropTable *mDbOperationRepoMockDropTable) Inspect(f func(tableName strin
 }
 
 // Return sets up results that will be returned by DBOperationRepo.DropTable
-func (mmDropTable *mDbOperationRepoMockDropTable) Return(err error) *DbOperationRepoMock {
+func (mmDropTable *mDBOperationRepoMockDropTable) Return(err error) *DBOperationRepoMock {
 	if mmDropTable.mock.funcDropTable != nil {
-		mmDropTable.mock.t.Fatalf("DbOperationRepoMock.DropTable mock is already set by Set")
+		mmDropTable.mock.t.Fatalf("DBOperationRepoMock.DropTable mock is already set by Set")
 	}
 
 	if mmDropTable.defaultExpectation == nil {
-		mmDropTable.defaultExpectation = &DbOperationRepoMockDropTableExpectation{mock: mmDropTable.mock}
+		mmDropTable.defaultExpectation = &DBOperationRepoMockDropTableExpectation{mock: mmDropTable.mock}
 	}
-	mmDropTable.defaultExpectation.results = &DbOperationRepoMockDropTableResults{err}
+	mmDropTable.defaultExpectation.results = &DBOperationRepoMockDropTableResults{err}
 	return mmDropTable.mock
 }
 
-// Set uses given function f to mock the DBOperationRepo.DropTable method
-func (mmDropTable *mDbOperationRepoMockDropTable) Set(f func(tableName string) (err error)) *DbOperationRepoMock {
+//Set uses given function f to mock the DBOperationRepo.DropTable method
+func (mmDropTable *mDBOperationRepoMockDropTable) Set(f func(tableName string) (err error)) *DBOperationRepoMock {
 	if mmDropTable.defaultExpectation != nil {
 		mmDropTable.mock.t.Fatalf("Default expectation is already set for the DBOperationRepo.DropTable method")
 	}
@@ -515,27 +515,27 @@ func (mmDropTable *mDbOperationRepoMockDropTable) Set(f func(tableName string) (
 
 // When sets expectation for the DBOperationRepo.DropTable which will trigger the result defined by the following
 // Then helper
-func (mmDropTable *mDbOperationRepoMockDropTable) When(tableName string) *DbOperationRepoMockDropTableExpectation {
+func (mmDropTable *mDBOperationRepoMockDropTable) When(tableName string) *DBOperationRepoMockDropTableExpectation {
 	if mmDropTable.mock.funcDropTable != nil {
-		mmDropTable.mock.t.Fatalf("DbOperationRepoMock.DropTable mock is already set by Set")
+		mmDropTable.mock.t.Fatalf("DBOperationRepoMock.DropTable mock is already set by Set")
 	}
 
-	expectation := &DbOperationRepoMockDropTableExpectation{
+	expectation := &DBOperationRepoMockDropTableExpectation{
 		mock:   mmDropTable.mock,
-		params: &DbOperationRepoMockDropTableParams{tableName},
+		params: &DBOperationRepoMockDropTableParams{tableName},
 	}
 	mmDropTable.expectations = append(mmDropTable.expectations, expectation)
 	return expectation
 }
 
 // Then sets up DBOperationRepo.DropTable return parameters for the expectation previously defined by the When method
-func (e *DbOperationRepoMockDropTableExpectation) Then(err error) *DbOperationRepoMock {
-	e.results = &DbOperationRepoMockDropTableResults{err}
+func (e *DBOperationRepoMockDropTableExpectation) Then(err error) *DBOperationRepoMock {
+	e.results = &DBOperationRepoMockDropTableResults{err}
 	return e.mock
 }
 
 // DropTable implements DBOperationRepo
-func (mmDropTable *DbOperationRepoMock) DropTable(tableName string) (err error) {
+func (mmDropTable *DBOperationRepoMock) DropTable(tableName string) (err error) {
 	mm_atomic.AddUint64(&mmDropTable.beforeDropTableCounter, 1)
 	defer mm_atomic.AddUint64(&mmDropTable.afterDropTableCounter, 1)
 
@@ -543,7 +543,7 @@ func (mmDropTable *DbOperationRepoMock) DropTable(tableName string) (err error) 
 		mmDropTable.inspectFuncDropTable(tableName)
 	}
 
-	mm_params := &DbOperationRepoMockDropTableParams{tableName}
+	mm_params := &DBOperationRepoMockDropTableParams{tableName}
 
 	// Record call args
 	mmDropTable.DropTableMock.mutex.Lock()
@@ -560,40 +560,40 @@ func (mmDropTable *DbOperationRepoMock) DropTable(tableName string) (err error) 
 	if mmDropTable.DropTableMock.defaultExpectation != nil {
 		mm_atomic.AddUint64(&mmDropTable.DropTableMock.defaultExpectation.Counter, 1)
 		mm_want := mmDropTable.DropTableMock.defaultExpectation.params
-		mm_got := DbOperationRepoMockDropTableParams{tableName}
+		mm_got := DBOperationRepoMockDropTableParams{tableName}
 		if mm_want != nil && !minimock.Equal(*mm_want, mm_got) {
-			mmDropTable.t.Errorf("DbOperationRepoMock.DropTable got unexpected parameters, want: %#v, got: %#v%s\n", *mm_want, mm_got, minimock.Diff(*mm_want, mm_got))
+			mmDropTable.t.Errorf("DBOperationRepoMock.DropTable got unexpected parameters, want: %#v, got: %#v%s\n", *mm_want, mm_got, minimock.Diff(*mm_want, mm_got))
 		}
 
 		mm_results := mmDropTable.DropTableMock.defaultExpectation.results
 		if mm_results == nil {
-			mmDropTable.t.Fatal("No results are set for the DbOperationRepoMock.DropTable")
+			mmDropTable.t.Fatal("No results are set for the DBOperationRepoMock.DropTable")
 		}
 		return (*mm_results).err
 	}
 	if mmDropTable.funcDropTable != nil {
 		return mmDropTable.funcDropTable(tableName)
 	}
-	mmDropTable.t.Fatalf("Unexpected call to DbOperationRepoMock.DropTable. %v", tableName)
+	mmDropTable.t.Fatalf("Unexpected call to DBOperationRepoMock.DropTable. %v", tableName)
 	return
 }
 
-// DropTableAfterCounter returns a count of finished DbOperationRepoMock.DropTable invocations
-func (mmDropTable *DbOperationRepoMock) DropTableAfterCounter() uint64 {
+// DropTableAfterCounter returns a count of finished DBOperationRepoMock.DropTable invocations
+func (mmDropTable *DBOperationRepoMock) DropTableAfterCounter() uint64 {
 	return mm_atomic.LoadUint64(&mmDropTable.afterDropTableCounter)
 }
 
-// DropTableBeforeCounter returns a count of DbOperationRepoMock.DropTable invocations
-func (mmDropTable *DbOperationRepoMock) DropTableBeforeCounter() uint64 {
+// DropTableBeforeCounter returns a count of DBOperationRepoMock.DropTable invocations
+func (mmDropTable *DBOperationRepoMock) DropTableBeforeCounter() uint64 {
 	return mm_atomic.LoadUint64(&mmDropTable.beforeDropTableCounter)
 }
 
-// Calls returns a list of arguments used in each call to DbOperationRepoMock.DropTable.
+// Calls returns a list of arguments used in each call to DBOperationRepoMock.DropTable.
 // The list is in the same order as the calls were made (i.e. recent calls have a higher index)
-func (mmDropTable *mDbOperationRepoMockDropTable) Calls() []*DbOperationRepoMockDropTableParams {
+func (mmDropTable *mDBOperationRepoMockDropTable) Calls() []*DBOperationRepoMockDropTableParams {
 	mmDropTable.mutex.RLock()
 
-	argCopy := make([]*DbOperationRepoMockDropTableParams, len(mmDropTable.callArgs))
+	argCopy := make([]*DBOperationRepoMockDropTableParams, len(mmDropTable.callArgs))
 	copy(argCopy, mmDropTable.callArgs)
 
 	mmDropTable.mutex.RUnlock()
@@ -603,7 +603,7 @@ func (mmDropTable *mDbOperationRepoMockDropTable) Calls() []*DbOperationRepoMock
 
 // MinimockDropTableDone returns true if the count of the DropTable invocations corresponds
 // the number of defined expectations
-func (m *DbOperationRepoMock) MinimockDropTableDone() bool {
+func (m *DBOperationRepoMock) MinimockDropTableDone() bool {
 	for _, e := range m.DropTableMock.expectations {
 		if mm_atomic.LoadUint64(&e.Counter) < 1 {
 			return false
@@ -622,66 +622,66 @@ func (m *DbOperationRepoMock) MinimockDropTableDone() bool {
 }
 
 // MinimockDropTableInspect logs each unmet expectation
-func (m *DbOperationRepoMock) MinimockDropTableInspect() {
+func (m *DBOperationRepoMock) MinimockDropTableInspect() {
 	for _, e := range m.DropTableMock.expectations {
 		if mm_atomic.LoadUint64(&e.Counter) < 1 {
-			m.t.Errorf("Expected call to DbOperationRepoMock.DropTable with params: %#v", *e.params)
+			m.t.Errorf("Expected call to DBOperationRepoMock.DropTable with params: %#v", *e.params)
 		}
 	}
 
 	// if default expectation was set then invocations count should be greater than zero
 	if m.DropTableMock.defaultExpectation != nil && mm_atomic.LoadUint64(&m.afterDropTableCounter) < 1 {
 		if m.DropTableMock.defaultExpectation.params == nil {
-			m.t.Error("Expected call to DbOperationRepoMock.DropTable")
+			m.t.Error("Expected call to DBOperationRepoMock.DropTable")
 		} else {
-			m.t.Errorf("Expected call to DbOperationRepoMock.DropTable with params: %#v", *m.DropTableMock.defaultExpectation.params)
+			m.t.Errorf("Expected call to DBOperationRepoMock.DropTable with params: %#v", *m.DropTableMock.defaultExpectation.params)
 		}
 	}
 	// if func was set then invocations count should be greater than zero
 	if m.funcDropTable != nil && mm_atomic.LoadUint64(&m.afterDropTableCounter) < 1 {
-		m.t.Error("Expected call to DbOperationRepoMock.DropTable")
+		m.t.Error("Expected call to DBOperationRepoMock.DropTable")
 	}
 }
 
-type mDbOperationRepoMockGetForeignKeys struct {
-	mock               *DbOperationRepoMock
-	defaultExpectation *DbOperationRepoMockGetForeignKeysExpectation
-	expectations       []*DbOperationRepoMockGetForeignKeysExpectation
+type mDBOperationRepoMockGetForeignKeys struct {
+	mock               *DBOperationRepoMock
+	defaultExpectation *DBOperationRepoMockGetForeignKeysExpectation
+	expectations       []*DBOperationRepoMockGetForeignKeysExpectation
 
-	callArgs []*DbOperationRepoMockGetForeignKeysParams
+	callArgs []*DBOperationRepoMockGetForeignKeysParams
 	mutex    sync.RWMutex
 }
 
-// DbOperationRepoMockGetForeignKeysExpectation specifies expectation struct of the DBOperationRepo.GetForeignKeys
-type DbOperationRepoMockGetForeignKeysExpectation struct {
-	mock    *DbOperationRepoMock
-	params  *DbOperationRepoMockGetForeignKeysParams
-	results *DbOperationRepoMockGetForeignKeysResults
+// DBOperationRepoMockGetForeignKeysExpectation specifies expectation struct of the DBOperationRepo.GetForeignKeys
+type DBOperationRepoMockGetForeignKeysExpectation struct {
+	mock    *DBOperationRepoMock
+	params  *DBOperationRepoMockGetForeignKeysParams
+	results *DBOperationRepoMockGetForeignKeysResults
 	Counter uint64
 }
 
-// DbOperationRepoMockGetForeignKeysParams contains parameters of the DBOperationRepo.GetForeignKeys
-type DbOperationRepoMockGetForeignKeysParams struct {
+// DBOperationRepoMockGetForeignKeysParams contains parameters of the DBOperationRepo.GetForeignKeys
+type DBOperationRepoMockGetForeignKeysParams struct {
 	tableName string
 }
 
-// DbOperationRepoMockGetForeignKeysResults contains results of the DBOperationRepo.GetForeignKeys
-type DbOperationRepoMockGetForeignKeysResults struct {
+// DBOperationRepoMockGetForeignKeysResults contains results of the DBOperationRepo.GetForeignKeys
+type DBOperationRepoMockGetForeignKeysResults struct {
 	f1  ForeignKeys
 	err error
 }
 
 // Expect sets up expected params for DBOperationRepo.GetForeignKeys
-func (mmGetForeignKeys *mDbOperationRepoMockGetForeignKeys) Expect(tableName string) *mDbOperationRepoMockGetForeignKeys {
+func (mmGetForeignKeys *mDBOperationRepoMockGetForeignKeys) Expect(tableName string) *mDBOperationRepoMockGetForeignKeys {
 	if mmGetForeignKeys.mock.funcGetForeignKeys != nil {
-		mmGetForeignKeys.mock.t.Fatalf("DbOperationRepoMock.GetForeignKeys mock is already set by Set")
+		mmGetForeignKeys.mock.t.Fatalf("DBOperationRepoMock.GetForeignKeys mock is already set by Set")
 	}
 
 	if mmGetForeignKeys.defaultExpectation == nil {
-		mmGetForeignKeys.defaultExpectation = &DbOperationRepoMockGetForeignKeysExpectation{}
+		mmGetForeignKeys.defaultExpectation = &DBOperationRepoMockGetForeignKeysExpectation{}
 	}
 
-	mmGetForeignKeys.defaultExpectation.params = &DbOperationRepoMockGetForeignKeysParams{tableName}
+	mmGetForeignKeys.defaultExpectation.params = &DBOperationRepoMockGetForeignKeysParams{tableName}
 	for _, e := range mmGetForeignKeys.expectations {
 		if minimock.Equal(e.params, mmGetForeignKeys.defaultExpectation.params) {
 			mmGetForeignKeys.mock.t.Fatalf("Expectation set by When has same params: %#v", *mmGetForeignKeys.defaultExpectation.params)
@@ -692,9 +692,9 @@ func (mmGetForeignKeys *mDbOperationRepoMockGetForeignKeys) Expect(tableName str
 }
 
 // Inspect accepts an inspector function that has same arguments as the DBOperationRepo.GetForeignKeys
-func (mmGetForeignKeys *mDbOperationRepoMockGetForeignKeys) Inspect(f func(tableName string)) *mDbOperationRepoMockGetForeignKeys {
+func (mmGetForeignKeys *mDBOperationRepoMockGetForeignKeys) Inspect(f func(tableName string)) *mDBOperationRepoMockGetForeignKeys {
 	if mmGetForeignKeys.mock.inspectFuncGetForeignKeys != nil {
-		mmGetForeignKeys.mock.t.Fatalf("Inspect function is already set for DbOperationRepoMock.GetForeignKeys")
+		mmGetForeignKeys.mock.t.Fatalf("Inspect function is already set for DBOperationRepoMock.GetForeignKeys")
 	}
 
 	mmGetForeignKeys.mock.inspectFuncGetForeignKeys = f
@@ -703,20 +703,20 @@ func (mmGetForeignKeys *mDbOperationRepoMockGetForeignKeys) Inspect(f func(table
 }
 
 // Return sets up results that will be returned by DBOperationRepo.GetForeignKeys
-func (mmGetForeignKeys *mDbOperationRepoMockGetForeignKeys) Return(f1 ForeignKeys, err error) *DbOperationRepoMock {
+func (mmGetForeignKeys *mDBOperationRepoMockGetForeignKeys) Return(f1 ForeignKeys, err error) *DBOperationRepoMock {
 	if mmGetForeignKeys.mock.funcGetForeignKeys != nil {
-		mmGetForeignKeys.mock.t.Fatalf("DbOperationRepoMock.GetForeignKeys mock is already set by Set")
+		mmGetForeignKeys.mock.t.Fatalf("DBOperationRepoMock.GetForeignKeys mock is already set by Set")
 	}
 
 	if mmGetForeignKeys.defaultExpectation == nil {
-		mmGetForeignKeys.defaultExpectation = &DbOperationRepoMockGetForeignKeysExpectation{mock: mmGetForeignKeys.mock}
+		mmGetForeignKeys.defaultExpectation = &DBOperationRepoMockGetForeignKeysExpectation{mock: mmGetForeignKeys.mock}
 	}
-	mmGetForeignKeys.defaultExpectation.results = &DbOperationRepoMockGetForeignKeysResults{f1, err}
+	mmGetForeignKeys.defaultExpectation.results = &DBOperationRepoMockGetForeignKeysResults{f1, err}
 	return mmGetForeignKeys.mock
 }
 
-// Set uses given function f to mock the DBOperationRepo.GetForeignKeys method
-func (mmGetForeignKeys *mDbOperationRepoMockGetForeignKeys) Set(f func(tableName string) (f1 ForeignKeys, err error)) *DbOperationRepoMock {
+//Set uses given function f to mock the DBOperationRepo.GetForeignKeys method
+func (mmGetForeignKeys *mDBOperationRepoMockGetForeignKeys) Set(f func(tableName string) (f1 ForeignKeys, err error)) *DBOperationRepoMock {
 	if mmGetForeignKeys.defaultExpectation != nil {
 		mmGetForeignKeys.mock.t.Fatalf("Default expectation is already set for the DBOperationRepo.GetForeignKeys method")
 	}
@@ -731,27 +731,27 @@ func (mmGetForeignKeys *mDbOperationRepoMockGetForeignKeys) Set(f func(tableName
 
 // When sets expectation for the DBOperationRepo.GetForeignKeys which will trigger the result defined by the following
 // Then helper
-func (mmGetForeignKeys *mDbOperationRepoMockGetForeignKeys) When(tableName string) *DbOperationRepoMockGetForeignKeysExpectation {
+func (mmGetForeignKeys *mDBOperationRepoMockGetForeignKeys) When(tableName string) *DBOperationRepoMockGetForeignKeysExpectation {
 	if mmGetForeignKeys.mock.funcGetForeignKeys != nil {
-		mmGetForeignKeys.mock.t.Fatalf("DbOperationRepoMock.GetForeignKeys mock is already set by Set")
+		mmGetForeignKeys.mock.t.Fatalf("DBOperationRepoMock.GetForeignKeys mock is already set by Set")
 	}
 
-	expectation := &DbOperationRepoMockGetForeignKeysExpectation{
+	expectation := &DBOperationRepoMockGetForeignKeysExpectation{
 		mock:   mmGetForeignKeys.mock,
-		params: &DbOperationRepoMockGetForeignKeysParams{tableName},
+		params: &DBOperationRepoMockGetForeignKeysParams{tableName},
 	}
 	mmGetForeignKeys.expectations = append(mmGetForeignKeys.expectations, expectation)
 	return expectation
 }
 
 // Then sets up DBOperationRepo.GetForeignKeys return parameters for the expectation previously defined by the When method
-func (e *DbOperationRepoMockGetForeignKeysExpectation) Then(f1 ForeignKeys, err error) *DbOperationRepoMock {
-	e.results = &DbOperationRepoMockGetForeignKeysResults{f1, err}
+func (e *DBOperationRepoMockGetForeignKeysExpectation) Then(f1 ForeignKeys, err error) *DBOperationRepoMock {
+	e.results = &DBOperationRepoMockGetForeignKeysResults{f1, err}
 	return e.mock
 }
 
 // GetForeignKeys implements DBOperationRepo
-func (mmGetForeignKeys *DbOperationRepoMock) GetForeignKeys(tableName string) (f1 ForeignKeys, err error) {
+func (mmGetForeignKeys *DBOperationRepoMock) GetForeignKeys(tableName string) (f1 ForeignKeys, err error) {
 	mm_atomic.AddUint64(&mmGetForeignKeys.beforeGetForeignKeysCounter, 1)
 	defer mm_atomic.AddUint64(&mmGetForeignKeys.afterGetForeignKeysCounter, 1)
 
@@ -759,7 +759,7 @@ func (mmGetForeignKeys *DbOperationRepoMock) GetForeignKeys(tableName string) (f
 		mmGetForeignKeys.inspectFuncGetForeignKeys(tableName)
 	}
 
-	mm_params := &DbOperationRepoMockGetForeignKeysParams{tableName}
+	mm_params := &DBOperationRepoMockGetForeignKeysParams{tableName}
 
 	// Record call args
 	mmGetForeignKeys.GetForeignKeysMock.mutex.Lock()
@@ -776,40 +776,40 @@ func (mmGetForeignKeys *DbOperationRepoMock) GetForeignKeys(tableName string) (f
 	if mmGetForeignKeys.GetForeignKeysMock.defaultExpectation != nil {
 		mm_atomic.AddUint64(&mmGetForeignKeys.GetForeignKeysMock.defaultExpectation.Counter, 1)
 		mm_want := mmGetForeignKeys.GetForeignKeysMock.defaultExpectation.params
-		mm_got := DbOperationRepoMockGetForeignKeysParams{tableName}
+		mm_got := DBOperationRepoMockGetForeignKeysParams{tableName}
 		if mm_want != nil && !minimock.Equal(*mm_want, mm_got) {
-			mmGetForeignKeys.t.Errorf("DbOperationRepoMock.GetForeignKeys got unexpected parameters, want: %#v, got: %#v%s\n", *mm_want, mm_got, minimock.Diff(*mm_want, mm_got))
+			mmGetForeignKeys.t.Errorf("DBOperationRepoMock.GetForeignKeys got unexpected parameters, want: %#v, got: %#v%s\n", *mm_want, mm_got, minimock.Diff(*mm_want, mm_got))
 		}
 
 		mm_results := mmGetForeignKeys.GetForeignKeysMock.defaultExpectation.results
 		if mm_results == nil {
-			mmGetForeignKeys.t.Fatal("No results are set for the DbOperationRepoMock.GetForeignKeys")
+			mmGetForeignKeys.t.Fatal("No results are set for the DBOperationRepoMock.GetForeignKeys")
 		}
 		return (*mm_results).f1, (*mm_results).err
 	}
 	if mmGetForeignKeys.funcGetForeignKeys != nil {
 		return mmGetForeignKeys.funcGetForeignKeys(tableName)
 	}
-	mmGetForeignKeys.t.Fatalf("Unexpected call to DbOperationRepoMock.GetForeignKeys. %v", tableName)
+	mmGetForeignKeys.t.Fatalf("Unexpected call to DBOperationRepoMock.GetForeignKeys. %v", tableName)
 	return
 }
 
-// GetForeignKeysAfterCounter returns a count of finished DbOperationRepoMock.GetForeignKeys invocations
-func (mmGetForeignKeys *DbOperationRepoMock) GetForeignKeysAfterCounter() uint64 {
+// GetForeignKeysAfterCounter returns a count of finished DBOperationRepoMock.GetForeignKeys invocations
+func (mmGetForeignKeys *DBOperationRepoMock) GetForeignKeysAfterCounter() uint64 {
 	return mm_atomic.LoadUint64(&mmGetForeignKeys.afterGetForeignKeysCounter)
 }
 
-// GetForeignKeysBeforeCounter returns a count of DbOperationRepoMock.GetForeignKeys invocations
-func (mmGetForeignKeys *DbOperationRepoMock) GetForeignKeysBeforeCounter() uint64 {
+// GetForeignKeysBeforeCounter returns a count of DBOperationRepoMock.GetForeignKeys invocations
+func (mmGetForeignKeys *DBOperationRepoMock) GetForeignKeysBeforeCounter() uint64 {
 	return mm_atomic.LoadUint64(&mmGetForeignKeys.beforeGetForeignKeysCounter)
 }
 
-// Calls returns a list of arguments used in each call to DbOperationRepoMock.GetForeignKeys.
+// Calls returns a list of arguments used in each call to DBOperationRepoMock.GetForeignKeys.
 // The list is in the same order as the calls were made (i.e. recent calls have a higher index)
-func (mmGetForeignKeys *mDbOperationRepoMockGetForeignKeys) Calls() []*DbOperationRepoMockGetForeignKeysParams {
+func (mmGetForeignKeys *mDBOperationRepoMockGetForeignKeys) Calls() []*DBOperationRepoMockGetForeignKeysParams {
 	mmGetForeignKeys.mutex.RLock()
 
-	argCopy := make([]*DbOperationRepoMockGetForeignKeysParams, len(mmGetForeignKeys.callArgs))
+	argCopy := make([]*DBOperationRepoMockGetForeignKeysParams, len(mmGetForeignKeys.callArgs))
 	copy(argCopy, mmGetForeignKeys.callArgs)
 
 	mmGetForeignKeys.mutex.RUnlock()
@@ -819,7 +819,7 @@ func (mmGetForeignKeys *mDbOperationRepoMockGetForeignKeys) Calls() []*DbOperati
 
 // MinimockGetForeignKeysDone returns true if the count of the GetForeignKeys invocations corresponds
 // the number of defined expectations
-func (m *DbOperationRepoMock) MinimockGetForeignKeysDone() bool {
+func (m *DBOperationRepoMock) MinimockGetForeignKeysDone() bool {
 	for _, e := range m.GetForeignKeysMock.expectations {
 		if mm_atomic.LoadUint64(&e.Counter) < 1 {
 			return false
@@ -838,63 +838,63 @@ func (m *DbOperationRepoMock) MinimockGetForeignKeysDone() bool {
 }
 
 // MinimockGetForeignKeysInspect logs each unmet expectation
-func (m *DbOperationRepoMock) MinimockGetForeignKeysInspect() {
+func (m *DBOperationRepoMock) MinimockGetForeignKeysInspect() {
 	for _, e := range m.GetForeignKeysMock.expectations {
 		if mm_atomic.LoadUint64(&e.Counter) < 1 {
-			m.t.Errorf("Expected call to DbOperationRepoMock.GetForeignKeys with params: %#v", *e.params)
+			m.t.Errorf("Expected call to DBOperationRepoMock.GetForeignKeys with params: %#v", *e.params)
 		}
 	}
 
 	// if default expectation was set then invocations count should be greater than zero
 	if m.GetForeignKeysMock.defaultExpectation != nil && mm_atomic.LoadUint64(&m.afterGetForeignKeysCounter) < 1 {
 		if m.GetForeignKeysMock.defaultExpectation.params == nil {
-			m.t.Error("Expected call to DbOperationRepoMock.GetForeignKeys")
+			m.t.Error("Expected call to DBOperationRepoMock.GetForeignKeys")
 		} else {
-			m.t.Errorf("Expected call to DbOperationRepoMock.GetForeignKeys with params: %#v", *m.GetForeignKeysMock.defaultExpectation.params)
+			m.t.Errorf("Expected call to DBOperationRepoMock.GetForeignKeys with params: %#v", *m.GetForeignKeysMock.defaultExpectation.params)
 		}
 	}
 	// if func was set then invocations count should be greater than zero
 	if m.funcGetForeignKeys != nil && mm_atomic.LoadUint64(&m.afterGetForeignKeysCounter) < 1 {
-		m.t.Error("Expected call to DbOperationRepoMock.GetForeignKeys")
+		m.t.Error("Expected call to DBOperationRepoMock.GetForeignKeys")
 	}
 }
 
-type mDbOperationRepoMockTruncateDatabase struct {
-	mock               *DbOperationRepoMock
-	defaultExpectation *DbOperationRepoMockTruncateDatabaseExpectation
-	expectations       []*DbOperationRepoMockTruncateDatabaseExpectation
+type mDBOperationRepoMockTruncateDatabase struct {
+	mock               *DBOperationRepoMock
+	defaultExpectation *DBOperationRepoMockTruncateDatabaseExpectation
+	expectations       []*DBOperationRepoMockTruncateDatabaseExpectation
 }
 
-// DbOperationRepoMockTruncateDatabaseExpectation specifies expectation struct of the DBOperationRepo.TruncateDatabase
-type DbOperationRepoMockTruncateDatabaseExpectation struct {
-	mock *DbOperationRepoMock
+// DBOperationRepoMockTruncateDatabaseExpectation specifies expectation struct of the DBOperationRepo.TruncateDatabase
+type DBOperationRepoMockTruncateDatabaseExpectation struct {
+	mock *DBOperationRepoMock
 
-	results *DbOperationRepoMockTruncateDatabaseResults
+	results *DBOperationRepoMockTruncateDatabaseResults
 	Counter uint64
 }
 
-// DbOperationRepoMockTruncateDatabaseResults contains results of the DBOperationRepo.TruncateDatabase
-type DbOperationRepoMockTruncateDatabaseResults struct {
+// DBOperationRepoMockTruncateDatabaseResults contains results of the DBOperationRepo.TruncateDatabase
+type DBOperationRepoMockTruncateDatabaseResults struct {
 	err error
 }
 
 // Expect sets up expected params for DBOperationRepo.TruncateDatabase
-func (mmTruncateDatabase *mDbOperationRepoMockTruncateDatabase) Expect() *mDbOperationRepoMockTruncateDatabase {
+func (mmTruncateDatabase *mDBOperationRepoMockTruncateDatabase) Expect() *mDBOperationRepoMockTruncateDatabase {
 	if mmTruncateDatabase.mock.funcTruncateDatabase != nil {
-		mmTruncateDatabase.mock.t.Fatalf("DbOperationRepoMock.TruncateDatabase mock is already set by Set")
+		mmTruncateDatabase.mock.t.Fatalf("DBOperationRepoMock.TruncateDatabase mock is already set by Set")
 	}
 
 	if mmTruncateDatabase.defaultExpectation == nil {
-		mmTruncateDatabase.defaultExpectation = &DbOperationRepoMockTruncateDatabaseExpectation{}
+		mmTruncateDatabase.defaultExpectation = &DBOperationRepoMockTruncateDatabaseExpectation{}
 	}
 
 	return mmTruncateDatabase
 }
 
 // Inspect accepts an inspector function that has same arguments as the DBOperationRepo.TruncateDatabase
-func (mmTruncateDatabase *mDbOperationRepoMockTruncateDatabase) Inspect(f func()) *mDbOperationRepoMockTruncateDatabase {
+func (mmTruncateDatabase *mDBOperationRepoMockTruncateDatabase) Inspect(f func()) *mDBOperationRepoMockTruncateDatabase {
 	if mmTruncateDatabase.mock.inspectFuncTruncateDatabase != nil {
-		mmTruncateDatabase.mock.t.Fatalf("Inspect function is already set for DbOperationRepoMock.TruncateDatabase")
+		mmTruncateDatabase.mock.t.Fatalf("Inspect function is already set for DBOperationRepoMock.TruncateDatabase")
 	}
 
 	mmTruncateDatabase.mock.inspectFuncTruncateDatabase = f
@@ -903,20 +903,20 @@ func (mmTruncateDatabase *mDbOperationRepoMockTruncateDatabase) Inspect(f func()
 }
 
 // Return sets up results that will be returned by DBOperationRepo.TruncateDatabase
-func (mmTruncateDatabase *mDbOperationRepoMockTruncateDatabase) Return(err error) *DbOperationRepoMock {
+func (mmTruncateDatabase *mDBOperationRepoMockTruncateDatabase) Return(err error) *DBOperationRepoMock {
 	if mmTruncateDatabase.mock.funcTruncateDatabase != nil {
-		mmTruncateDatabase.mock.t.Fatalf("DbOperationRepoMock.TruncateDatabase mock is already set by Set")
+		mmTruncateDatabase.mock.t.Fatalf("DBOperationRepoMock.TruncateDatabase mock is already set by Set")
 	}
 
 	if mmTruncateDatabase.defaultExpectation == nil {
-		mmTruncateDatabase.defaultExpectation = &DbOperationRepoMockTruncateDatabaseExpectation{mock: mmTruncateDatabase.mock}
+		mmTruncateDatabase.defaultExpectation = &DBOperationRepoMockTruncateDatabaseExpectation{mock: mmTruncateDatabase.mock}
 	}
-	mmTruncateDatabase.defaultExpectation.results = &DbOperationRepoMockTruncateDatabaseResults{err}
+	mmTruncateDatabase.defaultExpectation.results = &DBOperationRepoMockTruncateDatabaseResults{err}
 	return mmTruncateDatabase.mock
 }
 
-// Set uses given function f to mock the DBOperationRepo.TruncateDatabase method
-func (mmTruncateDatabase *mDbOperationRepoMockTruncateDatabase) Set(f func() (err error)) *DbOperationRepoMock {
+//Set uses given function f to mock the DBOperationRepo.TruncateDatabase method
+func (mmTruncateDatabase *mDBOperationRepoMockTruncateDatabase) Set(f func() (err error)) *DBOperationRepoMock {
 	if mmTruncateDatabase.defaultExpectation != nil {
 		mmTruncateDatabase.mock.t.Fatalf("Default expectation is already set for the DBOperationRepo.TruncateDatabase method")
 	}
@@ -930,7 +930,7 @@ func (mmTruncateDatabase *mDbOperationRepoMockTruncateDatabase) Set(f func() (er
 }
 
 // TruncateDatabase implements DBOperationRepo
-func (mmTruncateDatabase *DbOperationRepoMock) TruncateDatabase() (err error) {
+func (mmTruncateDatabase *DBOperationRepoMock) TruncateDatabase() (err error) {
 	mm_atomic.AddUint64(&mmTruncateDatabase.beforeTruncateDatabaseCounter, 1)
 	defer mm_atomic.AddUint64(&mmTruncateDatabase.afterTruncateDatabaseCounter, 1)
 
@@ -943,30 +943,30 @@ func (mmTruncateDatabase *DbOperationRepoMock) TruncateDatabase() (err error) {
 
 		mm_results := mmTruncateDatabase.TruncateDatabaseMock.defaultExpectation.results
 		if mm_results == nil {
-			mmTruncateDatabase.t.Fatal("No results are set for the DbOperationRepoMock.TruncateDatabase")
+			mmTruncateDatabase.t.Fatal("No results are set for the DBOperationRepoMock.TruncateDatabase")
 		}
 		return (*mm_results).err
 	}
 	if mmTruncateDatabase.funcTruncateDatabase != nil {
 		return mmTruncateDatabase.funcTruncateDatabase()
 	}
-	mmTruncateDatabase.t.Fatalf("Unexpected call to DbOperationRepoMock.TruncateDatabase.")
+	mmTruncateDatabase.t.Fatalf("Unexpected call to DBOperationRepoMock.TruncateDatabase.")
 	return
 }
 
-// TruncateDatabaseAfterCounter returns a count of finished DbOperationRepoMock.TruncateDatabase invocations
-func (mmTruncateDatabase *DbOperationRepoMock) TruncateDatabaseAfterCounter() uint64 {
+// TruncateDatabaseAfterCounter returns a count of finished DBOperationRepoMock.TruncateDatabase invocations
+func (mmTruncateDatabase *DBOperationRepoMock) TruncateDatabaseAfterCounter() uint64 {
 	return mm_atomic.LoadUint64(&mmTruncateDatabase.afterTruncateDatabaseCounter)
 }
 
-// TruncateDatabaseBeforeCounter returns a count of DbOperationRepoMock.TruncateDatabase invocations
-func (mmTruncateDatabase *DbOperationRepoMock) TruncateDatabaseBeforeCounter() uint64 {
+// TruncateDatabaseBeforeCounter returns a count of DBOperationRepoMock.TruncateDatabase invocations
+func (mmTruncateDatabase *DBOperationRepoMock) TruncateDatabaseBeforeCounter() uint64 {
 	return mm_atomic.LoadUint64(&mmTruncateDatabase.beforeTruncateDatabaseCounter)
 }
 
 // MinimockTruncateDatabaseDone returns true if the count of the TruncateDatabase invocations corresponds
 // the number of defined expectations
-func (m *DbOperationRepoMock) MinimockTruncateDatabaseDone() bool {
+func (m *DBOperationRepoMock) MinimockTruncateDatabaseDone() bool {
 	for _, e := range m.TruncateDatabaseMock.expectations {
 		if mm_atomic.LoadUint64(&e.Counter) < 1 {
 			return false
@@ -985,25 +985,25 @@ func (m *DbOperationRepoMock) MinimockTruncateDatabaseDone() bool {
 }
 
 // MinimockTruncateDatabaseInspect logs each unmet expectation
-func (m *DbOperationRepoMock) MinimockTruncateDatabaseInspect() {
+func (m *DBOperationRepoMock) MinimockTruncateDatabaseInspect() {
 	for _, e := range m.TruncateDatabaseMock.expectations {
 		if mm_atomic.LoadUint64(&e.Counter) < 1 {
-			m.t.Error("Expected call to DbOperationRepoMock.TruncateDatabase")
+			m.t.Error("Expected call to DBOperationRepoMock.TruncateDatabase")
 		}
 	}
 
 	// if default expectation was set then invocations count should be greater than zero
 	if m.TruncateDatabaseMock.defaultExpectation != nil && mm_atomic.LoadUint64(&m.afterTruncateDatabaseCounter) < 1 {
-		m.t.Error("Expected call to DbOperationRepoMock.TruncateDatabase")
+		m.t.Error("Expected call to DBOperationRepoMock.TruncateDatabase")
 	}
 	// if func was set then invocations count should be greater than zero
 	if m.funcTruncateDatabase != nil && mm_atomic.LoadUint64(&m.afterTruncateDatabaseCounter) < 1 {
-		m.t.Error("Expected call to DbOperationRepoMock.TruncateDatabase")
+		m.t.Error("Expected call to DBOperationRepoMock.TruncateDatabase")
 	}
 }
 
 // MinimockFinish checks that all mocked methods have been called the expected number of times
-func (m *DbOperationRepoMock) MinimockFinish() {
+func (m *DBOperationRepoMock) MinimockFinish() {
 	if !m.minimockDone() {
 		m.MinimockAllTableNamesInspect()
 
@@ -1019,7 +1019,7 @@ func (m *DbOperationRepoMock) MinimockFinish() {
 }
 
 // MinimockWait waits for all mocked methods to be called the expected number of times
-func (m *DbOperationRepoMock) MinimockWait(timeout mm_time.Duration) {
+func (m *DBOperationRepoMock) MinimockWait(timeout mm_time.Duration) {
 	timeoutCh := mm_time.After(timeout)
 	for {
 		if m.minimockDone() {
@@ -1034,7 +1034,7 @@ func (m *DbOperationRepoMock) MinimockWait(timeout mm_time.Duration) {
 	}
 }
 
-func (m *DbOperationRepoMock) minimockDone() bool {
+func (m *DBOperationRepoMock) minimockDone() bool {
 	done := true
 	return done &&
 		m.MinimockAllTableNamesDone() &&

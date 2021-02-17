@@ -25,8 +25,10 @@ type Migration struct {
 	Previous   string
 	Source     string // path to .sql\.go file
 	Registered bool
-	UpFn       func(*sql.Tx) error
-	DownFn     func(*sql.Tx) error
+	SafeUpFn   func(*sql.Tx) error
+	SafeDownFn func(*sql.Tx) error
+	UpFn       func(*sql.DB) error
+	DownFn     func(*sql.DB) error
 }
 
 type Direction string
@@ -47,23 +49,23 @@ func (m *Migration) String() string {
 	return fmt.Sprintf(m.Version)
 }
 
-func (m *Migration) Up(repo *repo.MigrationsRepository) error {
-	if err := m.run(repo, migrationDirectionUp); err != nil {
+func (m *Migration) Up(repo repo.MigrationRepo, runner RunnerInterface) error {
+	if err := m.run(repo, migrationDirectionUp, runner); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *Migration) Down(repo *repo.MigrationsRepository) error {
-	if err := m.run(repo, migrationDirectionDown); err != nil {
+func (m *Migration) Down(repo repo.MigrationRepo, runner RunnerInterface) error {
+	if err := m.run(repo, migrationDirectionDown, runner); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *Migration) run(repo *repo.MigrationsRepository, direction Direction) error {
+func (m *Migration) run(repo repo.MigrationRepo, direction Direction, runner RunnerInterface) error {
 	switch filepath.Ext(m.Source) {
 	case ".sql":
 		f, err := os.Open(m.Source)
@@ -77,26 +79,53 @@ func (m *Migration) run(repo *repo.MigrationsRepository, direction Direction) er
 			return errors.Wrapf(err, "failed to parse SQL migration file: %v", filepath.Base(m.Source))
 		}
 
-		if direction == migrationDirectionUp {
-			assembleFnFromStatements(statements, useTx, m, direction)
+		if useTx {
+			if direction == migrationDirectionUp {
+				m.SafeUpFn = assembleSafeFnFromStatements(statements)
 
-			return migrateUpGo(repo, m)
+				return runner.MigrateUpSafe(repo, m)
+			}
+
+			m.SafeDownFn = assembleSafeFnFromStatements(statements)
+
+			return runner.MigrateDownSafe(repo, m)
 		}
 
-		assembleFnFromStatements(statements, useTx, m, direction)
+		if direction == migrationDirectionUp {
+			m.UpFn = assembleFnFromStatements(statements)
 
-		return migrateDownGo(repo, m)
+			return runner.MigrateUp(repo, m)
+		}
 
+		m.DownFn = assembleFnFromStatements(statements)
+
+		return runner.MigrateDown(repo, m)
 	case ".go":
 		if !m.Registered {
 			return errors.Errorf("not registered %v", m.Source)
 		}
 
 		if direction == migrationDirectionUp {
-			return migrateUpGo(repo, m)
+			if m.SafeUpFn != nil {
+				return runner.MigrateUpSafe(repo, m)
+			}
+
+			if m.UpFn != nil {
+				return runner.MigrateUp(repo, m)
+			}
+
+			return errors.New("unexpected nil on both SafeUpFn UpFn")
 		}
 
-		return migrateDownGo(repo, m)
+		if m.SafeDownFn != nil {
+			return runner.MigrateDownSafe(repo, m)
+		}
+
+		if m.DownFn != nil {
+			return runner.MigrateDown(repo, m)
+		}
+
+		return errors.New("unexpected nil on both SafeDownFn DownFn")
 	}
 
 	return nil
@@ -156,48 +185,12 @@ func (ms Migrations) Less(i, j int) bool {
 	return iVal < jVal
 }
 
-func (ms Migrations) Reverse() {
+func (ms Migrations) Reverse() Migrations {
 	for i, j := 0, len(ms)-1; i < j; i, j = i+1, j-1 {
 		ms[i], ms[j] = ms[j], ms[i]
 	}
-}
 
-func (ms Migrations) Current(current string) (*Migration, error) {
-	for i, migration := range ms {
-		if migration.Version == current {
-			return ms[i], nil
-		}
-	}
-
-	return nil, errors.New("gomigrate: cannot get current version from migrations slice")
-}
-
-func (ms Migrations) Next(current string) (*Migration, error) {
-	for i, migration := range ms {
-		if migration.Version > current {
-			return ms[i], nil
-		}
-	}
-
-	return nil, errors.New("gomigrate: cannot get next version from migrations slice")
-}
-
-func (ms Migrations) Previous(current string) (*Migration, error) {
-	for i := len(ms) - 1; i >= 0; i-- {
-		if ms[i].Version < current {
-			return ms[i], nil
-		}
-	}
-
-	return nil, errors.New("gomigrate: cannot get previous version from migrations slice")
-}
-
-func (ms Migrations) Last() (*Migration, error) {
-	if len(ms) == 0 {
-		return nil, errors.New("gomigrate: cannot get last version from migrations slice")
-	}
-
-	return ms[len(ms)-1], nil
+	return ms
 }
 
 func (ms Migrations) String() string {
@@ -209,7 +202,18 @@ func (ms Migrations) String() string {
 	return str
 }
 
-func AddNamedMigration(filename string, up func(*sql.Tx) error, down func(*sql.Tx) error) {
+func AddSafeNamedMigration(filename string, up func(*sql.Tx) error, down func(*sql.Tx) error) {
+	v, _ := GetVersionFromFileName(filename)
+	migration := &Migration{Version: v, Next: "", Previous: "", Registered: true, SafeUpFn: up, SafeDownFn: down, Source: filename}
+
+	if existing, ok := registeredMigrations[v]; ok {
+		panic(fmt.Sprintf("failed to add migration %q: version conflicts with %q", filename, existing.Source))
+	}
+
+	registeredMigrations[v] = migration
+}
+
+func AddNamedMigration(filename string, up func(*sql.DB) error, down func(*sql.DB) error) {
 	v, _ := GetVersionFromFileName(filename)
 	migration := &Migration{Version: v, Next: "", Previous: "", Registered: true, UpFn: up, DownFn: down, Source: filename}
 
@@ -235,8 +239,8 @@ func Convert(records repo.MigrationRecords) Migrations {
 			Previous:   "",
 			Source:     "",
 			Registered: false,
-			UpFn:       nil,
-			DownFn:     nil,
+			SafeUpFn:   nil,
+			SafeDownFn: nil,
 		})
 	}
 

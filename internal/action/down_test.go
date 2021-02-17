@@ -113,11 +113,11 @@ func TestDownAction_Run(t *testing.T) {
 		//				CollectMigrationsMock.Return(migration.Migrations{
 		//				&migration.Migration{
 		//					Version: "m200101_000000_test",
-		//					DownFn:  nil,
+		//					SafeDownFn:  nil,
 		//				},
 		//				&migration.Migration{
 		//					Version: "m200102_000000_test",
-		//					DownFn:  nil,
+		//					SafeDownFn:  nil,
 		//				},
 		//			}, nil)
 		//

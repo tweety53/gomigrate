@@ -9,8 +9,15 @@ import (
 
 const LimitAll = "all"
 
+const (
+	migrationText      = "migration"
+	migrationsText     = "migrations"
+	migrationWasText   = "migration was"
+	migrationsWereText = "migrations were"
+)
+
 func AskForConfirmation(text string) bool {
-	internalLog.Warnln(text)
+	internalLog.Warnln(text + "[y/n]")
 
 	var response string
 
@@ -35,15 +42,15 @@ func processResponse(response string) bool {
 func ChooseLogText(n int, beforeRun bool) string {
 	if n == 1 {
 		if beforeRun {
-			return "migration"
+			return migrationText
 		}
 
-		return "migration was"
+		return migrationWasText
 	}
 
 	if beforeRun {
-		return "migrations"
+		return migrationsText
 	}
 
-	return "migrations were"
+	return migrationsWereText
 }

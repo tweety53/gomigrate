@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	gomigrate.AddMigration(upAddAnotherAccountsTable, downAddAnotherAccountsTable)
+	gomigrate.AddSafeMigration(upAddAnotherAccountsTable, downAddAnotherAccountsTable)
 }
 
 func upAddAnotherAccountsTable(tx *sql.Tx) error {

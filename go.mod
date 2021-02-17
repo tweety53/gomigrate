@@ -3,6 +3,7 @@ module github.com/tweety53/gomigrate
 go 1.15
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/gojuno/minimock/v3 v3.0.8
 	github.com/kr/text v0.2.0 // indirect
 	github.com/lib/pq v1.9.0

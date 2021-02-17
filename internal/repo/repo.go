@@ -1,6 +1,9 @@
 package repo
 
+import "database/sql"
+
 type MigrationRepo interface {
+	GetDB() (*sql.DB, error)
 	EnsureDBVersion() (string, error)
 	GetDBVersion() (string, error)
 	CreateVersionTable() error
