@@ -11,11 +11,11 @@ Database migrations written in go, with https://github.com/yiisoft/yii2 like API
 * .go (WIP)
 ## CLI usage
 
-###install and run in your system
+### install and run in your system
 * ```go get https://github.com/tweety53/gomigrate/cmd/gomigrate```
 * run from your ```GOBIN``` path with options:
 
-###run options
+### run options
 * -config string - (only .yaml type supported, env variables expanding supported) 
   * Example: -config /app/config/gomigrate.yaml (copy config from https://github.com/tweety53/gomigrate/blob/master/examples/gomigrate.yaml and update with your actual environment)
 
@@ -27,7 +27,7 @@ OR
 * -dsn string - full data source name
 * -d string - your DB sql dialect (see available [here](#databases-supported))
 
-###and then add action(required) and params(optional, depends on action)
+### and then add action(required) and params(optional, depends on action)
 ```text
 Usage: gomigrate [OPTIONS] ACTION [ACTION PARAMS]
 
@@ -82,15 +82,15 @@ Actions:
 - [x] Пайплайн - github actions : go build ... , go test ..., golangci-lint (есть нюанс что предложенный конфиг ломается на текущей версии либы на github actions, запускал с предложенным на локалке)
 
 - [x] Использовать как cli
-- [ ] Использовать как библиотеку из кода (отложено из-за непоняток с .go миграциями)
-- [ ] Поддержка миграций на Go (запускаются пока только если есть внутри самой программы)
+- [ ] Использовать как библиотеку из кода (не полностью подготовлено к этому возможно)
+- [x] Поддержка миграций на Go (запустится но надо заимпортить в бинарник)
 - [x] Поддержка миграций на SQL
 - [x] Реализован механизм блокировки на время миграции (на up все вроде бы ок, на down возможно нужно будет пересмотреть некоторые кейсы)
 - [x] Реализованы различные способы конфигурирования - yaml конфиг(c expand env) (с указанием пути через флаг -config) или флаги 
 - [x] Написаны юнит-тесты - написаны, но не полностью
-- [ ] Написаны интеграционные тесты - написаны для create, up, down
-- [ ] Тесты адекватны и полностью покрывают фукнционал
-- [ ] Понятность и чистота кода - текущий хз, рефакторинг будет по ходу и по окончанию написания юнит и инт. тестов
+- [x] Написаны интеграционные тесты - написаны для create, up, down
+- [x] Тесты адекватны и полностью покрывают фукнционал
+- [ ] Понятность и чистота кода
 
 
 

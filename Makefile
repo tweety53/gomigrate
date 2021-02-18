@@ -34,3 +34,6 @@ test-integration: ; $(info $(M) running integration tests…) @ ## Run integrati
 
 test-integration-docker: ;
 	$Q docker-compose -f .docker/docker-compose.yml up --build
+
+gen:
+	$Q $(GO) generate ./...
