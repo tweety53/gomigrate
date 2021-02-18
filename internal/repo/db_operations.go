@@ -69,9 +69,6 @@ func (r *DBOperationsRepository) GetForeignKeys(tableName string) (ForeignKeys, 
 		return nil, err
 	}
 	defer fkRows.Close()
-	if fkRows.Err() != nil {
-		return nil, fkRows.Err()
-	}
 
 	var fKeys ForeignKeys
 	for fkRows.Next() {
@@ -81,6 +78,9 @@ func (r *DBOperationsRepository) GetForeignKeys(tableName string) (ForeignKeys, 
 		}
 
 		fKeys = append(fKeys, &fk)
+	}
+	if fkRows.Err() != nil {
+		return nil, fkRows.Err()
 	}
 
 	return fKeys, nil
@@ -108,9 +108,6 @@ func (r *DBOperationsRepository) AllTableNames() ([]string, error) {
 		return nil, err
 	}
 	defer tableNamesRows.Close()
-	if tableNamesRows.Err() != nil {
-		return nil, tableNamesRows.Err()
-	}
 
 	tableNames := make([]string, 0, 1024*1024*4)
 	// First drop all foreign keys
@@ -121,6 +118,9 @@ func (r *DBOperationsRepository) AllTableNames() ([]string, error) {
 		}
 
 		tableNames = append(tableNames, tableName)
+	}
+	if tableNamesRows.Err() != nil {
+		return nil, tableNamesRows.Err()
 	}
 
 	return tableNames, err
