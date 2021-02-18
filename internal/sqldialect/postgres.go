@@ -79,5 +79,5 @@ func (pd PostgresDialect) LockVersionSQL() string {
 }
 
 func (pd PostgresDialect) MigrationsHistorySQL() string {
-	return fmt.Sprintf("SELECT version, apply_time FROM %s ORDER BY apply_time DESC, version DESC", pd.migrationTable)
+	return fmt.Sprintf("SELECT version, apply_time FROM %s ORDER BY apply_time DESC, version DESC;", pd.migrationTable)
 }

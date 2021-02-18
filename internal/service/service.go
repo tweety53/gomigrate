@@ -38,7 +38,7 @@ func (s *MigrationService) GetNewMigrations() (migration.Migrations, error) {
 
 	records, err := s.MigrationsRepo.GetMigrationsHistory(0)
 	if err != nil {
-		return migration.Migrations{}, errors.Wrap(err, "cannot get migrations history from db")
+		return nil, errors.Wrap(err, "cannot get migrations history from db")
 	}
 
 	applied := make(map[string]int)
@@ -53,14 +53,10 @@ func (s *MigrationService) GetNewMigrations() (migration.Migrations, error) {
 
 	allMigrations, err := s.MigrationsCollector.CollectMigrations(s.MigrationsPath, 0, 0)
 	if err != nil {
-		return migration.Migrations{}, errors.Wrapf(err, "cannot collect migration files from path: %s", s.MigrationsPath)
+		return nil, errors.Wrapf(err, "cannot collect migration files from path: %s", s.MigrationsPath)
 	}
 
-	newCnt := len(allMigrations) - len(applied)
-	if newCnt < 0 {
-		newCnt = 0
-	}
-	newMigrations := make(migration.Migrations, 0, newCnt)
+	newMigrations := make(migration.Migrations, 0, len(allMigrations)-len(applied))
 	for _, row := range allMigrations {
 		if _, ok := applied[row.Version]; ok {
 			continue
@@ -69,5 +65,5 @@ func (s *MigrationService) GetNewMigrations() (migration.Migrations, error) {
 		newMigrations = append(newMigrations, row)
 	}
 
-	return newMigrations, err
+	return newMigrations, nil
 }

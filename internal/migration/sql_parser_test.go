@@ -314,3 +314,76 @@ FOR EACH ROW EXECUTE PROCEDURE  update_updated_at_column();
 DROP TRIGGER update_properties_updated_at;
 DROP FUNCTION update_updated_at_column();
 `
+
+func Test_clearStatement(t *testing.T) {
+	want := `ALTER TABLE some_table ALTER COLUMN password TYPE VARCHAR(80);
+ALTER TABLE some_table ALTER COLUMN password TYPE VARCHAR(50);
+`
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "clear comments",
+			args: args{s: `-- +gomigrate Up
+-- some random comment
+-- +gomigrate StatementBegin
+ALTER TABLE some_table ALTER COLUMN password TYPE VARCHAR(80);
+-- some random comment
+-- +gomigrate StatementEnd
+-- some random comment
+-- +gomigrate Down
+-- +gomigrate StatementBegin
+ALTER TABLE some_table ALTER COLUMN password TYPE VARCHAR(50);
+-- +gomigrate StatementEnd
+`},
+			want: want,
+		},
+		{
+			name: "clear empty eol",
+			args: args{s: `
+
+ALTER TABLE some_table ALTER COLUMN password TYPE VARCHAR(80);
+ALTER TABLE some_table ALTER COLUMN password TYPE VARCHAR(50);
+
+
+`},
+			want: want,
+		},
+		{
+			name: "mixed",
+			args: args{s: `
+
+
+-- +gomigrate Up
+-- some random comment
+-- +gomigrate StatementBegin
+ALTER TABLE some_table ALTER COLUMN password TYPE VARCHAR(80);
+-- some random comment
+-- +gomigrate StatementEnd
+-- some random comment
+-- +gomigrate Down
+
+
+
+-- +gomigrate StatementBegin
+ALTER TABLE some_table ALTER COLUMN password TYPE VARCHAR(50);
+-- +gomigrate StatementEnd
+
+
+`},
+			want: want,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := clearStatement(tt.args.s); got != tt.want {
+				t.Errorf("clearStatement() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

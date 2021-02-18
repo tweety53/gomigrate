@@ -3,6 +3,7 @@ package repo
 import (
 	"database/sql"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -28,34 +29,40 @@ func (r *MigrationsRepository) GetDB() (*sql.DB, error) {
 }
 
 func (r *MigrationsRepository) GetMigrationsHistory(limit int) (MigrationRecords, error) {
-	query := r.dialect.MigrationsHistorySQL()
-	if limit > 0 {
-		query += " LIMIT " + strconv.Itoa(limit)
-	}
-
-	query += ";"
+	query := buildMigrationsHistoryQuery(limit, r.dialect.MigrationsHistorySQL())
 
 	rows, err := r.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	if rows.Err() != nil {
-		return nil, rows.Err()
-	}
 
 	var records MigrationRecords
 
 	for rows.Next() {
 		var row MigrationRecord
+
 		if err = rows.Scan(&row.Version, &row.ApplyTime); err != nil {
 			return nil, errors.Wrap(err, "failed to scan row")
 		}
 
 		records = append(records, &row)
 	}
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
 
 	return records, nil
+}
+
+func buildMigrationsHistoryQuery(limit int, query string) string {
+	if limit == 0 {
+		return query
+	}
+
+	query = strings.TrimRight(query, ";")
+	query += " LIMIT " + strconv.Itoa(limit) + ";"
+	return query
 }
 
 func (r *MigrationsRepository) InsertVersion(v string) error {
