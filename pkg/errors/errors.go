@@ -9,6 +9,7 @@ var (
 	ErrNotEnoughArgs           = errors.New("not enough args")
 	ErrInvalidActionParamsType = errors.New("invalid action params type")
 	ErrInvalidVersionFormat    = errors.New("invalid version format")
+	ErrConfigNotValidated      = errors.New("config not validated, please add config.Validate() call before Run()")
 )
 
 type GoMigrateError struct {

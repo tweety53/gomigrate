@@ -17,6 +17,11 @@ type GoMigrateConfig struct {
 	Compact        bool   `yaml:"gomigrate_compact"`
 	SQLDialect     string `yaml:"gomigrate_sql_dialect"`
 	DataSourceName string `yaml:"gomigrate_dsn"`
+	isValid        bool
+}
+
+func (c *GoMigrateConfig) IsValid() bool {
+	return c.isValid
 }
 
 func BuildFromFile(f string) (*GoMigrateConfig, error) {
@@ -68,6 +73,7 @@ func Validate(conf *GoMigrateConfig, db *sql.DB) error {
 	if _, err := mRepo.EnsureDBVersion(); err != nil {
 		return errors.Wrap(err, "gomigrate config: cannot check/create migrations table in DB")
 	}
+	conf.isValid = true
 
 	return nil
 }

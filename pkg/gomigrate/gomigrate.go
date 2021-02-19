@@ -2,6 +2,7 @@ package gomigrate
 
 import (
 	"database/sql"
+	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
 	"runtime"
 
 	"github.com/pkg/errors"
@@ -16,6 +17,9 @@ import (
 
 func Run(a string, db *sql.DB, config *config.GoMigrateConfig, args []string) error {
 	log.SetVerbose(!config.Compact)
+	if !config.IsValid() {
+		return errorsInternal.ErrConfigNotValidated
+	}
 
 	dialect, err := sqldialect.InitDialect(config.SQLDialect, config.MigrationTable)
 	if err != nil {
