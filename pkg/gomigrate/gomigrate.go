@@ -2,8 +2,9 @@ package gomigrate
 
 import (
 	"database/sql"
-	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
 	"runtime"
+
+	errorsInternal "github.com/tweety53/gomigrate/pkg/errors"
 
 	"github.com/pkg/errors"
 	"github.com/tweety53/gomigrate/internal/action"
